@@ -173,6 +173,10 @@ try
     }
 
     // ─── Pipeline de middleware ─────────────────────────────────────────────────
+    // IMPORTANTE: UseCors debe ir ANTES del ExceptionHandler para que las respuestas
+    // de error (500) también incluyan los headers Access-Control-Allow-Origin.
+    // Si no, el navegador reporta "CORS blocked" cuando en realidad hay un 500.
+    app.UseCors("LllCorsPolicy");
     app.UseMiddleware<CorrelationIdMiddleware>();
     app.UseMiddleware<ExceptionHandlerMiddleware>();
 
@@ -197,7 +201,6 @@ try
         RequestPath  = "/uploads"
     });
 
-    app.UseCors("LllCorsPolicy");
     app.UseRateLimiter();
     app.UseAuthentication();
     app.UseAuthorization();
