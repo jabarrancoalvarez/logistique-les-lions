@@ -4,7 +4,7 @@ import {
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { VehicleService, VehicleMake } from '@core/services/vehicle.service';
+import { VehicleService, VehicleMake, VehicleAiContext, AiDocumentExtraction } from '@core/services/vehicle.service';
 import { AuthService } from '@core/auth/auth.service';
 
 type WizardStep = 1 | 2 | 3 | 4;
@@ -26,6 +26,14 @@ export class VehicleFormComponent {
   readonly isSubmitting = signal(false);
   readonly submitError = signal<string | null>(null);
   readonly makes = signal<VehicleMake[]>([]);
+
+  // ─── Estado IA ────────────────────────────────────────────────────────
+  readonly isExtractingDoc = signal(false);
+  readonly extractError = signal<string | null>(null);
+  readonly extractInfo = signal<string | null>(null);
+  readonly isGeneratingDesc = signal(false);
+  readonly aiError = signal<string | null>(null);
+  readonly aiDescriptionEn = signal<string>('');
 
   readonly steps = [
     { number: 1, label: 'Datos básicos' },
@@ -163,4 +171,98 @@ export class VehicleFormComponent {
     { code: 'GB', name: 'Reino Unido' }, { code: 'MA', name: 'Marruecos' },
   ];
   readonly years = Array.from({ length: new Date().getFullYear() - 1989 }, (_, i) => new Date().getFullYear() - i);
+
+  // ─── IA: extraer datos de documento (Step 1) ──────────────────────────
+  onDocumentSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.isExtractingDoc.set(true);
+    this.extractError.set(null);
+    this.extractInfo.set(null);
+
+    this.vehicleService.extractDocument(file).subscribe({
+      next: (data) => {
+        this.isExtractingDoc.set(false);
+        this.applyDocumentExtraction(data);
+        input.value = '';
+      },
+      error: () => {
+        this.isExtractingDoc.set(false);
+        this.extractError.set('No se pudo procesar el documento. Inténtalo de nuevo.');
+        input.value = '';
+      }
+    });
+  }
+
+  private applyDocumentExtraction(data: AiDocumentExtraction): void {
+    const filled: string[] = [];
+
+    // Step 1: marca por nombre + año + VIN
+    if (data.make) {
+      const match = this.makes().find(
+        m => m.name.toLowerCase() === data.make!.toLowerCase()
+      );
+      if (match) { this.step1.patchValue({ makeId: match.id }); filled.push('marca'); }
+    }
+    if (data.year) { this.step1.patchValue({ year: String(data.year) }); filled.push('año'); }
+    if (data.vin)  { this.step1.patchValue({ vin: data.vin }); filled.push('VIN'); }
+
+    // Step 2: km, color, combustible
+    if (data.mileage  !== null) { this.step2.patchValue({ mileage: String(data.mileage) }); filled.push('km'); }
+    if (data.color)             { this.step2.patchValue({ color: data.color }); filled.push('color'); }
+    if (data.fuelType)          { this.step2.patchValue({ fuelType: data.fuelType }); filled.push('combustible'); }
+
+    this.extractInfo.set(
+      filled.length > 0
+        ? `Campos rellenados: ${filled.join(', ')}.`
+        : 'No se han extraído campos del documento.'
+    );
+  }
+
+  // ─── IA: generar descripción (Step 4) ─────────────────────────────────
+  generateDescription(): void {
+    const makeId = this.step1.value.makeId;
+    const make   = this.makes().find(m => m.id === makeId)?.name;
+    const year   = this.step1.value.year ? +this.step1.value.year : null;
+    const price  = this.step3.value.price ? +this.step3.value.price : null;
+
+    if (!make || !year || !price || !this.step3.value.countryOrigin) {
+      this.aiError.set('Completa los pasos anteriores (marca, año, precio, país) antes de generar la descripción.');
+      return;
+    }
+
+    const context: VehicleAiContext = {
+      make,
+      model:        null,
+      year,
+      mileage:      this.step2.value.mileage ? +this.step2.value.mileage : null,
+      fuelType:     this.step2.value.fuelType || null,
+      transmission: this.step2.value.transmission || null,
+      bodyType:     this.step2.value.bodyType || null,
+      color:        this.step2.value.color || null,
+      condition:    this.step1.value.condition || 'Used',
+      price,
+      currency:     this.step3.value.currency || 'EUR',
+      countryOrigin: this.step3.value.countryOrigin || '',
+      isExportReady: !!this.step3.value.isExportReady
+    };
+
+    this.isGeneratingDesc.set(true);
+    this.aiError.set(null);
+    this.aiDescriptionEn.set('');
+
+    this.vehicleService.previewAiDescription(context).subscribe({
+      next: (res) => {
+        this.isGeneratingDesc.set(false);
+        this.step4.patchValue({ descriptionEs: res.descriptionEs });
+        this.aiDescriptionEn.set(res.descriptionEn);
+      },
+      error: () => {
+        this.isGeneratingDesc.set(false);
+        this.aiError.set('No se pudo generar la descripción. Inténtalo de nuevo.');
+      }
+    });
+  }
 }

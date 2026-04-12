@@ -2,6 +2,8 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
+export type AppRole = 'Admin' | 'Moderator' | 'Dealer' | 'Seller' | 'Buyer';
+
 export const authGuard: CanActivateFn = () => {
   const auth   = inject(AuthService);
   const router = inject(Router);
@@ -23,5 +25,20 @@ export const guestGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   if (!auth.isAuthenticated()) return true;
+  return router.createUrlTree(['/']);
+};
+
+/**
+ * Factory de guard parametrizado por roles permitidos. Uso en routes:
+ *   { path: 'admin', canActivate: [roleGuard('Admin', 'Moderator')], ... }
+ */
+export const roleGuard = (...allowedRoles: AppRole[]): CanActivateFn => () => {
+  const auth   = inject(AuthService);
+  const router = inject(Router);
+
+  if (!auth.isAuthenticated()) {
+    return router.createUrlTree(['/auth/login']);
+  }
+  if (auth.hasAnyRole(allowedRoles)) return true;
   return router.createUrlTree(['/']);
 };

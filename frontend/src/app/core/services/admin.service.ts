@@ -28,6 +28,25 @@ export interface VehicleAdminItem {
   expiresAt?: string;
 }
 
+export interface StatusBucket {
+  status: string;
+  count: number;
+}
+
+export interface MonthBucket {
+  month: string;
+  count: number;
+}
+
+export interface DashboardKpis {
+  processesByStatus: StatusBucket[];
+  vehiclesByStatus: StatusBucket[];
+  processesPerMonth: MonthBucket[];
+  averageLeadTimeDays: number;
+  openIncidents: number;
+  completedThisMonth: number;
+}
+
 export interface PagedResult<T> {
   items: T[];
   totalCount: number;
@@ -52,6 +71,12 @@ export class AdminService {
     let url = `${this.apiUrl}/vehicles?page=${page}&pageSize=${pageSize}`;
     if (status) url += `&status=${status}`;
     return this.http.get<{ isSuccess: boolean; value: PagedResult<VehicleAdminItem> }>(url).pipe(
+      map(r => r.value)
+    );
+  }
+
+  getDashboardKpis(): Observable<DashboardKpis> {
+    return this.http.get<{ isSuccess: boolean; value: DashboardKpis }>(`${this.apiUrl}/dashboard/kpis`).pipe(
       map(r => r.value)
     );
   }

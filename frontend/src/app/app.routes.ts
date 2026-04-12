@@ -110,6 +110,12 @@ export const routes: Routes = [
     title: 'Financiación — Logistique Les Lions'
   },
   {
+    path: 'tracking',
+    loadComponent: () =>
+      import('./features/tracking/public-tracking.component').then(m => m.PublicTrackingComponent),
+    title: 'Seguimiento de trámite — Logistique Les Lions'
+  },
+  {
     path: '**',
     loadComponent: () =>
       import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent)

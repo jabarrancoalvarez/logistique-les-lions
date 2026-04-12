@@ -55,6 +55,19 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this._user());
   readonly isAdmin = computed(() => this._user()?.role === 'Admin');
   readonly isDealer = computed(() => this._user()?.role === 'Dealer');
+  readonly isModerator = computed(() => this._user()?.role === 'Moderator');
+
+  /** Devuelve true si el usuario tiene exactamente uno de los roles indicados. */
+  hasAnyRole(roles: readonly string[]): boolean {
+    const role = this._user()?.role;
+    return !!role && roles.includes(role);
+  }
+
+  /** Helper de capacidades — alineado con las policies del backend. */
+  canModerate       = computed(() => this.hasAnyRole(['Admin', 'Moderator']));
+  canPublishVehicle = computed(() => this.hasAnyRole(['Admin', 'Dealer', 'Seller']));
+  canManageUsers    = computed(() => this.hasAnyRole(['Admin']));
+  canViewAdminPanel = computed(() => this.hasAnyRole(['Admin', 'Moderator']));
 
   constructor(private http: HttpClient) {}
 

@@ -2,11 +2,12 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AdminService, AdminStats, VehicleAdminItem } from '@core/services/admin.service';
+import { DashboardKpisComponent } from './dashboard-kpis.component';
 
 @Component({
   selector: 'lll-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, CurrencyPipe],
+  imports: [CommonModule, RouterLink, CurrencyPipe, DashboardKpisComponent],
   templateUrl: './admin-dashboard.component.html'
 })
 export class AdminDashboardComponent implements OnInit {

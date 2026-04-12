@@ -225,4 +225,48 @@ export class VehicleService {
       params: { userId }
     });
   }
+
+  // ─── IA generativa ──────────────────────────────────────────────────────
+  previewAiDescription(context: VehicleAiContext): Observable<AiVehicleDescription> {
+    return this.http.post<AiVehicleDescription>(`${this.baseUrl}/ai/preview-description`, context);
+  }
+
+  extractDocument(file: File): Observable<AiDocumentExtraction> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<AiDocumentExtraction>(`${this.baseUrl}/ai/extract-document`, form);
+  }
+}
+
+export interface VehicleAiContext {
+  make: string;
+  model: string | null;
+  year: number;
+  mileage: number | null;
+  fuelType: string | null;
+  transmission: string | null;
+  bodyType: string | null;
+  color: string | null;
+  condition: string;
+  price: number;
+  currency: string;
+  countryOrigin: string;
+  isExportReady: boolean;
+}
+
+export interface AiVehicleDescription {
+  descriptionEs: string;
+  descriptionEn: string;
+}
+
+export interface AiDocumentExtraction {
+  vin: string | null;
+  make: string | null;
+  model: string | null;
+  year: number | null;
+  licensePlate: string | null;
+  color: string | null;
+  mileage: number | null;
+  fuelType: string | null;
+  rawJson: string | null;
 }
