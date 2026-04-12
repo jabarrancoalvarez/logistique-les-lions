@@ -7,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LogistiqueLesLions.Application.Features.Compliance.Commands.InitiateProcess;
 
-public class InitiateProcessCommandHandler(IApplicationDbContext context)
+public class InitiateProcessCommandHandler(
+    IApplicationDbContext context,
+    IWebhookPublisher webhooks)
     : IRequestHandler<InitiateProcessCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(
@@ -41,6 +43,7 @@ public class InitiateProcessCommandHandler(IApplicationDbContext context)
 
         var process = new ImportExportProcess
         {
+            TrackingCode       = ImportExportProcess.GenerateTrackingCode(),
             VehicleId          = request.VehicleId,
             BuyerId            = request.BuyerId,
             SellerId           = request.SellerId,
@@ -86,6 +89,22 @@ public class InitiateProcessCommandHandler(IApplicationDbContext context)
 
         process.RecalculateCompletion();
         await context.SaveChangesAsync(cancellationToken);
+
+        // Notificar a sistemas externos (n8n/Slack/email vía webhook).
+        await webhooks.PublishAsync("process.created", new
+        {
+            id                 = process.Id,
+            trackingCode       = process.TrackingCode,
+            vehicleId          = process.VehicleId,
+            buyerId            = process.BuyerId,
+            sellerId           = process.SellerId,
+            originCountry      = process.OriginCountry,
+            destinationCountry = process.DestinationCountry,
+            processType        = process.ProcessType.ToString(),
+            estimatedCostEur   = process.EstimatedCostEur,
+            documentsCount     = process.Documents.Count,
+            startedAt          = process.StartedAt
+        }, cancellationToken);
 
         return Result<Guid>.Success(process.Id);
     }

@@ -12,6 +12,9 @@ public class ImportExportProcessConfiguration : IEntityTypeConfiguration<ImportE
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Id).ValueGeneratedNever();
 
+        builder.Property(p => p.TrackingCode).HasMaxLength(12).IsRequired();
+        builder.HasIndex(p => p.TrackingCode).IsUnique();
+
         builder.Property(p => p.OriginCountry).HasMaxLength(2).IsRequired();
         builder.Property(p => p.DestinationCountry).HasMaxLength(2).IsRequired();
         builder.Property(p => p.ProcessType).HasConversion<string>().HasMaxLength(50);

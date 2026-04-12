@@ -29,8 +29,11 @@ public class GetFeaturedVehiclesQueryHandlerTests : IDisposable
         mockCurrentUser.Setup(u => u.UserId).Returns(Guid.NewGuid());
 
         var auditInterceptor = new LogistiqueLesLions.Infrastructure.Persistence.Interceptors.AuditInterceptor(mockCurrentUser.Object);
+        var auditLogInterceptor = new LogistiqueLesLions.Infrastructure.Persistence.Interceptors.AuditLogInterceptor(
+            mockCurrentUser.Object,
+            new Microsoft.AspNetCore.Http.HttpContextAccessor());
 
-        _context = new ApplicationDbContext(options, auditInterceptor);
+        _context = new ApplicationDbContext(options, auditInterceptor, auditLogInterceptor);
         _handler = new GetFeaturedVehiclesQueryHandler(_context);
 
         SeedTestData();

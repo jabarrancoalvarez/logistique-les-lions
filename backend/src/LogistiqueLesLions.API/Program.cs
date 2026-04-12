@@ -6,6 +6,7 @@ using LogistiqueLesLions.Infrastructure;
 using LogistiqueLesLions.Infrastructure.Persistence;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -41,6 +42,10 @@ try
     // ─── Application + Infrastructure ──────────────────────────────────────────
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
+    builder.Services.AddSingleton<LogistiqueLesLions.API.Telemetry.BusinessMetrics>();
+    builder.Services.AddScoped<LogistiqueLesLions.Application.Common.Interfaces.INotificationService,
+                               LogistiqueLesLions.API.Hubs.SignalRNotificationService>();
+    builder.Services.AddScoped<LogistiqueLesLions.Infrastructure.Persistence.Seeding.DatabaseSeeder>();
 
     // ─── OpenTelemetry ──────────────────────────────────────────────────────────
     builder.Services.AddOpenTelemetry()
@@ -48,7 +53,13 @@ try
         .WithTracing(tracing => tracing
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
-            .AddConsoleExporter());
+            .AddConsoleExporter())
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddRuntimeInstrumentation()
+            .AddMeter("LogistiqueLesLions.Business")
+            .AddPrometheusExporter());
 
     // ─── OpenAPI / Scalar ───────────────────────────────────────────────────────
     builder.Services.AddOpenApi(options =>
@@ -144,13 +155,37 @@ try
             };
         });
 
+    // ─── Authorization policies ─────────────────────────────────────────────────
+    // Roles del dominio (UserRole enum): Buyer, Seller, Dealer, Admin, Moderator.
+    // Política composite: agrupar roles por capacidad para no hardcodear nombres
+    // de rol en cada endpoint.
     builder.Services.AddAuthorization(options =>
     {
-        options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+        // Roles individuales
+        options.AddPolicy("AdminOnly",     p => p.RequireRole("Admin"));
+        options.AddPolicy("ModeratorOnly", p => p.RequireRole("Moderator"));
+        options.AddPolicy("DealerOnly",    p => p.RequireRole("Dealer"));
+
+        // Capacidades — usar éstas en endpoints en lugar de roles directos
+        options.AddPolicy("CanModerate",       p => p.RequireRole("Admin", "Moderator"));
+        options.AddPolicy("CanPublishVehicle", p => p.RequireRole("Admin", "Dealer", "Seller"));
+        options.AddPolicy("CanManageUsers",    p => p.RequireRole("Admin"));
+        options.AddPolicy("CanViewAdminPanel", p => p.RequireRole("Admin", "Moderator"));
+        options.AddPolicy("CanBuyVehicle",     p => p.RequireRole("Admin", "Dealer", "Buyer"));
     });
 
     // ─── Health checks ──────────────────────────────────────────────────────────
-    builder.Services.AddHealthChecks();
+    // live  → el proceso responde (kubelet/Render restart trigger)
+    // ready → dependencias listas (DB) — el LB no enruta tráfico hasta que pase
+    var dbConnection = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection no configurada");
+
+    builder.Services.AddHealthChecks()
+        .AddNpgSql(
+            connectionString: dbConnection,
+            name: "postgres",
+            failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
+            tags: ["ready", "db"]);
 
     // ────────────────────────────────────────────────────────────────────────────
     var app = builder.Build();
@@ -165,6 +200,14 @@ try
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             await db.Database.MigrateAsync();
             Log.Information("✓ Migraciones aplicadas correctamente");
+
+            if (builder.Configuration.GetValue<bool>("Seed:Enabled"))
+            {
+                var seeder = scope.ServiceProvider
+                    .GetRequiredService<LogistiqueLesLions.Infrastructure.Persistence.Seeding.DatabaseSeeder>();
+                await seeder.SeedAsync();
+                Log.Information("✓ Seed de datos demo aplicado");
+            }
         }
         catch (Exception ex)
         {
@@ -228,7 +271,28 @@ try
     }
 
     // ─── Health ────────────────────────────────────────────────────────────────
-    app.MapHealthChecks("/health");
+    // /health        → todos los checks (compatibilidad legacy)
+    // /health/live   → solo proceso vivo (sin DB) — para liveness probe
+    // /health/ready  → checks con tag "ready" (incluye DB) — para readiness probe
+    app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+    {
+        ResponseWriter = HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+    }).AllowAnonymous();
+
+    app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+    {
+        Predicate = _ => false,
+        ResponseWriter = HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+    }).AllowAnonymous();
+
+    app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+    {
+        Predicate = check => check.Tags.Contains("ready"),
+        ResponseWriter = HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+    }).AllowAnonymous();
+
+    // ─── Prometheus metrics scrape endpoint ────────────────────────────────────
+    app.MapPrometheusScrapingEndpoint("/metrics").AllowAnonymous();
 
     // ─── Endpoints Minimal API ─────────────────────────────────────────────────
     var v1 = app.MapGroup("/api/v1")
@@ -266,8 +330,27 @@ try
         .WithTags("Newsletter")
         .MapNewsletterEndpoints();
 
-    // SignalR hub
+    // Endpoint público sin autenticación — tracking por código
+    v1.MapGroup("/public/tracking")
+        .WithTags("Tracking público")
+        .MapPublicTrackingEndpoints();
+
+    v1.MapGroup("/exports")
+        .WithTags("Exportaciones")
+        .MapExportEndpoints();
+
+    v1.MapGroup("/notifications")
+        .WithTags("Notificaciones")
+        .MapNotificationsEndpoints();
+
+    v1.MapGroup("/marketplace")
+        .WithTags("Marketplace partners")
+        .MapMarketplaceEndpoints();
+
+    // SignalR hubs
     app.MapHub<LogistiqueLesLions.API.Hubs.ChatHub>("/hubs/chat")
+        .RequireAuthorization();
+    app.MapHub<LogistiqueLesLions.API.Hubs.NotificationHub>("/hubs/notifications")
         .RequireAuthorization();
 
     // ─── Redirect raíz a docs ────────────────────────────────────────────────

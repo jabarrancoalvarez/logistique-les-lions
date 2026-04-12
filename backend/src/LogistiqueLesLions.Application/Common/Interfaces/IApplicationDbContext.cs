@@ -28,10 +28,13 @@ public interface IApplicationDbContext
     DbSet<DocumentTemplate> DocumentTemplates { get; }
     DbSet<HomologationRequirement> HomologationRequirements { get; }
     DbSet<CustomsTariff> CustomsTariffs { get; }
+    DbSet<ProcessIncident> ProcessIncidents { get; }
 
     // ─── M5: Mensajería ────────────────────────────────────────────────────
     DbSet<Conversation> Conversations { get; }
     DbSet<Message> Messages { get; }
+    DbSet<UserNotification> UserNotifications { get; }
+    DbSet<ServicePartner> ServicePartners { get; }
 
     // ─── M6: Usuarios ──────────────────────────────────────────────────────
     DbSet<UserProfile> UserProfiles { get; }

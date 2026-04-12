@@ -1,5 +1,6 @@
 using LogistiqueLesLions.Application.Features.Admin.Commands.ApproveVehicle;
 using LogistiqueLesLions.Application.Features.Admin.Queries.GetAdminStats;
+using LogistiqueLesLions.Application.Features.Admin.Queries.GetDashboardKpis;
 using LogistiqueLesLions.Application.Features.Admin.Queries.GetVehiclesAdmin;
 using LogistiqueLesLions.Domain.Enums;
 using MediatR;
@@ -11,7 +12,17 @@ public static class AdminEndpoints
 {
     public static RouteGroupBuilder MapAdminEndpoints(this RouteGroupBuilder group)
     {
-        group.RequireAuthorization("AdminOnly");
+        // El panel admin lo pueden ver Admin + Moderator (policy CanViewAdminPanel).
+        // Para acciones de mutación se mantienen restricciones más finas a nivel endpoint.
+        group.RequireAuthorization("CanViewAdminPanel");
+
+        // GET /api/v1/admin/dashboard/kpis
+        group.MapGet("/dashboard/kpis", async (ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetDashboardKpisQuery(), ct);
+            return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
+        })
+        .WithSummary("KPIs agregados para el dashboard (procesos por estado, lead time, incidencias)");
 
         // GET /api/v1/admin/stats
         group.MapGet("/stats", async (ISender sender, CancellationToken ct) =>
@@ -35,11 +46,13 @@ public static class AdminEndpoints
         .WithSummary("Listar todos los vehículos (admin)");
 
         // POST /api/v1/admin/vehicles/{id}/approve
+        // Solo Admin puede aprobar (acción de mutación crítica)
         group.MapPost("/vehicles/{id:guid}/approve", async (Guid id, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new ApproveVehicleCommand(id), ct);
             return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result);
         })
+        .RequireAuthorization("AdminOnly")
         .WithSummary("Aprobar un vehículo (pasar a estado Active)");
 
         return group;

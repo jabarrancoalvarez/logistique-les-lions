@@ -1,9 +1,14 @@
+using LogistiqueLesLions.Application.Features.Compliance.Commands.CreateIncident;
 using LogistiqueLesLions.Application.Features.Compliance.Commands.InitiateProcess;
+using LogistiqueLesLions.Application.Features.Compliance.Commands.ResolveIncident;
 using LogistiqueLesLions.Application.Features.Compliance.Commands.UploadDocument;
 using LogistiqueLesLions.Application.Features.Compliance.Queries.EstimateCost;
 using LogistiqueLesLions.Application.Features.Compliance.Queries.GetDocumentTemplates;
+using LogistiqueLesLions.Application.Features.Compliance.Queries.GetIncidents;
 using LogistiqueLesLions.Application.Features.Compliance.Queries.GetProcessStatus;
 using LogistiqueLesLions.Application.Features.Compliance.Queries.GetRequirements;
+using LogistiqueLesLions.Application.Features.Compliance.Queries.SimulateCost;
+using LogistiqueLesLions.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -164,6 +169,65 @@ public static class ComplianceEndpoints
         })
         .WithName("UploadProcessDocument")
         .WithSummary("Subir/actualizar un documento de un proceso de tramitación")
+        .RequireAuthorization();
+
+        // ─── POST /api/v1/compliance/simulate ────────────────────────────────
+        group.MapPost("/simulate", async (
+            SimulateCostQuery body,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            var result = await mediator.Send(body, ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        })
+        .WithName("SimulateImportCost")
+        .WithSummary("Calculadora interactiva: estima costes sin necesidad de un vehículo registrado")
+        .AllowAnonymous();
+
+        // ─── POST /api/v1/compliance/processes/{id}/incidents ───────────────
+        group.MapPost("/processes/{id:guid}/incidents", async (
+            Guid id,
+            CreateIncidentCommand body,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            var command = body with { ProcessId = id };
+            var result = await mediator.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Created($"/api/v1/compliance/incidents/{result.Value}", new { id = result.Value })
+                : Results.BadRequest(result.Error);
+        })
+        .WithName("CreateProcessIncident")
+        .WithSummary("Crear una incidencia asociada a un proceso de tramitación")
+        .RequireAuthorization();
+
+        // ─── POST /api/v1/compliance/incidents/{id}/resolve ─────────────────
+        group.MapPost("/incidents/{id:guid}/resolve", async (
+            Guid id,
+            ResolveIncidentCommand body,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            var command = body with { IncidentId = id };
+            var result = await mediator.Send(command, ct);
+            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
+        })
+        .WithName("ResolveIncident")
+        .WithSummary("Marcar una incidencia como resuelta")
+        .RequireAuthorization();
+
+        // ─── GET /api/v1/compliance/incidents?processId=&status= ────────────
+        group.MapGet("/incidents", async (
+            [FromQuery] Guid? processId,
+            [FromQuery] IncidentStatus? status,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            var result = await mediator.Send(new GetIncidentsQuery(processId, status), ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        })
+        .WithName("GetIncidents")
+        .WithSummary("Listar incidencias filtrando por proceso y/o estado")
         .RequireAuthorization();
 
         return group;

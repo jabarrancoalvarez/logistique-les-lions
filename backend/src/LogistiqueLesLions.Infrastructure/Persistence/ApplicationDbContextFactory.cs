@@ -33,7 +33,10 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
             .UseNpgsql(connectionString)
             .UseSnakeCaseNamingConvention();
 
-        // AuditInterceptor no se necesita en design-time
-        return new ApplicationDbContext(optionsBuilder.Options, new Interceptors.AuditInterceptor(null!));
+        // Los interceptores no se necesitan en design-time
+        return new ApplicationDbContext(
+            optionsBuilder.Options,
+            new Interceptors.AuditInterceptor(null!),
+            new Interceptors.AuditLogInterceptor(null!, null!));
     }
 }

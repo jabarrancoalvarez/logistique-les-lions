@@ -1,7 +1,9 @@
+using System.Text.Json;
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Domain.Entities;
 using LogistiqueLesLions.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LogistiqueLesLions.Infrastructure.Persistence;
 
@@ -11,9 +13,12 @@ namespace LogistiqueLesLions.Infrastructure.Persistence;
 /// </summary>
 public class ApplicationDbContext(
     DbContextOptions<ApplicationDbContext> options,
-    AuditInterceptor auditInterceptor)
+    AuditInterceptor auditInterceptor,
+    AuditLogInterceptor auditLogInterceptor)
     : DbContext(options), IApplicationDbContext
 {
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+
     // ─── M1 ────────────────────────────────────────────────────────────────
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
     public DbSet<VehicleMake> VehicleMakes => Set<VehicleMake>();
@@ -33,10 +38,13 @@ public class ApplicationDbContext(
     public DbSet<DocumentTemplate> DocumentTemplates => Set<DocumentTemplate>();
     public DbSet<HomologationRequirement> HomologationRequirements => Set<HomologationRequirement>();
     public DbSet<CustomsTariff> CustomsTariffs => Set<CustomsTariff>();
+    public DbSet<ProcessIncident> ProcessIncidents => Set<ProcessIncident>();
 
     // ─── M5 ────────────────────────────────────────────────────────────────
     public DbSet<Conversation> Conversations => Set<Conversation>();
     public DbSet<Message> Messages => Set<Message>();
+    public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
+    public DbSet<ServicePartner> ServicePartners => Set<ServicePartner>();
 
     // ─── M6 ────────────────────────────────────────────────────────────────
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
@@ -46,7 +54,9 @@ public class ApplicationDbContext(
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.AddInterceptors(auditInterceptor);
+        // Orden importante: AuditInterceptor primero (rellena timestamps),
+        // AuditLogInterceptor después (lee los valores ya enriquecidos).
+        optionsBuilder.AddInterceptors(auditInterceptor, auditLogInterceptor);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -56,6 +66,21 @@ public class ApplicationDbContext(
 
         // Registrar todas las configuraciones del assembly automáticamente
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+        // Conversor genérico JsonDocument? <-> string para que el provider InMemory
+        // (usado en tests) pueda mapear las propiedades jsonb. En PostgreSQL la
+        // columna sigue siendo jsonb (definida en la configuración de cada entidad).
+        var jsonDocConverter = new ValueConverter<JsonDocument?, string?>(
+            v => v == null ? null : v.RootElement.GetRawText(),
+            v => string.IsNullOrEmpty(v) ? null : JsonDocument.Parse(v, default));
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var prop in entityType.GetProperties())
+            {
+                if (prop.ClrType == typeof(JsonDocument) || prop.ClrType == typeof(JsonDocument))
+                    prop.SetValueConverter(jsonDocConverter);
+            }
+        }
 
         base.OnModelCreating(modelBuilder);
     }
