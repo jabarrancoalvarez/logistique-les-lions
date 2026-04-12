@@ -177,12 +177,13 @@ try
     // ─── Health checks ──────────────────────────────────────────────────────────
     // live  → el proceso responde (kubelet/Render restart trigger)
     // ready → dependencias listas (DB) — el LB no enruta tráfico hasta que pase
-    var dbConnection = builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection no configurada");
-
+    //
+    // Usamos AddDbContextCheck en lugar de AddNpgSql porque la connection string
+    // de Neon incluye "Channel Binding=Require", que el parser interno de
+    // HealthChecks.NpgSql no entendía y rompía el /health en producción. El
+    // DbContext ya tiene Npgsql.EFCore configurado correctamente.
     builder.Services.AddHealthChecks()
-        .AddNpgSql(
-            connectionString: dbConnection,
+        .AddDbContextCheck<ApplicationDbContext>(
             name: "postgres",
             failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
             tags: ["ready", "db"]);
