@@ -12,8 +12,7 @@ namespace LogistiqueLesLions.API.Middleware;
 /// </summary>
 public class ExceptionHandlerMiddleware(
     RequestDelegate next,
-    ILogger<ExceptionHandlerMiddleware> logger,
-    IHostEnvironment environment)
+    ILogger<ExceptionHandlerMiddleware> logger)
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -65,7 +64,7 @@ public class ExceptionHandlerMiddleware(
         {
             Status = (int)statusCode,
             Title = title,
-            Detail = environment.IsDevelopment() ? exception.Message : title,
+            Detail = exception.Message,
             Instance = context.Request.Path,
             Extensions =
             {
