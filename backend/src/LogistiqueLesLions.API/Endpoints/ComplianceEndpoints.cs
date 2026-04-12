@@ -7,6 +7,7 @@ using LogistiqueLesLions.Application.Features.Compliance.Queries.GetDocumentTemp
 using LogistiqueLesLions.Application.Features.Compliance.Queries.GetIncidents;
 using LogistiqueLesLions.Application.Features.Compliance.Queries.GetProcessStatus;
 using LogistiqueLesLions.Application.Features.Compliance.Queries.GetRequirements;
+using LogistiqueLesLions.Application.Features.Compliance.Queries.ListProcesses;
 using LogistiqueLesLions.Application.Features.Compliance.Queries.SimulateCost;
 using LogistiqueLesLions.Domain.Enums;
 using MediatR;
@@ -124,6 +125,20 @@ public static class ComplianceEndpoints
         .WithName("GetDocumentTemplates")
         .WithSummary("Plantillas de documentos por país y tipo")
         .AllowAnonymous();
+
+        // ─── GET /api/v1/compliance/processes ───────────────────────────────
+        group.MapGet("/processes", async (
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            var result = await mediator.Send(new ListProcessesQuery(), ct);
+            return result.IsSuccess
+                ? Results.Ok(new { items = result.Value })
+                : Results.BadRequest(result.Error);
+        })
+        .WithName("ListProcesses")
+        .WithSummary("Listado de procesos de tramitación (admin)")
+        .RequireAuthorization("CanViewAdminPanel");
 
         // ─── GET /api/v1/compliance/processes/{id} ───────────────────────────
         group.MapGet("/processes/{id:guid}", async (
