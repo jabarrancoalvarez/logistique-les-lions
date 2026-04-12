@@ -27,6 +27,7 @@ public class DatabaseSeeder(
         var (makes, models) = await SeedMakesAndModelsAsync(now, ct);
         var users = await SeedUsersAsync(now, ct);
         var vehicles = await SeedVehiclesAsync(makes, models, users, now, ct);
+        await RepairPlaceholderVehicleImagesAsync(ct);
         await SeedCountryRequirementsAsync(now, ct);
         await SeedHomologationsAndTariffsAsync(now, ct);
         await SeedDocumentTemplatesAsync(now, ct);
@@ -254,20 +255,25 @@ public class DatabaseSeeder(
             };
             vehicles.Add(v);
 
-            // 3 imágenes ficticias por vehículo (placeholder URLs públicas)
+            // 3 imágenes reales por vehículo vía loremflickr — keyword por marca/modelo.
+            // El sufijo ?lock=<idx>-<i> garantiza que cada vehículo tenga foto distinta
+            // y que la misma URL devuelva la misma imagen en cada request (cacheable).
+            var keyword = Uri.EscapeDataString($"{d.Make},{d.Model},car");
+            var lockBase = Math.Abs(HashCode.Combine(v.Id, d.Make, d.Model));
             for (int i = 0; i < 3; i++)
             {
+                var lockId = lockBase + i;
                 images.Add(new VehicleImage
                 {
                     VehicleId    = v.Id,
-                    Url          = $"https://placehold.co/1200x800/1a2332/d4af37?text={Uri.EscapeDataString(d.Make + "+" + d.Model + "+" + (i+1))}",
-                    ThumbnailUrl = $"https://placehold.co/400x300/1a2332/d4af37?text={Uri.EscapeDataString(d.Make)}",
+                    Url          = $"https://loremflickr.com/1200/800/{keyword}?lock={lockId}",
+                    ThumbnailUrl = $"https://loremflickr.com/400/300/{keyword}?lock={lockId}",
                     SortOrder    = i,
                     IsPrimary    = i == 0,
                     AltText      = $"{d.Make} {d.Model} foto {i + 1}",
                     Width        = 1200,
                     Height       = 800,
-                    Format       = "webp",
+                    Format       = "jpeg",
                     CreatedAt    = v.CreatedAt,
                     UpdatedAt    = v.CreatedAt
                 });
@@ -279,6 +285,36 @@ public class DatabaseSeeder(
         await db.SaveChangesAsync(ct);
         logger.LogInformation("  · {V} vehículos, {I} imágenes", vehicles.Count, images.Count);
         return vehicles;
+    }
+
+    // ─── Reparación: cambiar placehold.co por fotos reales ─────────────────
+    // Se ejecuta en cada seed (no solo la primera vez) para migrar instalaciones
+    // antiguas que ya tenían VehicleImages con URLs de placehold.co.
+    private async Task RepairPlaceholderVehicleImagesAsync(CancellationToken ct)
+    {
+        var toFix = await db.VehicleImages
+            .Include(i => i.Vehicle).ThenInclude(v => v.Make)
+            .Include(i => i.Vehicle).ThenInclude(v => v.Model)
+            .Where(i => i.Url.Contains("placehold.co") || (i.ThumbnailUrl != null && i.ThumbnailUrl.Contains("placehold.co")))
+            .ToListAsync(ct);
+
+        if (toFix.Count == 0)
+            return;
+
+        foreach (var img in toFix)
+        {
+            var make = img.Vehicle?.Make?.Name ?? "car";
+            var model = img.Vehicle?.Model?.Name ?? string.Empty;
+            var keyword = Uri.EscapeDataString($"{make},{model},car");
+            var lockBase = Math.Abs(HashCode.Combine(img.VehicleId, make, model));
+            var lockId = lockBase + img.SortOrder;
+            img.Url = $"https://loremflickr.com/1200/800/{keyword}?lock={lockId}";
+            img.ThumbnailUrl = $"https://loremflickr.com/400/300/{keyword}?lock={lockId}";
+            img.Format = "jpeg";
+        }
+
+        await db.SaveChangesAsync(ct);
+        logger.LogInformation("  · {N} imágenes reparadas (placehold.co → loremflickr)", toFix.Count);
     }
 
     // ─── Normativa por par de países ───────────────────────────────────────
