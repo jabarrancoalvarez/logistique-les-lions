@@ -138,40 +138,60 @@ public static class DependencyInjection
         if (string.IsNullOrWhiteSpace(raw))
             return raw;
 
-        if (!raw.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) &&
-            !raw.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+        Npgsql.NpgsqlConnectionStringBuilder builder;
+
+        if (raw.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||
+            raw.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
         {
-            return raw;
+            // Formato URI (el que devuelve Neon por defecto) → convertir
+            var uri = new Uri(raw);
+            var userInfo = uri.UserInfo.Split(':', 2);
+
+            builder = new Npgsql.NpgsqlConnectionStringBuilder
+            {
+                Host = uri.Host,
+                Port = uri.Port > 0 ? uri.Port : 5432,
+                Database = uri.AbsolutePath.TrimStart('/'),
+                Username = Uri.UnescapeDataString(userInfo[0]),
+                Password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty,
+                SslMode = Npgsql.SslMode.Require,
+                TrustServerCertificate = true
+            };
+
+            foreach (var pair in uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var kv = pair.Split('=', 2);
+                if (kv.Length != 2) continue;
+                var key = Uri.UnescapeDataString(kv[0]);
+                var value = Uri.UnescapeDataString(kv[1]);
+
+                // Channel binding lo gestionamos explícitamente más abajo
+                if (IsChannelBindingKey(key)) continue;
+
+                try { builder[key] = value; } catch { /* keyword desconocido */ }
+            }
+        }
+        else
+        {
+            // Ya está en formato ADO.NET (posiblemente con "Channel Binding=Require")
+            builder = new Npgsql.NpgsqlConnectionStringBuilder(raw);
         }
 
-        var uri = new Uri(raw);
-        var userInfo = uri.UserInfo.Split(':', 2);
-        var username = Uri.UnescapeDataString(userInfo[0]);
-        var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
-        var database = uri.AbsolutePath.TrimStart('/');
-        var port = uri.Port > 0 ? uri.Port : 5432;
-
-        var builder = new Npgsql.NpgsqlConnectionStringBuilder
-        {
-            Host = uri.Host,
-            Port = port,
-            Database = database,
-            Username = username,
-            Password = password,
-            SslMode = Npgsql.SslMode.Require,
-            TrustServerCertificate = true
-        };
-
-        // Neon suele requerir Channel Binding; lo respetamos si viene en el query.
-        foreach (var pair in uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
-        {
-            var kv = pair.Split('=', 2);
-            if (kv.Length != 2) continue;
-            var key = Uri.UnescapeDataString(kv[0]);
-            var value = Uri.UnescapeDataString(kv[1]);
-            try { builder[key] = value; } catch { /* keyword desconocido: ignorar */ }
-        }
+        // IMPORTANTE: con TrustServerCertificate=true, Npgsql no puede obtener el
+        // token tls-server-end-point del canal TLS, así que SCRAM-PLUS (channel
+        // binding) falla con "Couldn't set channel binding". Forzamos SslMode=Require
+        // + TrustServerCertificate=true (Neon requiere TLS pero nos basta con
+        // validar el hostname) y deshabilitamos channel binding explícitamente.
+        builder.SslMode = Npgsql.SslMode.Require;
+        builder.TrustServerCertificate = true;
+        builder.ChannelBinding = Npgsql.ChannelBinding.Disable;
 
         return builder.ConnectionString;
+    }
+
+    private static bool IsChannelBindingKey(string key)
+    {
+        var normalized = key.Replace(" ", "").Replace("_", "");
+        return normalized.Equals("channelbinding", StringComparison.OrdinalIgnoreCase);
     }
 }
