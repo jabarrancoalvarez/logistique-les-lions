@@ -6,7 +6,7 @@ services:
     dockerContext: ./backend
     region: frankfurt
     plan: free
-    healthCheckPath: /health
+    healthCheckPath: /health/live
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
