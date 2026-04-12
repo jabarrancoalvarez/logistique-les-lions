@@ -171,6 +171,34 @@ public class DatabaseSeeder(
     }
 
     // ─── Vehículos ─────────────────────────────────────────────────────────
+    // Fotos reales curadas de Unsplash (IDs verificados, sin restricciones de hotlink).
+    // Se rotan por hash del vehículo para dar variedad. loremflickr se descartó tras
+    // comprobar que el host puede estar caído.
+    private static readonly string[] UnsplashCarPhotoIds =
+    [
+        "1503376780353-7e6692767b70",
+        "1492144534655-ae79c964c9d7",
+        "1549317661-bd32c8ce0db2",
+        "1552519507-da3b142c6e3d",
+        "1494976388531-d1058494cdd8",
+        "1580273916550-e323be2ae537",
+        "1553440569-bcc63803a83d",
+        "1605559424843-9e4c228bf1c2",
+        "1542362567-b07e54358753",
+        "1511919884226-fd3cad34687c",
+        "1606664515524-ed2f786a0bd6",
+        "1469285994282-454ceb49e63c",
+    ];
+
+    private static (string full, string thumb) PickCarPhoto(Guid vehicleId, int sortOrder)
+    {
+        var hash = Math.Abs(HashCode.Combine(vehicleId, sortOrder));
+        var photoId = UnsplashCarPhotoIds[hash % UnsplashCarPhotoIds.Length];
+        var full  = $"https://images.unsplash.com/photo-{photoId}?w=1200&q=80&auto=format&fit=crop";
+        var thumb = $"https://images.unsplash.com/photo-{photoId}?w=400&q=70&auto=format&fit=crop";
+        return (full, thumb);
+    }
+
     private async Task<List<Vehicle>> SeedVehiclesAsync(
         List<VehicleMake> makes, List<VehicleModel> models, List<UserProfile> users,
         DateTimeOffset now, CancellationToken ct)
@@ -255,19 +283,15 @@ public class DatabaseSeeder(
             };
             vehicles.Add(v);
 
-            // 3 imágenes reales por vehículo vía loremflickr — keyword por marca/modelo.
-            // El sufijo ?lock=<idx>-<i> garantiza que cada vehículo tenga foto distinta
-            // y que la misma URL devuelva la misma imagen en cada request (cacheable).
-            var keyword = Uri.EscapeDataString($"{d.Make},{d.Model},car");
-            var lockBase = Math.Abs(HashCode.Combine(v.Id, d.Make, d.Model));
+            // 3 fotos reales de Unsplash por vehículo (IDs curados en UnsplashCarPhotoIds).
             for (int i = 0; i < 3; i++)
             {
-                var lockId = lockBase + i;
+                var (full, thumb) = PickCarPhoto(v.Id, i);
                 images.Add(new VehicleImage
                 {
                     VehicleId    = v.Id,
-                    Url          = $"https://loremflickr.com/1200/800/{keyword}?lock={lockId}",
-                    ThumbnailUrl = $"https://loremflickr.com/400/300/{keyword}?lock={lockId}",
+                    Url          = full,
+                    ThumbnailUrl = thumb,
                     SortOrder    = i,
                     IsPrimary    = i == 0,
                     AltText      = $"{d.Make} {d.Model} foto {i + 1}",
@@ -293,9 +317,10 @@ public class DatabaseSeeder(
     private async Task RepairPlaceholderVehicleImagesAsync(CancellationToken ct)
     {
         var toFix = await db.VehicleImages
-            .Include(i => i.Vehicle).ThenInclude(v => v.Make)
-            .Include(i => i.Vehicle).ThenInclude(v => v.Model)
-            .Where(i => i.Url.Contains("placehold.co") || (i.ThumbnailUrl != null && i.ThumbnailUrl.Contains("placehold.co")))
+            .Where(i =>
+                i.Url.Contains("placehold.co") ||
+                i.Url.Contains("loremflickr") ||
+                (i.ThumbnailUrl != null && (i.ThumbnailUrl.Contains("placehold.co") || i.ThumbnailUrl.Contains("loremflickr"))))
             .ToListAsync(ct);
 
         if (toFix.Count == 0)
@@ -303,18 +328,14 @@ public class DatabaseSeeder(
 
         foreach (var img in toFix)
         {
-            var make = img.Vehicle?.Make?.Name ?? "car";
-            var model = img.Vehicle?.Model?.Name ?? string.Empty;
-            var keyword = Uri.EscapeDataString($"{make},{model},car");
-            var lockBase = Math.Abs(HashCode.Combine(img.VehicleId, make, model));
-            var lockId = lockBase + img.SortOrder;
-            img.Url = $"https://loremflickr.com/1200/800/{keyword}?lock={lockId}";
-            img.ThumbnailUrl = $"https://loremflickr.com/400/300/{keyword}?lock={lockId}";
+            var (full, thumb) = PickCarPhoto(img.VehicleId, img.SortOrder);
+            img.Url = full;
+            img.ThumbnailUrl = thumb;
             img.Format = "jpeg";
         }
 
         await db.SaveChangesAsync(ct);
-        logger.LogInformation("  · {N} imágenes reparadas (placehold.co → loremflickr)", toFix.Count);
+        logger.LogInformation("  · {N} imágenes reparadas → Unsplash", toFix.Count);
     }
 
     // ─── Normativa por par de países ───────────────────────────────────────
