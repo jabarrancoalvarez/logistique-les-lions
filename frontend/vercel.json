@@ -4,6 +4,9 @@
   "outputDirectory": "dist/logistique-les-lions/browser",
   "framework": "angular",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/((?!.*\\.).*)",
+      "destination": "/index.html"
+    }
   ]
 }
