@@ -173,8 +173,19 @@ public static class DependencyInjection
         }
         else
         {
-            // Ya está en formato ADO.NET (posiblemente con "Channel Binding=Require")
-            builder = new Npgsql.NpgsqlConnectionStringBuilder(raw);
+            // Ya está en formato ADO.NET. Algunas versiones de Npgsql no reconocen
+            // "Channel Binding" como keyword y el constructor lanza si está presente,
+            // así que lo eliminamos del string antes de parsear.
+            var sanitized = string.Join(';', raw
+                .Split(';', StringSplitOptions.RemoveEmptyEntries)
+                .Where(part =>
+                {
+                    var eq = part.IndexOf('=');
+                    if (eq <= 0) return true;
+                    var key = part.Substring(0, eq).Trim();
+                    return !IsChannelBindingKey(key);
+                }));
+            builder = new Npgsql.NpgsqlConnectionStringBuilder(sanitized);
         }
 
         // IMPORTANTE: con TrustServerCertificate=true, Npgsql no puede obtener el
