@@ -66,9 +66,22 @@ try
     });
 
     // ─── CORS ───────────────────────────────────────────────────────────────────
-    var allowedOrigins = builder.Configuration
-        .GetSection("Cors:AllowedOrigins")
-        .Get<string[]>() ?? ["http://localhost:4200"];
+    // Acepta tanto array (appsettings.json) como string CSV (env var en Render)
+    var allowedOriginsRaw = builder.Configuration["Cors:AllowedOrigins"];
+    string[] allowedOrigins;
+    if (!string.IsNullOrWhiteSpace(allowedOriginsRaw))
+    {
+        allowedOrigins = allowedOriginsRaw
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+    else
+    {
+        allowedOrigins = builder.Configuration
+            .GetSection("Cors:AllowedOrigins")
+            .Get<string[]>() ?? ["http://localhost:4200"];
+    }
+
+    Log.Information("CORS: orígenes permitidos → {Origins}", string.Join(", ", allowedOrigins));
 
     builder.Services.AddCors(options =>
     {
