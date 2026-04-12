@@ -41,6 +41,12 @@ public static class DependencyInjection
 
             options.UseSnakeCaseNamingConvention();
 
+            // Suprimimos el PendingModelChangesWarning: algunas configuraciones
+            // HasData usan valores dinámicos y EF lo detecta como "modelo cambia
+            // cada build". No queremos bloquear migraciones por eso.
+            options.ConfigureWarnings(w => w.Ignore(
+                Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+
             // En desarrollo: logging de queries lentas
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             {
