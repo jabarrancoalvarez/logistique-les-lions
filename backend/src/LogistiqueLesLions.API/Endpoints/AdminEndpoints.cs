@@ -3,6 +3,7 @@ using LogistiqueLesLions.Application.Features.Admin.Queries.GetAdminStats;
 using LogistiqueLesLions.Application.Features.Admin.Queries.GetDashboardKpis;
 using LogistiqueLesLions.Application.Features.Admin.Queries.GetVehiclesAdmin;
 using LogistiqueLesLions.Domain.Enums;
+using LogistiqueLesLions.Infrastructure.Persistence.Seeding;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -54,6 +55,18 @@ public static class AdminEndpoints
         })
         .RequireAuthorization("AdminOnly")
         .WithSummary("Aprobar un vehículo (pasar a estado Active)");
+
+        // POST /api/v1/admin/seed
+        // Ejecuta el DatabaseSeeder bajo demanda. Idempotente: solo inserta lo que
+        // aún no existe. Útil para poblar la demo sin tener que reiniciar el
+        // servicio con Seed:Enabled=true.
+        group.MapPost("/seed", async (DatabaseSeeder seeder, CancellationToken ct) =>
+        {
+            await seeder.SeedAsync(ct);
+            return Results.Ok(new { ok = true, message = "Seed ejecutado" });
+        })
+        .RequireAuthorization("AdminOnly")
+        .WithSummary("Ejecuta el seeder de datos demo (idempotente)");
 
         return group;
     }
