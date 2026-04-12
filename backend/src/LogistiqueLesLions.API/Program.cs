@@ -212,7 +212,8 @@ try
         }
         catch (Exception ex)
         {
-            Log.Warning("No se pudieron aplicar migraciones automáticas: {Message}", ex.Message);
+            Log.Error(ex, "No se pudieron aplicar migraciones automáticas");
+            throw;
         }
     }
 
