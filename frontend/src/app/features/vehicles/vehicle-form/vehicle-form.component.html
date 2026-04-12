@@ -1,0 +1,217 @@
+<div class="min-h-screen bg-ivory/50 py-10">
+  <div class="container mx-auto px-4 max-w-2xl">
+
+    <!-- Cabecera -->
+    <div class="mb-8">
+      <h1 class="font-heading text-navy text-3xl font-bold">Publicar vehículo</h1>
+      <p class="text-navy/60 mt-1">Completa los 4 pasos para publicar tu anuncio.</p>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-2">
+        @for (step of steps; track step.number) {
+          <div class="flex flex-col items-center" [style.width]="'25%'">
+            <div
+              class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+              [ngClass]="step.number <= currentStep()
+                ? 'bg-gold text-white'
+                : 'bg-navy/10 text-navy/40'"
+            >
+              {{ step.number < currentStep() ? '✓' : step.number }}
+            </div>
+            <p class="text-xs text-navy/50 mt-1 hidden sm:block">{{ step.label }}</p>
+          </div>
+        }
+      </div>
+      <div class="h-1.5 bg-navy/10 rounded-full">
+        <div class="h-full bg-gold rounded-full transition-all duration-300"
+          [style.width]="progress() + '%'"></div>
+      </div>
+    </div>
+
+    <!-- Contenido del paso -->
+    <div class="card p-8">
+
+      <!-- Step 1: Datos básicos -->
+      @if (currentStep() === 1) {
+        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Datos básicos</h2>
+        <form [formGroup]="step1" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Marca *</label>
+            <select formControlName="makeId" class="input">
+              <option value="">Selecciona una marca</option>
+              @for (make of makes(); track make.id) {
+                <option [value]="make.id">{{ make.name }}</option>
+              }
+            </select>
+            @if (step1.get('makeId')?.touched && step1.get('makeId')?.errors?.['required']) {
+              <p class="text-xs text-red-600 mt-1">La marca es obligatoria.</p>
+            }
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Año *</label>
+            <select formControlName="year" class="input">
+              <option value="">Selecciona el año</option>
+              @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Estado *</label>
+            <div class="grid grid-cols-3 gap-3">
+              @for (opt of [{v:'Used',l:'Segunda mano'},{v:'New',l:'Nuevo'},{v:'Km0',l:'Km 0'}]; track opt.v) {
+                <label class="flex items-center gap-2 cursor-pointer border rounded-xl p-3 transition-colors"
+                  [ngClass]="step1.get('condition')?.value === opt.v
+                    ? 'border-gold bg-gold/5'
+                    : 'border-navy/20'"
+                >
+                  <input type="radio" formControlName="condition" [value]="opt.v" class="sr-only">
+                  <span class="text-sm font-medium text-navy">{{ opt.l }}</span>
+                </label>
+              }
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">VIN (opcional)</label>
+            <input type="text" formControlName="vin" class="input font-mono" placeholder="17 caracteres" maxlength="17">
+          </div>
+        </form>
+      }
+
+      <!-- Step 2: Especificaciones -->
+      @if (currentStep() === 2) {
+        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Especificaciones técnicas</h2>
+        <form [formGroup]="step2" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Combustible</label>
+            <select formControlName="fuelType" class="input">
+              <option value="">Sin especificar</option>
+              @for (f of fuelTypes; track f.value) { <option [value]="f.value">{{ f.label }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Transmisión</label>
+            <select formControlName="transmission" class="input">
+              <option value="">Sin especificar</option>
+              @for (t of transmissions; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Carrocería</label>
+            <select formControlName="bodyType" class="input">
+              <option value="">Sin especificar</option>
+              @for (b of bodyTypes; track b.value) { <option [value]="b.value">{{ b.label }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Kilometraje</label>
+            <input type="number" formControlName="mileage" class="input" placeholder="ej: 45000" min="0">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Color</label>
+            <input type="text" formControlName="color" class="input" placeholder="ej: Azul metalizado">
+          </div>
+        </form>
+      }
+
+      <!-- Step 3: Precio y ubicación -->
+      @if (currentStep() === 3) {
+        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Precio y ubicación</h2>
+        <form [formGroup]="step3" class="space-y-5">
+          <div class="grid grid-cols-3 gap-3">
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-navy mb-1.5">Precio *</label>
+              <input type="number" formControlName="price" class="input" placeholder="0" min="1">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-navy mb-1.5">Divisa</label>
+              <select formControlName="currency" class="input">
+                @for (c of currencies; track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="checkbox" formControlName="priceNegotiable" id="negotiable" class="w-4 h-4">
+            <label for="negotiable" class="text-sm text-navy">Precio negociable</label>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">País de origen *</label>
+            <select formControlName="countryOrigin" class="input">
+              <option value="">Selecciona el país</option>
+              @for (c of countries; track c.code) { <option [value]="c.code">{{ c.name }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Ciudad</label>
+            <input type="text" formControlName="city" class="input" placeholder="ej: Berlín">
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="checkbox" formControlName="isExportReady" id="exportReady" class="w-4 h-4">
+            <label for="exportReady" class="text-sm text-navy">
+              Vehículo listo para exportar (documentación completa)
+            </label>
+          </div>
+        </form>
+      }
+
+      <!-- Step 4: Fotos y descripción -->
+      @if (currentStep() === 4) {
+        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Título y descripción</h2>
+        <form [formGroup]="step4" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Título del anuncio *</label>
+            <input type="text" formControlName="title" class="input"
+              placeholder="ej: BMW Serie 3 320d 2022 — Estado impecable">
+            @if (step4.get('title')?.touched && step4.get('title')?.errors?.['required']) {
+              <p class="text-xs text-red-600 mt-1">El título es obligatorio.</p>
+            }
+            <p class="text-xs text-navy/40 mt-1">{{ step4.get('title')?.value?.length ?? 0 }}/200 caracteres</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Descripción (en español)</label>
+            <textarea formControlName="descriptionEs" class="input h-40 resize-none"
+              placeholder="Describe el estado del vehículo, historial, extras incluidos..."></textarea>
+            <p class="text-xs text-navy/40 mt-1">{{ step4.get('descriptionEs')?.value?.length ?? 0 }}/5000 caracteres</p>
+          </div>
+
+          @if (submitError()) {
+            <p class="text-red-600 text-sm">{{ submitError() }}</p>
+          }
+        </form>
+      }
+
+    </div>
+
+    <!-- Navegación del wizard -->
+    <div class="flex items-center justify-between mt-6">
+      <button
+        (click)="back()"
+        [class.invisible]="currentStep() === 1"
+        class="btn-outline py-3 px-6"
+      >
+        ← Atrás
+      </button>
+
+      @if (currentStep() < 4) {
+        <button (click)="next()" class="btn-gold py-3 px-8">
+          Siguiente →
+        </button>
+      } @else {
+        <button
+          (click)="submit()"
+          [disabled]="isSubmitting()"
+          class="btn-gold py-3 px-8"
+        >
+          @if (isSubmitting()) {
+            <svg class="animate-spin w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          }
+          Publicar vehículo
+        </button>
+      }
+    </div>
+
+  </div>
+</div>

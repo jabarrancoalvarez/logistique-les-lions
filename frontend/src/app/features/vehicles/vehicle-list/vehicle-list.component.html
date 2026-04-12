@@ -1,0 +1,137 @@
+<div class="min-h-screen bg-ivory/50">
+  <!-- Header -->
+  <div class="bg-navy text-white py-10">
+    <div class="container mx-auto px-4 lg:px-6">
+      <h1 class="font-heading text-3xl lg:text-4xl font-bold">Vehículos de importación</h1>
+      <p class="mt-2 text-white/70">
+        @if (!isLoading() && totalCount() > 0) {
+          {{ totalCount() | number }} vehículos disponibles
+        } @else if (isLoading()) {
+          Buscando vehículos...
+        }
+      </p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 lg:px-6 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+
+      <!-- Sidebar filtros (desktop) / Panel mobile -->
+      <aside class="lg:w-72 flex-shrink-0">
+        <button
+          (click)="toggleFilters()"
+          class="lg:hidden btn-outline w-full mb-4 flex items-center justify-between"
+        >
+          <span>Filtros</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              [attr.d]="showFilters() ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'"/>
+          </svg>
+        </button>
+
+        <div [class.hidden]="!showFilters()" class="lg:block">
+          <lll-filter-panel
+            [filters]="filters()"
+            (filtersChange)="onFiltersChange($event)"
+          />
+        </div>
+      </aside>
+
+      <!-- Contenido principal -->
+      <main class="flex-1 min-w-0">
+
+        <!-- Barra de ordenación -->
+        <div class="flex items-center justify-between mb-6">
+          <p class="text-navy/60 text-sm">
+            @if (!isLoading()) {
+              Mostrando {{ vehicles().length }} de {{ totalCount() | number }}
+            }
+          </p>
+          <select
+            class="input w-auto text-sm"
+            [value]="sortValue"
+            (change)="onSortChange($any($event.target).value)"
+          >
+            @for (opt of sortOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Estado de carga -->
+        @if (isLoading()) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            @for (i of [1,2,3,4,5,6]; track i) {
+              <div class="card skeleton h-72"></div>
+            }
+          </div>
+        }
+
+        <!-- Error -->
+        @if (error()) {
+          <div class="text-center py-16">
+            <p class="text-red-600 mb-4">{{ error() }}</p>
+            <button (click)="loadVehicles()" class="btn-primary">Reintentar</button>
+          </div>
+        }
+
+        <!-- Sin resultados -->
+        @if (isEmpty()) {
+          <div class="text-center py-16">
+            <svg class="w-16 h-16 mx-auto text-navy/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="font-heading text-xl text-navy mb-2">No encontramos vehículos</h3>
+            <p class="text-navy/60">Prueba con otros filtros de búsqueda.</p>
+          </div>
+        }
+
+        <!-- Grid de vehículos -->
+        @if (!isLoading() && hasResults()) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            @for (vehicle of vehicles(); track vehicle.id) {
+              <lll-vehicle-card
+                [vehicle]="vehicle"
+                [routerLink]="['/vehiculos', vehicle.slug]"
+              />
+            }
+          </div>
+
+          <!-- Paginación -->
+          @if (totalPages() > 1) {
+            <nav class="mt-10 flex items-center justify-center gap-2" aria-label="Paginación">
+              <button
+                (click)="goToPage(currentPage() - 1)"
+                [disabled]="currentPage() === 1"
+                class="btn-outline py-2 px-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ← Anterior
+              </button>
+
+              @for (p of pageRange; track p) {
+                <button
+                  (click)="goToPage(p)"
+                  [class.bg-navy]="p === currentPage()"
+                  [class.text-white]="p === currentPage()"
+                  [class.btn-outline]="p !== currentPage()"
+                  class="py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+                >
+                  {{ p }}
+                </button>
+              }
+
+              <button
+                (click)="goToPage(currentPage() + 1)"
+                [disabled]="currentPage() === totalPages()"
+                class="btn-outline py-2 px-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Siguiente →
+              </button>
+            </nav>
+          }
+        }
+      </main>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+{
+  "APP_NAME": "Logistique Les Lions",
+  "NAV": {
+    "VEHICLES": "Véhicules",
+    "COMPLIANCE": "Documentation",
+    "HOW_IT_WORKS": "Comment ça marche",
+    "COUNTRIES": "Pays",
+    "DEALERS": "Concessionnaires",
+    "LOGIN": "Se connecter",
+    "REGISTER": "S'inscrire",
+    "PUBLISH": "Publier un véhicule"
+  },
+  "HERO": {
+    "BADGE": "12+ pays · Documentation complète incluse",
+    "TITLE_1": "Commerce international",
+    "TITLE_2_VARIANTS": ["intelligent", "simplifié", "sécurisé", "documenté"],
+    "SUBTITLE": "Importez ou exportez votre véhicule avec toute la documentation gérée : douanes, homologations, droits et procédures légales en un seul endroit.",
+    "SEARCH_BTN": "Rechercher des véhicules importés"
+  },
+  "COOKIE": {
+    "TITLE": "Confidentialité et cookies",
+    "DESCRIPTION": "Nous utilisons des cookies pour améliorer votre expérience.",
+    "ACCEPT_ALL": "Tout accepter",
+    "ACCEPT_NECESSARY": "Nécessaires uniquement",
+    "CUSTOMIZE": "Personnaliser",
+    "SAVE": "Sauvegarder"
+  }
+}

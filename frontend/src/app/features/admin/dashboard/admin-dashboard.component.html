@@ -1,0 +1,120 @@
+<div class="min-h-screen bg-navy/3 p-6">
+
+  <div class="max-w-7xl mx-auto">
+    <h1 class="font-heading text-3xl font-bold text-navy mb-8">Panel de administración</h1>
+
+    <!-- KPI Cards -->
+    @if (stats()) {
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-xl border border-navy/10 p-5">
+          <p class="text-xs font-medium text-navy/50 uppercase tracking-wide">Vehículos activos</p>
+          <p class="text-3xl font-bold text-navy mt-1">{{ stats()!.activeListings }}</p>
+          <p class="text-xs text-navy/40 mt-0.5">de {{ stats()!.totalVehicles }} totales</p>
+        </div>
+        <div class="bg-white rounded-xl border border-navy/10 p-5">
+          <p class="text-xs font-medium text-navy/50 uppercase tracking-wide">Usuarios</p>
+          <p class="text-3xl font-bold text-navy mt-1">{{ stats()!.totalUsers }}</p>
+          <p class="text-xs text-navy/40 mt-0.5">+{{ stats()!.newUsersThisMonth }} este mes</p>
+        </div>
+        <div class="bg-white rounded-xl border border-navy/10 p-5">
+          <p class="text-xs font-medium text-navy/50 uppercase tracking-wide">Procesos activos</p>
+          <p class="text-3xl font-bold text-navy mt-1">{{ stats()!.activeProcesses }}</p>
+          <p class="text-xs text-navy/40 mt-0.5">{{ stats()!.completedProcesses }} completados</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gold/30 p-5 bg-gradient-to-br from-gold/5">
+          <p class="text-xs font-medium text-gold/80 uppercase tracking-wide">Valor en catálogo</p>
+          <p class="text-3xl font-bold text-navy mt-1">
+            {{ stats()!.totalListingValue | currency:'EUR':'symbol':'1.0-0' }}
+          </p>
+          <p class="text-xs text-navy/40 mt-0.5">{{ stats()!.totalConversations }} conversaciones</p>
+        </div>
+      </div>
+    }
+
+    <!-- Vehicles table -->
+    <div class="bg-white rounded-xl border border-navy/10 overflow-hidden">
+      <div class="flex items-center justify-between p-5 border-b border-navy/10">
+        <h2 class="font-heading font-semibold text-navy">Vehículos</h2>
+        <!-- Status filter -->
+        <div class="flex gap-2">
+          @for (s of ['', 'Reviewing', 'Active', 'Sold', 'Expired']; track s) {
+            <button
+              (click)="filterByStatus(s)"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+              [ngClass]="statusFilter() === s
+                ? 'bg-navy text-ivory'
+                : 'bg-navy/5 text-navy/60'"
+            >
+              {{ s || 'Todos' }}
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (loading()) {
+        <div class="p-8 text-center text-navy/40">Cargando...</div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-navy/3 text-left">
+                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Vehículo</th>
+                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Estado</th>
+                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Precio</th>
+                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Vendedor</th>
+                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-navy/5">
+              @for (v of vehicles(); track v.id) {
+                <tr class="hover:bg-navy/2 transition-colors">
+                  <td class="px-5 py-3">
+                    <p class="font-medium text-navy text-sm">{{ v.title }}</p>
+                    <p class="text-xs text-navy/40">{{ v.makeName }} · {{ v.year }}</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium"
+                          [ngClass]="v.status === 'Reviewing'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : v.status === 'Active'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-navy/10 text-navy/60'">
+                      {{ v.status }}
+                    </span>
+                  </td>
+                  <td class="px-5 py-3 text-sm text-navy font-medium">
+                    {{ v.price | currency:v.currency:'symbol':'1.0-0' }}
+                  </td>
+                  <td class="px-5 py-3 text-xs text-navy/60">{{ v.sellerEmail }}</td>
+                  <td class="px-5 py-3">
+                    @if (v.status === 'Reviewing') {
+                      <button
+                        (click)="approve(v.id)"
+                        class="text-xs btn-gold py-1.5 px-3"
+                      >
+                        Aprobar
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <div class="flex items-center justify-between px-5 py-4 border-t border-navy/10">
+            <button (click)="prevPage()" [disabled]="page() === 1" class="btn-outline py-1.5 px-3 text-sm disabled:opacity-40">
+              Anterior
+            </button>
+            <span class="text-sm text-navy/60">Página {{ page() }} de {{ totalPages() }}</span>
+            <button (click)="nextPage()" [disabled]="page() === totalPages()" class="btn-outline py-1.5 px-3 text-sm disabled:opacity-40">
+              Siguiente
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

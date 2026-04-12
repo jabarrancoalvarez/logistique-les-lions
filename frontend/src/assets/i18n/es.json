@@ -1,0 +1,53 @@
+{
+  "APP_NAME": "Logistique Les Lions",
+  "NAV": {
+    "VEHICLES": "Vehículos",
+    "COMPLIANCE": "Tramitación",
+    "HOW_IT_WORKS": "Cómo funciona",
+    "COUNTRIES": "Países",
+    "DEALERS": "Concesionarios",
+    "LOGIN": "Iniciar sesión",
+    "REGISTER": "Registrarse",
+    "PUBLISH": "Publicar vehículo"
+  },
+  "HERO": {
+    "BADGE": "Más de 12 países · Documentación completa incluida",
+    "TITLE_1": "Compraventa de vehículos",
+    "TITLE_2_VARIANTS": ["inteligente", "internacional", "documentada", "garantizada"],
+    "SUBTITLE": "Importa o exporta tu vehículo con toda la documentación gestionada: aduanas, homologaciones, aranceles y trámites legales en un solo lugar.",
+    "SEARCH_BTN": "Buscar vehículos importados"
+  },
+  "SEARCH": {
+    "MAKE_LABEL": "Marca",
+    "MAKE_PLACEHOLDER": "BMW, Mercedes, Toyota...",
+    "ORIGIN_LABEL": "País de origen",
+    "ORIGIN_PLACEHOLDER": "Todos los países",
+    "DEST_LABEL": "País destino",
+    "DEST_PLACEHOLDER": "¿Dónde importas?",
+    "PRICE_MIN_LABEL": "Precio desde (€)",
+    "PRICE_MAX_LABEL": "Precio hasta (€)",
+    "CONDITION_LABEL": "Estado",
+    "ALL_CONDITIONS": "Todos",
+    "NEW": "Nuevo",
+    "USED": "De ocasión",
+    "KM0": "Km 0"
+  },
+  "STATS": {
+    "ACTIVE_VEHICLES": "Vehículos activos",
+    "COUNTRIES": "Países operativos",
+    "TRANSACTIONS": "Transacciones completadas",
+    "MAKES": "Marcas disponibles"
+  },
+  "FOOTER": {
+    "DESCRIPTION": "Plataforma líder en compraventa internacional de vehículos con gestión completa de documentación transfronteriza.",
+    "COPYRIGHT": "Todos los derechos reservados."
+  },
+  "COOKIE": {
+    "TITLE": "Privacidad y cookies",
+    "DESCRIPTION": "Usamos cookies para mejorar tu experiencia y mostrarte contenido relevante.",
+    "ACCEPT_ALL": "Aceptar todas",
+    "ACCEPT_NECESSARY": "Solo necesarias",
+    "CUSTOMIZE": "Personalizar",
+    "SAVE": "Guardar preferencias"
+  }
+}

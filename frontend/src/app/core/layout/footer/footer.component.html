@@ -1,0 +1,119 @@
+<footer class="bg-navy text-ivory" role="contentinfo">
+
+  <!-- ─── Franja gold decorativa ────────────────────────────────────────── -->
+  <div class="h-0.5 bg-gradient-to-r from-transparent via-gold to-transparent opacity-40"></div>
+
+  <!-- ─── Contenido principal ──────────────────────────────────────────── -->
+  <div class="container mx-auto px-4 lg:px-6 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
+
+      <!-- Columna 1: Marca y descripción -->
+      <div class="lg:col-span-2">
+        <a routerLink="/" class="inline-block mb-5">
+          <img src="assets/logo.jpeg" alt="Logistique Les Lions" class="h-14 w-auto" loading="lazy">
+        </a>
+        <p class="text-ivory/60 text-sm leading-relaxed mb-6 max-w-xs">
+          Plataforma líder en compraventa internacional de vehículos con gestión completa de documentación transfronteriza, aduanas y homologaciones.
+        </p>
+        <!-- Redes sociales -->
+        <div class="flex items-center gap-3">
+          @for (social of socials; track social.name) {
+            <a
+              [href]="social.url"
+              [attr.aria-label]="social.name"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-9 h-9 border border-white/20 rounded-lg flex items-center justify-center text-ivory/60 hover:text-gold hover:border-gold/50 transition-all duration-200"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path [attr.d]="social.icon"/>
+              </svg>
+            </a>
+          }
+        </div>
+      </div>
+
+      <!-- Columna 2: Plataforma -->
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-gold mb-5">Plataforma</h3>
+        <ul class="space-y-3" role="list">
+          @for (link of platformLinks; track link.label) {
+            <li>
+              <a [routerLink]="link.path" class="text-sm text-ivory/60 hover:text-gold transition-colors duration-200">
+                {{ link.label }}
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Columna 3: Servicios -->
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-gold mb-5">Servicios</h3>
+        <ul class="space-y-3" role="list">
+          @for (link of serviceLinks; track link.label) {
+            <li>
+              <a [routerLink]="link.path" class="text-sm text-ivory/60 hover:text-gold transition-colors duration-200">
+                {{ link.label }}
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Columna 4: Legal -->
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-gold mb-5">Legal</h3>
+        <ul class="space-y-3" role="list">
+          @for (link of legalLinks; track link.label) {
+            <li>
+              <a [routerLink]="link.path" class="text-sm text-ivory/60 hover:text-gold transition-colors duration-200">
+                {{ link.label }}
+              </a>
+            </li>
+          }
+        </ul>
+        <!-- Badge RGPD -->
+        <div class="mt-6 flex items-center gap-2 text-xs text-ivory/40">
+          <svg class="w-4 h-4 text-success flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          Conforme al RGPD
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Newsletter ─────────────────────────────────────────────────── -->
+    <div class="mt-12 pt-10 border-t border-white/10">
+      <div class="max-w-xl">
+        <h3 class="font-heading font-semibold text-lg text-ivory mb-1">
+          Recibe alertas de vehículos importados
+        </h3>
+        <p class="text-sm text-ivory/50 mb-4">Nuevos anuncios, guías de tramitación y ofertas exclusivas.</p>
+        <form class="flex gap-2 max-w-md" (submit)="$event.preventDefault()">
+          <input
+            type="email"
+            placeholder="tu@email.com"
+            class="flex-1 px-4 py-2.5 bg-white/5 border border-white/20 rounded-lg text-sm text-ivory placeholder-ivory/30 focus:outline-none focus:border-gold transition-colors"
+            aria-label="Email para newsletter"
+          >
+          <button type="submit" class="btn-gold text-sm py-2.5 px-5 whitespace-nowrap">
+            Suscribirme
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Bottom bar ────────────────────────────────────────────────────── -->
+  <div class="border-t border-white/10">
+    <div class="container mx-auto px-4 lg:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-xs text-ivory/40">
+        © {{ currentYear }} Logistique Les Lions. Todos los derechos reservados.
+      </p>
+      <div class="flex items-center gap-6 text-xs text-ivory/40">
+        <span>España · Francia · Alemania · Marruecos · +8 países</span>
+      </div>
+    </div>
+  </div>
+</footer>

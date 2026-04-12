@@ -1,0 +1,109 @@
+<div class="card p-5 space-y-5">
+  <div class="flex items-center justify-between">
+    <h2 class="font-heading font-semibold text-navy">Filtros</h2>
+    <button (click)="reset()" class="text-xs text-gold hover:underline">Limpiar todo</button>
+  </div>
+
+  <!-- Búsqueda -->
+  <div>
+    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Búsqueda</label>
+    <input
+      type="text"
+      class="input"
+      placeholder="BMW, Mercedes, Tesla..."
+      [(ngModel)]="search"
+    >
+  </div>
+
+  <!-- Marca -->
+  <div>
+    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Marca</label>
+    <select class="input" [(ngModel)]="makeId">
+      <option value="">Todas las marcas</option>
+      @for (make of makes(); track make.id) {
+        <option [value]="make.id">{{ make.name }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- País de origen -->
+  <div>
+    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">País de origen</label>
+    <select class="input" [(ngModel)]="countryOrigin">
+      <option value="">Todos los países</option>
+      @for (c of countries; track c.code) {
+        <option [value]="c.code">{{ c.name }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Precio -->
+  <div>
+    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Precio (EUR)</label>
+    <div class="flex gap-2">
+      <input type="number" class="input" placeholder="Mín." [(ngModel)]="priceFrom" min="0">
+      <input type="number" class="input" placeholder="Máx." [(ngModel)]="priceTo" min="0">
+    </div>
+  </div>
+
+  <!-- Año -->
+  <div>
+    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Año</label>
+    <div class="flex gap-2">
+      <select class="input" [(ngModel)]="yearFrom">
+        <option value="">Desde</option>
+        @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+      </select>
+      <select class="input" [(ngModel)]="yearTo">
+        <option value="">Hasta</option>
+        @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+      </select>
+    </div>
+  </div>
+
+  <!-- Condición -->
+  <div>
+    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Estado</label>
+    <select class="input" [(ngModel)]="condition">
+      <option value="">Cualquiera</option>
+      @for (c of conditions; track c.value) { <option [value]="c.value">{{ c.label }}</option> }
+    </select>
+  </div>
+
+  <!-- Combustible -->
+  <div>
+    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Combustible</label>
+    <select class="input" [(ngModel)]="fuelType">
+      <option value="">Todos</option>
+      @for (f of fuelTypes; track f.value) { <option [value]="f.value">{{ f.label }}</option> }
+    </select>
+  </div>
+
+  <!-- Transmisión -->
+  <div>
+    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Transmisión</label>
+    <select class="input" [(ngModel)]="transmission">
+      <option value="">Cualquiera</option>
+      @for (t of transmissions; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+    </select>
+  </div>
+
+  <!-- Carrocería -->
+  <div>
+    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Carrocería</label>
+    <select class="input" [(ngModel)]="bodyType">
+      <option value="">Todas</option>
+      @for (b of bodyTypes; track b.value) { <option [value]="b.value">{{ b.label }}</option> }
+    </select>
+  </div>
+
+  <!-- Listo para exportar -->
+  <div class="flex items-center gap-2">
+    <input type="checkbox" id="export-ready" [(ngModel)]="isExportReady" class="w-4 h-4">
+    <label for="export-ready" class="text-sm text-navy">Solo listo para exportar</label>
+  </div>
+
+  <button (click)="apply()" class="btn-gold w-full py-3">
+    Aplicar filtros
+  </button>
+</div>

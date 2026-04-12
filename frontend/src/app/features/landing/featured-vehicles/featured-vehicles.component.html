@@ -1,0 +1,44 @@
+<section class="section bg-white border-t border-navy/5" aria-labelledby="featured-heading">
+  <div class="container mx-auto px-4 lg:px-6">
+
+    <!-- Cabecera de sección -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
+      <div>
+        <span class="divider-gold text-left">Selección destacada</span>
+        <h2 id="featured-heading" class="mt-2 font-heading text-navy text-2xl lg:text-3xl">
+          Vehículos destacados
+        </h2>
+        <p class="mt-1 text-navy/60 text-sm">Seleccionados por calidad y documentación completa</p>
+      </div>
+      <a
+        routerLink="/vehiculos"
+        class="btn-outline text-sm shrink-0"
+        aria-label="Ver todos los vehículos disponibles"
+      >
+        Ver todos
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Grid de vehículos -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (vehicle of vehicles(); track vehicle.id; let i = $index) {
+        <div class="animate-fadeInUp" [style.animation-delay]="(i * 0.08) + 's'" style="opacity:0;animation-fill-mode:forwards">
+          <lll-vehicle-card [vehicle]="vehicle" />
+        </div>
+      }
+    </div>
+
+    <!-- CTA inferior -->
+    <div class="mt-12 text-center">
+      <a routerLink="/vehiculos" class="btn-primary">
+        Explorar todos los vehículos importados
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,41 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": ["/favicon.ico", "/index.html", "/manifest.webmanifest", "/*.css", "/*.js"]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/assets/**", "/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "api-featured",
+      "urls": ["/api/v1/vehicles/featured", "/api/v1/vehicles/stats"],
+      "cacheConfig": {
+        "maxSize": 10,
+        "maxAge": "5m",
+        "strategy": "freshness"
+      }
+    },
+    {
+      "name": "api-static",
+      "urls": ["/api/v1/vehicles/makes", "/api/v1/countries/supported"],
+      "cacheConfig": {
+        "maxSize": 10,
+        "maxAge": "1h",
+        "strategy": "performance"
+      }
+    }
+  ]
+}

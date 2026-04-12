@@ -1,0 +1,70 @@
+<div class="min-h-screen bg-ivory/50 py-10">
+  <div class="container mx-auto px-4 max-w-3xl">
+
+    @if (isLoading()) {
+      <div class="space-y-4">
+        <div class="skeleton h-12 w-1/2"></div>
+        <div class="skeleton h-64"></div>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="card p-10 text-center">
+        <p class="text-red-600 text-lg">{{ error() }}</p>
+      </div>
+    }
+
+    @if (process(); as p) {
+      <!-- Cabecera del proceso -->
+      <div class="card p-6 mb-6">
+        <div class="flex items-start justify-between flex-wrap gap-4">
+          <div>
+            <h1 class="font-heading font-bold text-navy text-2xl">{{ p.vehicleTitle }}</h1>
+            <p class="text-navy/60 mt-1">
+              {{ p.originCountry }} → {{ p.destinationCountry }} · {{ p.processType }}
+            </p>
+          </div>
+          <span class="badge px-3 py-1 text-sm font-medium"
+            [ngClass]="statusClass[p.status]">
+            {{ statusLabel[p.status] ?? p.status }}
+          </span>
+        </div>
+
+        <!-- Métricas -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+          <div class="text-center">
+            <p class="text-2xl font-bold text-navy">{{ p.completionPercent }}%</p>
+            <p class="text-xs text-navy/50">Completado</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-navy">{{ p.documents.length }}</p>
+            <p class="text-xs text-navy/50">Documentos</p>
+          </div>
+          <div class="text-center">
+            <p class="text-lg font-bold text-navy">{{ formatEur(p.estimatedCostEur) }}</p>
+            <p class="text-xs text-navy/50">Coste estimado</p>
+          </div>
+          <div class="text-center">
+            <p class="text-lg font-bold text-navy">{{ formatEur(p.actualCostEur) }}</p>
+            <p class="text-xs text-navy/50">Coste real</p>
+          </div>
+        </div>
+
+        <!-- Barra de progreso -->
+        <div class="mt-6">
+          <div class="h-3 bg-navy/10 rounded-full">
+            <div class="h-full bg-gold rounded-full transition-all duration-500"
+              [style.width]="p.completionPercent + '%'"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist -->
+      <lll-document-checklist
+        [documents]="p.documents"
+        [processId]="p.id"
+        [completionPercent]="p.completionPercent"
+      />
+    }
+  </div>
+</div>

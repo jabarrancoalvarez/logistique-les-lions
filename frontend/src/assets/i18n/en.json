@@ -1,0 +1,43 @@
+{
+  "APP_NAME": "Logistique Les Lions",
+  "NAV": {
+    "VEHICLES": "Vehicles",
+    "COMPLIANCE": "Documentation",
+    "HOW_IT_WORKS": "How it works",
+    "COUNTRIES": "Countries",
+    "DEALERS": "Dealers",
+    "LOGIN": "Log in",
+    "REGISTER": "Sign up",
+    "PUBLISH": "List a vehicle"
+  },
+  "HERO": {
+    "BADGE": "12+ countries · Full documentation included",
+    "TITLE_1": "International vehicle",
+    "TITLE_2_VARIANTS": ["trading", "importing", "exporting", "simplified"],
+    "SUBTITLE": "Import or export your vehicle with complete documentation managed: customs, homologation, tariffs and legal procedures all in one place.",
+    "SEARCH_BTN": "Search imported vehicles"
+  },
+  "SEARCH": {
+    "MAKE_LABEL": "Make",
+    "MAKE_PLACEHOLDER": "BMW, Mercedes, Toyota...",
+    "ORIGIN_LABEL": "Country of origin",
+    "ORIGIN_PLACEHOLDER": "All countries",
+    "DEST_LABEL": "Destination country",
+    "DEST_PLACEHOLDER": "Where are you importing?",
+    "PRICE_MIN_LABEL": "Price from (€)",
+    "PRICE_MAX_LABEL": "Price up to (€)",
+    "CONDITION_LABEL": "Condition",
+    "ALL_CONDITIONS": "All",
+    "NEW": "New",
+    "USED": "Used",
+    "KM0": "Nearly new"
+  },
+  "COOKIE": {
+    "TITLE": "Privacy & Cookies",
+    "DESCRIPTION": "We use cookies to improve your experience and show you relevant content.",
+    "ACCEPT_ALL": "Accept all",
+    "ACCEPT_NECESSARY": "Necessary only",
+    "CUSTOMIZE": "Customize",
+    "SAVE": "Save preferences"
+  }
+}

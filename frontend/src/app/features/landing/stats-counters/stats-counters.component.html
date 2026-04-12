@@ -1,0 +1,44 @@
+<section class="relative py-20 bg-navy overflow-hidden" aria-label="Estadísticas de la plataforma">
+  <!-- Subtle grid pattern -->
+  <div class="absolute inset-0 opacity-[0.04]" aria-hidden="true">
+    <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="stats-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#stats-grid)"/>
+    </svg>
+  </div>
+  <!-- Gold glow accents -->
+  <div class="absolute top-0 left-1/4 w-80 h-80 rounded-full bg-gold opacity-[0.06] blur-3xl pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute bottom-0 right-1/4 w-64 h-64 rounded-full bg-gold opacity-[0.04] blur-3xl pointer-events-none" aria-hidden="true"></div>
+
+  <div class="relative container mx-auto px-4 lg:px-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-4">
+      @for (stat of stats(); track stat.label) {
+        <div class="text-center group px-4" role="img" [attr.aria-label]="stat.displayValue + stat.suffix + ' ' + stat.label">
+          <!-- Icon circle -->
+          <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gold/10 border border-gold/25 text-2xl mb-5 mx-auto group-hover:bg-gold/20 group-hover:border-gold/50 transition-all duration-300" aria-hidden="true">
+            {{ stat.icon }}
+          </div>
+          <!-- Number -->
+          <div class="text-4xl lg:text-5xl font-heading font-bold text-gold mb-2 tabular-nums leading-none">
+            {{ stat.displayValue | number }}{{ stat.suffix }}
+          </div>
+          <!-- Label -->
+          <div class="text-sm font-semibold text-ivory tracking-wide mb-1">{{ stat.label }}</div>
+          <!-- Description -->
+          <div class="text-xs text-ivory/40 hidden lg:block leading-relaxed">{{ stat.description }}</div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Bottom wave → ivory-dark (categories section) -->
+  <div class="absolute bottom-0 left-0 right-0 pointer-events-none" aria-hidden="true">
+    <svg viewBox="0 0 1440 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full" style="height:56px; display:block;">
+      <path d="M0,28 C240,56 480,0 720,28 C960,56 1200,0 1440,28 L1440,56 L0,56 Z" fill="#EDE9DF"/>
+    </svg>
+  </div>
+</section>

@@ -1,0 +1,189 @@
+<div class="min-h-screen bg-ivory/50">
+
+  <!-- Loading skeleton -->
+  @if (isLoading()) {
+    <div class="container mx-auto px-4 lg:px-6 py-10">
+      <div class="skeleton h-96 w-full rounded-2xl mb-8"></div>
+      <div class="skeleton h-8 w-1/2 mb-4"></div>
+      <div class="skeleton h-6 w-1/4"></div>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="container mx-auto px-4 lg:px-6 py-20 text-center">
+      <p class="text-red-600 text-lg mb-4">{{ error() }}</p>
+      <a routerLink="/vehiculos" class="btn-primary">Ver todos los vehículos</a>
+    </div>
+  }
+
+  @if (vehicle(); as v) {
+    <!-- Breadcrumb -->
+    <div class="bg-white border-b border-navy/8">
+      <div class="container mx-auto px-4 lg:px-6 py-3">
+        <nav class="flex items-center gap-2 text-sm text-navy/50">
+          <a routerLink="/" class="hover:text-gold">Inicio</a>
+          <span>/</span>
+          <a routerLink="/vehiculos" class="hover:text-gold">Vehículos</a>
+          <span>/</span>
+          <span class="text-navy">{{ v.title }}</span>
+        </nav>
+      </div>
+    </div>
+
+    <div class="container mx-auto px-4 lg:px-6 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+        <!-- Galería de imágenes -->
+        <div class="lg:col-span-2">
+          <div class="relative rounded-2xl overflow-hidden bg-navy/5 aspect-video">
+            @if (activeImage(); as img) {
+              <img [src]="img.url" [alt]="img.altText ?? v.title"
+                class="w-full h-full object-cover">
+            } @else {
+              <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-24 h-24 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+            }
+
+            <!-- Badges -->
+            <div class="absolute top-3 left-3 flex gap-2">
+              @if (v.isFeatured) {
+                <span class="badge bg-gold text-white text-xs">Destacado</span>
+              }
+              @if (v.isExportReady) {
+                <span class="badge bg-navy text-white text-xs">Export Ready</span>
+              }
+            </div>
+          </div>
+
+          <!-- Miniaturas -->
+          @if (v.images.length > 1) {
+            <div class="flex gap-3 mt-3 overflow-x-auto pb-2">
+              @for (img of v.images; track img.id; let i = $index) {
+                <button
+                  (click)="selectImage(i)"
+                  class="flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-colors"
+                  [class.border-gold]="activeImageIndex() === i"
+                  [class.border-transparent]="activeImageIndex() !== i"
+                >
+                  <img [src]="img.thumbnailUrl ?? img.url" [alt]="img.altText ?? ''"
+                    class="w-full h-full object-cover">
+                </button>
+              }
+            </div>
+          }
+
+          <!-- Descripción -->
+          @if (v.descriptionEs) {
+            <div class="mt-8 card p-6">
+              <h2 class="font-heading font-semibold text-navy text-xl mb-3">Descripción</h2>
+              <p class="text-navy/70 leading-relaxed whitespace-pre-line">{{ v.descriptionEs }}</p>
+            </div>
+          }
+
+          <!-- Ficha técnica -->
+          <div class="mt-6 card p-6">
+            <h2 class="font-heading font-semibold text-navy text-xl mb-4">Ficha técnica</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div>
+                <p class="text-xs text-navy/50 uppercase tracking-wide">Año</p>
+                <p class="font-semibold text-navy">{{ v.year }}</p>
+              </div>
+              @if (v.mileage !== null) {
+                <div>
+                  <p class="text-xs text-navy/50 uppercase tracking-wide">Kilometraje</p>
+                  <p class="font-semibold text-navy">{{ formatMileage(v.mileage) }}</p>
+                </div>
+              }
+              @if (fuelLabel()) {
+                <div>
+                  <p class="text-xs text-navy/50 uppercase tracking-wide">Combustible</p>
+                  <p class="font-semibold text-navy">{{ fuelLabel() }}</p>
+                </div>
+              }
+              @if (transmissionLabel()) {
+                <div>
+                  <p class="text-xs text-navy/50 uppercase tracking-wide">Transmisión</p>
+                  <p class="font-semibold text-navy">{{ transmissionLabel() }}</p>
+                </div>
+              }
+              @if (v.color) {
+                <div>
+                  <p class="text-xs text-navy/50 uppercase tracking-wide">Color</p>
+                  <p class="font-semibold text-navy">{{ v.color }}</p>
+                </div>
+              }
+              @if (v.vin) {
+                <div>
+                  <p class="text-xs text-navy/50 uppercase tracking-wide">VIN</p>
+                  <p class="font-semibold text-navy font-mono text-sm">{{ v.vin }}</p>
+                </div>
+              }
+              <div>
+                <p class="text-xs text-navy/50 uppercase tracking-wide">País de origen</p>
+                <p class="font-semibold text-navy">{{ v.flagEmoji }} {{ v.countryName ?? v.countryOrigin }}</p>
+              </div>
+              @if (v.city) {
+                <div>
+                  <p class="text-xs text-navy/50 uppercase tracking-wide">Ciudad</p>
+                  <p class="font-semibold text-navy">{{ v.city }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar: precio y acciones -->
+        <div class="space-y-4">
+          <div class="card p-6 sticky top-24">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge bg-navy/10 text-navy text-xs">{{ conditionLabel() }}</span>
+              @if (v.isExportReady) {
+                <span class="badge bg-green-100 text-green-800 text-xs">Export Ready</span>
+              }
+            </div>
+
+            <h1 class="font-heading font-bold text-navy text-2xl leading-tight mb-1">{{ v.title }}</h1>
+            <p class="text-navy/50 text-sm mb-4">{{ v.makeName }} {{ v.modelName }} · {{ v.year }}</p>
+
+            <div class="border-t border-navy/8 pt-4 mb-4">
+              <p class="text-3xl font-bold text-navy">{{ formatPrice(v.price, v.currency) }}</p>
+              @if (v.priceNegotiable) {
+                <p class="text-sm text-gold mt-1">Precio negociable</p>
+              }
+            </div>
+
+            <div class="flex gap-2 text-sm text-navy/50 mb-6">
+              <span>{{ v.viewsCount }} vistas</span>
+              <span>·</span>
+              <span>{{ v.favoritesCount }} guardados</span>
+            </div>
+
+            <div class="space-y-3">
+              @if (auth.user()?.id !== v.sellerId) {
+                <button
+                  (click)="contactSeller()"
+                  class="btn-gold w-full py-3 text-base"
+                  [disabled]="contacting()"
+                >
+                  @if (contacting()) { Enviando mensaje... } @else { Contactar al vendedor }
+                </button>
+              }
+              <a
+                [routerLink]="['/tramitacion']"
+                [queryParams]="{ vehicleId: v.id, origin: v.countryOrigin }"
+                class="btn-outline w-full py-3 text-sm text-center block"
+              >
+                Calcular costes de importación
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

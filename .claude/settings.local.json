@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(telegram:configure)",
+      "Read(//c/Users/jabar/.claude/channels/telegram/**)",
+      "mcp__plugin_telegram_telegram__reply",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('mcpServers',{}\\), indent=2\\)\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d, indent=2\\)\\)\")",
+      "Bash(tasklist)",
+      "Bash(curl:*)",
+      "Bash(xargs grep:*)",
+      "Bash(xargs cat:*)",
+      "Bash(sed -i 's|from '\\\\''@app/core/services/compliance.service'\\\\''|from '\\\\''@core/services/compliance.service'\\\\''|g' P:/ClaudeCode/logistique-les-lions/frontend/src/app/features/compliance/compliance-home/compliance-home.component.ts P:/ClaudeCode/logistique-les-lions/frontend/src/app/features/compliance/cost-estimator/cost-estimator.component.ts P:/ClaudeCode/logistique-les-lions/frontend/src/app/features/compliance/document-checklist/document-checklist.component.ts P:/ClaudeCode/logistique-les-lions/frontend/src/app/features/compliance/process-tracker/process-tracker.component.ts)",
+      "Bash(sed -i 's|from '\\\\''@app/core/services/vehicle.service'\\\\''|from '\\\\''@core/services/vehicle.service'\\\\''|g' P:/ClaudeCode/logistique-les-lions/frontend/src/app/features/vehicles/filter-panel/filter-panel.component.ts P:/ClaudeCode/logistique-les-lions/frontend/src/app/features/vehicles/vehicle-form/vehicle-form.component.ts P:/ClaudeCode/logistique-les-lions/frontend/src/app/features/vehicles/vehicle-list/vehicle-list.component.ts)",
+      "Bash(sed -i 's|from '\\\\''@app/shared/components/vehicle-card/vehicle-card.component'\\\\''|from '\\\\''@shared/components/vehicle-card/vehicle-card.component'\\\\''|g' P:/ClaudeCode/logistique-les-lions/frontend/src/app/features/vehicles/vehicle-list/vehicle-list.component.ts)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(grep -E \"^.*error CS|Build succeeded|FAILED|Errores$\")",
+      "Bash(dotnet ef:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker exec lll_postgres:*)",
+      "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet ef database update --startup-project ../LogistiqueLesLions.API)",
+      "Bash(grep -v \"^$\")",
+      "Bash(PGPASSWORD=lll_secure_password_dev psql:*)",
+      "Bash(EF_DESIGN_TIME=1 dotnet ef database update --startup-project ../LogistiqueLesLions.API)",
+      "Bash(EF_DESIGN_TIME=1 dotnet ef migrations script --startup-project ../LogistiqueLesLions.API --idempotent --output /tmp/lll_migrations.sql)",
+      "Read(//tmp/**)",
+      "Bash(docker cp:*)"
+    ]
+  }
+}

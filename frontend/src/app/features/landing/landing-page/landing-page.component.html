@@ -1,0 +1,242 @@
+<!-- Landing Page — Logistique Les Lions -->
+
+<!-- SECCIÓN 1: Hero con buscador -->
+<lll-hero-search />
+
+<!-- SECCIÓN 2: Contadores animados -->
+<lll-stats-counters />
+
+<!-- SECCIÓN 3: Categorías de vehículos -->
+<section class="section bg-ivory-dark" aria-labelledby="categorias-heading">
+  <div class="container">
+    <div class="text-center mb-12">
+      <span class="divider-gold">Explorar por tipo</span>
+      <h2 id="categorias-heading" class="mt-3 font-heading text-navy">
+        ¿Qué tipo de vehículo buscas?
+      </h2>
+      <p class="mt-2 text-navy/50 text-sm max-w-md mx-auto">
+        Desde berlinas de lujo hasta 4x4 de aventura — todos con documentación de importación incluida.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      @for (cat of vehicleCategories; track cat.id) {
+        <a
+          [routerLink]="['/vehiculos']"
+          [queryParams]="{ bodyType: cat.id }"
+          class="group flex flex-col items-center gap-3 p-5 bg-white rounded-xl border border-navy/8 hover:border-gold hover:shadow-gold transition-all duration-300 cursor-pointer relative overflow-hidden"
+        >
+          <!-- hover gold top border accent -->
+          <div class="absolute top-0 left-0 right-0 h-0.5 bg-gold scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+          <div class="text-3xl group-hover:scale-110 transition-transform duration-300" [attr.aria-hidden]="true">{{ cat.emoji }}</div>
+          <span class="text-sm font-semibold text-navy group-hover:text-gold transition-colors text-center">
+            {{ cat.label }}
+          </span>
+          <span class="text-xs text-navy/40 group-hover:text-gold/60 transition-colors">{{ cat.count }}+ anuncios</span>
+        </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN 4: Vehículos destacados -->
+<lll-featured-vehicles />
+
+<!-- SECCIÓN 5: Cómo funciona -->
+<lll-how-it-works />
+
+<!-- SECCIÓN 6: Mapa de países -->
+<lll-country-map />
+
+<!-- SECCIÓN 7: Precios -->
+<section class="section bg-white" aria-labelledby="precios-heading">
+  <div class="container">
+    <div class="text-center mb-12">
+      <span class="divider-gold">Sin letra pequeña</span>
+      <h2 id="precios-heading" class="mt-3 font-heading text-navy">
+        Planes para cada necesidad
+      </h2>
+      <p class="mt-2 text-navy/50 max-w-md mx-auto">
+        Acceso completo desde gratis. Sin comisiones ocultas sobre las transacciones.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-10">
+      @for (plan of pricingPlans; track plan.name) {
+        <div
+          class="reveal rounded-2xl p-8 flex flex-col relative"
+          [class.bg-navy]="plan.highlighted"
+          [class.bg-white]="!plan.highlighted"
+          [class.shadow-navy]="plan.highlighted"
+          [class.shadow-card]="!plan.highlighted"
+          [class.border]="!plan.highlighted"
+          [class.border-navy]="!plan.highlighted"
+          style="border-color: rgba(11,31,58,0.08)"
+        >
+          @if (plan.highlighted) {
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+              <span class="badge badge-gold text-xs px-4 py-1 shadow-gold">Más popular</span>
+            </div>
+          }
+
+          <!-- Nombre y precio -->
+          <div class="mb-6">
+            <p [class]="plan.highlighted ? 'text-xs font-bold uppercase tracking-widest text-gold mb-2' : 'text-xs font-bold uppercase tracking-widest text-navy/40 mb-2'">
+              {{ plan.tag }}
+            </p>
+            <h3 [class]="plan.highlighted ? 'font-heading text-2xl font-bold text-ivory mb-1' : 'font-heading text-2xl font-bold text-navy mb-1'">
+              {{ plan.name }}
+            </h3>
+            <div class="flex items-baseline gap-1 mt-3">
+              <span [class]="plan.highlighted ? 'font-heading text-4xl font-bold text-gold' : 'font-heading text-4xl font-bold text-navy'">
+                {{ plan.price }}
+              </span>
+              <span [class]="plan.highlighted ? 'text-sm text-ivory/50' : 'text-sm text-navy/40'">{{ plan.period }}</span>
+            </div>
+            <p [class]="plan.highlighted ? 'text-sm text-ivory/60 mt-2' : 'text-sm text-navy/50 mt-2'">{{ plan.description }}</p>
+          </div>
+
+          <!-- Features -->
+          <ul class="space-y-3 mb-8 flex-1">
+            @for (feat of plan.features; track feat) {
+              <li class="flex items-start gap-2.5 text-sm">
+                <svg class="w-4 h-4 shrink-0 mt-0.5 text-gold" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span [class]="plan.highlighted ? 'text-ivory/80' : 'text-navy/70'">{{ feat }}</span>
+              </li>
+            }
+          </ul>
+
+          <!-- CTA -->
+          <a
+            routerLink="/auth/register"
+            [class]="plan.highlighted
+              ? 'block text-center py-3 px-6 rounded-lg font-semibold text-sm bg-gold text-navy hover:bg-gold-dark transition-colors'
+              : 'block text-center py-3 px-6 rounded-lg font-semibold text-sm border-2 border-navy/20 text-navy hover:bg-navy hover:text-ivory hover:border-navy transition-colors'"
+          >{{ plan.cta }}</a>
+        </div>
+      }
+    </div>
+
+    <p class="text-center text-xs text-navy/40">
+      ¿Necesitas servicios de tramitación, homologación o transporte?
+      <a routerLink="/precios" class="text-gold hover:underline">Ver todas las tarifas →</a>
+    </p>
+  </div>
+</section>
+
+<!-- SECCIÓN 8: Testimonios -->
+<section class="relative section bg-navy overflow-hidden" aria-labelledby="testimonios-heading">
+  <!-- Decorative -->
+  <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+    <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="test-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#test-grid)"/>
+    </svg>
+  </div>
+  <div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-gold opacity-[0.05] blur-3xl pointer-events-none" aria-hidden="true"></div>
+
+  <div class="relative container">
+    <div class="text-center mb-12">
+      <span class="divider-gold">Clientes satisfechos</span>
+      <h2 id="testimonios-heading" class="mt-3 font-heading text-ivory">
+        Lo que dicen nuestros clientes
+      </h2>
+      <p class="mt-2 text-ivory/50 max-w-xl mx-auto">
+        Más de 1.200 transacciones internacionales completadas con éxito.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      @for (testimonial of testimonials; track testimonial.id) {
+        <article class="bg-white/[0.04] border border-white/10 rounded-2xl p-6 reveal hover:border-gold/30 hover:bg-white/[0.07] transition-all duration-300">
+          <!-- Quote mark -->
+          <div class="text-gold/20 font-heading text-6xl leading-none mb-2 select-none" aria-hidden="true">"</div>
+          <!-- Estrellas -->
+          <div class="flex gap-1 mb-4" aria-label="5 estrellas de 5">
+            @for (star of [1,2,3,4,5]; track star) {
+              <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+            }
+          </div>
+          <blockquote>
+            <p class="text-ivory/75 text-sm leading-relaxed mb-6 italic">"{{ testimonial.text }}"</p>
+          </blockquote>
+          <footer class="flex items-center gap-3 pt-4 border-t border-white/10">
+            <div class="w-10 h-10 rounded-full bg-gold/20 border border-gold/40 flex items-center justify-center text-gold font-bold text-sm flex-shrink-0">
+              {{ testimonial.initials }}
+            </div>
+            <div>
+              <p class="text-ivory text-sm font-semibold">{{ testimonial.name }}</p>
+              <p class="text-gold/60 text-xs">{{ testimonial.role }} · {{ testimonial.country }}</p>
+            </div>
+          </footer>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN 8: CTA para concesionarios -->
+<section class="section bg-ivory-dark" aria-labelledby="dealers-cta-heading">
+  <div class="container">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-navy via-navy to-navy-light p-10 lg:p-16 text-center">
+      <!-- Gold radial glow -->
+      <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
+           style="background: radial-gradient(ellipse 60% 80% at 80% 20%, rgba(201,168,76,0.15) 0%, transparent 60%)">
+      </div>
+      <!-- Subtle grid pattern -->
+      <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="cta-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#cta-grid)"/>
+        </svg>
+      </div>
+      <!-- Lion icon decoration -->
+      <div class="absolute top-6 right-8 text-5xl opacity-10 select-none" aria-hidden="true">🦁</div>
+      <div class="absolute bottom-6 left-8 text-4xl opacity-10 select-none" aria-hidden="true">🦁</div>
+
+      <div class="relative">
+        <span class="divider-gold text-gold mb-5 block">Para profesionales</span>
+        <h2 id="dealers-cta-heading" class="font-heading text-ivory text-3xl lg:text-4xl font-bold mb-4">
+          ¿Eres concesionario o importador?
+        </h2>
+        <p class="text-ivory/60 max-w-lg mx-auto mb-10 text-lg leading-relaxed">
+          Accede a anuncios ilimitados, estadísticas avanzadas, badge verificado y gestión documental prioritaria.
+        </p>
+        <!-- Feature points -->
+        <div class="flex flex-wrap justify-center gap-4 mb-10 text-sm text-ivory/70">
+          @for (feat of ['Anuncios ilimitados', 'Badge verificado', 'Estadísticas avanzadas', 'Soporte prioritario']; track feat) {
+            <span class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5">
+              <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              {{ feat }}
+            </span>
+          }
+        </div>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a routerLink="/concesionarios/registro" class="btn-gold text-base px-8 py-3">
+            Registrar mi concesionario
+          </a>
+          <a routerLink="/concesionarios/planes" class="btn-outline btn-outline-gold text-base px-8 py-3">
+            Ver planes y precios
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN 9: Newsletter -->
+<lll-newsletter />
