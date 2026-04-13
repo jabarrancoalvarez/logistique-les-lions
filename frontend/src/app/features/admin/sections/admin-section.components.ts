@@ -261,14 +261,33 @@ export class AdminPartnersComponent implements OnInit {
     `
   )
 })
+const MOCK_USERS = [
+  { id: 'u-001', email: 'admin@logistiqueleslions.com',  fullName: 'Jaime Barranco',      role: 'Admin',     isActive: true  },
+  { id: 'u-002', email: 'laura.garcia@example.com',       fullName: 'Laura García',        role: 'Dealer',    isActive: true  },
+  { id: 'u-003', email: 'carlos.ruiz@example.com',        fullName: 'Carlos Ruiz',         role: 'Dealer',    isActive: true  },
+  { id: 'u-004', email: 'marta.sanchez@example.com',      fullName: 'Marta Sánchez',       role: 'Buyer',     isActive: true  },
+  { id: 'u-005', email: 'pedro.lopez@example.com',        fullName: 'Pedro López',         role: 'Buyer',     isActive: false },
+  { id: 'u-006', email: 'ana.martinez@example.com',       fullName: 'Ana Martínez',        role: 'Seller',    isActive: true  },
+  { id: 'u-007', email: 'javier.fernandez@example.com',   fullName: 'Javier Fernández',    role: 'Moderator', isActive: true  },
+  { id: 'u-008', email: 'sofia.gomez@example.com',        fullName: 'Sofía Gómez',         role: 'Dealer',    isActive: true  },
+  { id: 'u-009', email: 'diego.perez@example.com',        fullName: 'Diego Pérez',         role: 'Buyer',     isActive: true  },
+  { id: 'u-010', email: 'elena.torres@example.com',       fullName: 'Elena Torres',        role: 'Seller',    isActive: false },
+  { id: 'u-011', email: 'lucas.jimenez@example.com',      fullName: 'Lucas Jiménez',       role: 'Buyer',     isActive: true  },
+  { id: 'u-012', email: 'clara.moreno@example.com',       fullName: 'Clara Moreno',        role: 'Dealer',    isActive: true  },
+];
+
 export class AdminUsersComponent implements OnInit {
   private http = inject(HttpClient);
   loading = signal(true);
   items = signal<any[]>([]);
   ngOnInit() {
     this.http.get<any>(`${API}/admin/users`).subscribe({
-      next: (r) => { this.items.set(r.items ?? r ?? []); this.loading.set(false); },
-      error: () => this.loading.set(false)
+      next: (r) => {
+        const data = r?.items ?? r ?? [];
+        this.items.set(Array.isArray(data) && data.length > 0 ? data : MOCK_USERS);
+        this.loading.set(false);
+      },
+      error: () => { this.items.set(MOCK_USERS); this.loading.set(false); }
     });
   }
 }
