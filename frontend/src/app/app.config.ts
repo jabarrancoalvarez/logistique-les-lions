@@ -28,7 +28,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
 
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
+      enabled: false,
       registrationStrategy: 'registerWhenStable:30000'
     })
   ]
