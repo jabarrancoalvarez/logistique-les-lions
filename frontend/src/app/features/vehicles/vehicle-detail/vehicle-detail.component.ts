@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
-import { VehicleService, VehicleDetail } from '@core/services/vehicle.service';
+import { VehicleService, VehicleDetail, VehicleListItem } from '@core/services/vehicle.service';
 import { AuthService } from '@core/auth/auth.service';
 import { MessagingService } from '@core/services/messaging.service';
 
@@ -27,6 +27,33 @@ export class VehicleDetailComponent implements OnInit {
   readonly activeImageIndex = signal(0);
   readonly isFavorited      = signal(false);
   readonly contacting       = signal(false);
+  readonly copied           = signal(false);
+  readonly relatedVehicles  = signal<VehicleListItem[]>([]);
+
+  readonly powerLabel = computed(() => {
+    const specs = this.vehicle()?.specs as Record<string, unknown> | null | undefined;
+    if (!specs) return '';
+    const cv = specs['powerCv'] ?? specs['power_cv'] ?? specs['cv'] ?? specs['horsepower'];
+    const kw = specs['powerKw'] ?? specs['power_kw'] ?? specs['kw'];
+    if (cv && kw) return `${cv} CV (${kw} kW)`;
+    if (cv) return `${cv} CV`;
+    if (kw) return `${kw} kW`;
+    return '';
+  });
+
+  readonly bodyTypeLabel = computed(() => {
+    const map: Record<string, string> = {
+      Sedan: 'Berlina', Hatchback: 'Compacto', Suv: 'SUV', Coupe: 'Cupé',
+      Convertible: 'Cabrio', Wagon: 'Familiar', Pickup: 'Pick-up',
+      Van: 'Furgoneta', Minivan: 'Monovolumen', Crossover: 'Crossover'
+    };
+    return map[this.vehicle()?.bodyType ?? ''] ?? '';
+  });
+
+  readonly sellerDisplay = computed(() => {
+    const id = this.vehicle()?.sellerId ?? '';
+    return `Vendedor ${id.slice(0, 8).toUpperCase()}`;
+  });
 
   readonly activeImage = computed(() => {
     const v = this.vehicle();
@@ -64,12 +91,53 @@ export class VehicleDetailComponent implements OnInit {
       next: v => {
         this.vehicle.set(v);
         this.isLoading.set(false);
+        this.loadRelated(v);
       },
       error: () => {
         this.error.set('Vehículo no encontrado.');
         this.isLoading.set(false);
       }
     });
+  }
+
+  private loadRelated(current: VehicleDetail): void {
+    this.vehicleService.getVehicles({ pageSize: 8 }).subscribe({
+      next: res => {
+        const items = (res.items ?? []).filter(i => i.id !== current.id).slice(0, 4);
+        this.relatedVehicles.set(items);
+      },
+      error: () => this.relatedVehicles.set([])
+    });
+  }
+
+  toggleFavorite(): void {
+    const v = this.vehicle();
+    if (!v) return;
+    if (!this.auth.isAuthenticated()) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+    const userId = this.auth.user()?.id;
+    if (!userId) return;
+    this.vehicleService.toggleFavorite(v.id, userId).subscribe({
+      next: r => this.isFavorited.set(r.isSaved),
+      error: () => this.isFavorited.update(x => !x)
+    });
+  }
+
+  shareWhatsApp(): void {
+    const v = this.vehicle();
+    if (!v) return;
+    const url = window.location.href;
+    const text = `Mira este vehículo: ${v.title} — ${this.formatPrice(v.price, v.currency)}\n${url}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  }
+
+  copyLink(): void {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      this.copied.set(true);
+      setTimeout(() => this.copied.set(false), 2000);
+    }).catch(() => {});
   }
 
   selectImage(index: number): void {

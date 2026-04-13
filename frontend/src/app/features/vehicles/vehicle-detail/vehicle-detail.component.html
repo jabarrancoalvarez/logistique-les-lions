@@ -111,6 +111,18 @@
                   <p class="font-semibold text-navy">{{ transmissionLabel() }}</p>
                 </div>
               }
+              @if (powerLabel()) {
+                <div>
+                  <p class="text-xs text-navy/50 uppercase tracking-wide">Potencia</p>
+                  <p class="font-semibold text-navy">{{ powerLabel() }}</p>
+                </div>
+              }
+              @if (bodyTypeLabel()) {
+                <div>
+                  <p class="text-xs text-navy/50 uppercase tracking-wide">Carrocería</p>
+                  <p class="font-semibold text-navy">{{ bodyTypeLabel() }}</p>
+                </div>
+              }
               @if (v.color) {
                 <div>
                   <p class="text-xs text-navy/50 uppercase tracking-wide">Color</p>
@@ -135,6 +147,23 @@
               }
             </div>
           </div>
+
+          <!-- Equipamiento -->
+          @if (v.features && v.features.length > 0) {
+            <div class="mt-6 card p-6">
+              <h2 class="font-heading font-semibold text-navy text-xl mb-4">Equipamiento</h2>
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                @for (feat of v.features; track feat) {
+                  <li class="flex items-center gap-2 text-sm text-navy/80">
+                    <svg class="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>{{ feat }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
         </div>
 
         <!-- Sidebar: precio y acciones -->
@@ -180,10 +209,89 @@
               >
                 Calcular costes de importación
               </a>
+
+              <!-- Favorito + compartir -->
+              <div class="grid grid-cols-3 gap-2 pt-2">
+                <button
+                  (click)="toggleFavorite()"
+                  class="flex flex-col items-center gap-1 py-2 rounded-lg border border-navy/10 hover:border-gold hover:bg-gold/5 transition-colors"
+                  [attr.aria-label]="isFavorited() ? 'Quitar de favoritos' : 'Añadir a favoritos'"
+                >
+                  <svg class="w-5 h-5" [class.text-gold]="isFavorited()" [class.text-navy]="!isFavorited()" [attr.fill]="isFavorited() ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                  </svg>
+                  <span class="text-xs text-navy/70">{{ isFavorited() ? 'Guardado' : 'Favorito' }}</span>
+                </button>
+                <button
+                  (click)="shareWhatsApp()"
+                  class="flex flex-col items-center gap-1 py-2 rounded-lg border border-navy/10 hover:border-green-500 hover:bg-green-50 transition-colors"
+                  aria-label="Compartir por WhatsApp"
+                >
+                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                  </svg>
+                  <span class="text-xs text-navy/70">WhatsApp</span>
+                </button>
+                <button
+                  (click)="copyLink()"
+                  class="flex flex-col items-center gap-1 py-2 rounded-lg border border-navy/10 hover:border-navy hover:bg-navy/5 transition-colors"
+                  aria-label="Copiar enlace"
+                >
+                  <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                  </svg>
+                  <span class="text-xs text-navy/70">{{ copied() ? '¡Copiado!' : 'Enlace' }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vendedor -->
+          <div class="card p-6">
+            <h3 class="font-heading font-semibold text-navy text-base mb-3">Vendedor</h3>
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center text-gold font-bold text-lg">
+                {{ sellerDisplay().charAt(9) }}
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-1">
+                  <p class="font-semibold text-navy text-sm">{{ sellerDisplay() }}</p>
+                  <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <div class="flex items-center gap-1 text-xs text-navy/60">
+                  <span class="text-gold">★★★★★</span>
+                  <span>4.8 · verificado</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Vehículos similares -->
+      @if (relatedVehicles().length > 0) {
+        <div class="mt-12">
+          <h2 class="font-heading font-semibold text-navy text-2xl mb-6">Vehículos similares</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @for (rel of relatedVehicles(); track rel.id) {
+              <a [routerLink]="['/vehiculos', rel.slug]" class="card overflow-hidden hover:shadow-lg transition-shadow group">
+                <div class="aspect-video bg-navy/5 overflow-hidden">
+                  @if (rel.primaryImageUrl) {
+                    <img [src]="rel.primaryImageUrl" [alt]="rel.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                  }
+                </div>
+                <div class="p-4">
+                  <h3 class="font-semibold text-navy text-sm line-clamp-1">{{ rel.title }}</h3>
+                  <p class="text-xs text-navy/50 mt-1">{{ rel.year }} · {{ rel.countryOrigin }}</p>
+                  <p class="text-lg font-bold text-navy mt-2">{{ formatPrice(rel.price, rel.currency) }}</p>
+                </div>
+              </a>
+            }
+          </div>
+        </div>
+      }
     </div>
   }
 </div>
