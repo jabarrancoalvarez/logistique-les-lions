@@ -33,7 +33,7 @@ const ADMIN_NAV: AdminNavItem[] = [
         <nav class="flex-1 px-3 py-4 space-y-1">
           @for (item of nav; track item.path) {
             <a
-              [routerLink]="['/admin', item.path]"
+              [routerLink]="item.path ? ['/admin', item.path] : ['/admin']"
               [routerLinkActiveOptions]="{ exact: item.path === '' }"
               routerLinkActive="bg-amber-500 text-slate-900 font-semibold"
               class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-slate-800 transition-colors">
