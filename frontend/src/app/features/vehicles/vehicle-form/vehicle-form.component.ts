@@ -120,17 +120,37 @@ export class VehicleFormComponent {
     this.isSubmitting.set(true);
     this.submitError.set(null);
 
+    const s1 = this.step1.value;
+    const s2 = this.step2.value;
+    const s3 = this.step3.value;
+    const s4 = this.step4.value;
+    const nz = (v: unknown) => (v === '' || v === undefined ? null : v);
+
     const payload = {
-      ...this.step1.value,
-      ...this.step2.value,
-      ...this.step3.value,
-      ...this.step4.value,
-      mileage: this.step2.value.mileage ? +this.step2.value.mileage : null,
-      price: +this.step3.value.price!,
-      year: +this.step1.value.year!,
-      priceNegotiable: !!this.step3.value.priceNegotiable,
-      isExportReady: !!this.step3.value.isExportReady,
-      sellerId: this.auth.user()?.id,
+      title:          s4.title,
+      descriptionEs:  nz(s4.descriptionEs),
+      descriptionEn:  null,
+      makeId:         s1.makeId,
+      modelId:        nz(s1.modelId),
+      year:           +s1.year!,
+      mileage:        s2.mileage ? +s2.mileage : null,
+      condition:      s1.condition,
+      bodyType:       nz(s2.bodyType),
+      fuelType:       nz(s2.fuelType),
+      transmission:   nz(s2.transmission),
+      color:          nz(s2.color),
+      vin:            nz(s1.vin),
+      price:          +s3.price!,
+      currency:       s3.currency,
+      priceNegotiable: !!s3.priceNegotiable,
+      countryOrigin:  s3.countryOrigin,
+      city:           nz(s3.city),
+      postalCode:     null,
+      isExportReady:  !!s3.isExportReady,
+      sellerId:       this.auth.user()?.id,
+      dealerId:       null,
+      specs:          null,
+      features:       null,
     };
 
     this.vehicleService.createVehicle(payload).subscribe({
