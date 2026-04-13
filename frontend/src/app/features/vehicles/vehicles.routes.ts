@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '@core/auth/auth.guard';
 
 export const VEHICLES_ROUTES: Routes = [
   {
@@ -9,6 +10,7 @@ export const VEHICLES_ROUTES: Routes = [
   },
   {
     path: 'nuevo',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./vehicle-form/vehicle-form.component').then(m => m.VehicleFormComponent),
     title: 'Publicar vehículo — Logistique Les Lions'
