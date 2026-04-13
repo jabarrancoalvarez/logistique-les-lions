@@ -55,7 +55,7 @@ public class CreateVehicleCommandHandler(IApplicationDbContext context)
             DealerId       = request.DealerId,
             Specs          = request.Specs,
             Features       = request.Features,
-            Status         = VehicleStatus.Reviewing,
+            Status         = VehicleStatus.Active,
             ExpiresAt      = DateTimeOffset.UtcNow.AddDays(90)
         };
 
