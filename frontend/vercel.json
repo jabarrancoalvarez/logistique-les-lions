@@ -3,9 +3,11 @@
   "buildCommand": "npm run build -- --configuration=production",
   "outputDirectory": "dist/logistique-les-lions/browser",
   "framework": "angular",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/((?!.*\\.).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
