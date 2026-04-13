@@ -39,6 +39,16 @@ try
         .WriteTo.File("logs/api-.log", rollingInterval: RollingInterval.Day,
             outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}"));
 
+    // ─── JSON (Minimal API) — enums como strings ───────────────────────────────
+    // Sin esto, el model binder rechaza { "condition": "Used" } con 400 (body
+    // vacío) porque espera un entero. Afecta a todos los endpoints que reciben
+    // DTOs con enums del dominio.
+    builder.Services.ConfigureHttpJsonOptions(options =>
+    {
+        options.SerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
     // ─── Application + Infrastructure ──────────────────────────────────────────
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
