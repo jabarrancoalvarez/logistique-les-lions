@@ -35,6 +35,10 @@ export class VehicleFormComponent {
   readonly aiError = signal<string | null>(null);
   readonly aiDescriptionEn = signal<string>('');
 
+  // ─── Fotos del anuncio (Step 4) ───────────────────────────────────────
+  readonly selectedImages = signal<{ file: File; preview: string }[]>([]);
+  readonly uploadingImages = signal(false);
+
   readonly steps = [
     { number: 1, label: 'Datos básicos' },
     { number: 2, label: 'Especificaciones' },
@@ -131,14 +135,60 @@ export class VehicleFormComponent {
 
     this.vehicleService.createVehicle(payload).subscribe({
       next: ({ id }) => {
-        this.isSubmitting.set(false);
-        this.router.navigate(['/vehiculos']);
+        const imgs = this.selectedImages();
+        if (imgs.length === 0) {
+          this.isSubmitting.set(false);
+          this.router.navigate(['/vehiculos']);
+          return;
+        }
+        this.uploadingImages.set(true);
+        let uploaded = 0;
+        const done = () => {
+          uploaded++;
+          if (uploaded === imgs.length) {
+            this.uploadingImages.set(false);
+            this.isSubmitting.set(false);
+            this.router.navigate(['/vehiculos']);
+          }
+        };
+        imgs.forEach(({ file }) => {
+          const form = new FormData();
+          form.append('file', file);
+          this.vehicleService.uploadImage(id, form).subscribe({
+            next: () => done(),
+            error: () => done()
+          });
+        });
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting.set(false);
-        this.submitError.set('Error al publicar el vehículo. Inténtalo de nuevo.');
+        const detail = err?.error?.error ?? err?.error?.title ?? err?.error?.message
+          ?? (typeof err?.error === 'string' ? err.error : null);
+        const validation = err?.error?.errors
+          ? Object.entries(err.error.errors).map(([k, v]) => `${k}: ${(v as string[]).join(', ')}`).join(' · ')
+          : null;
+        this.submitError.set(
+          validation ?? detail ?? `Error al publicar (${err?.status ?? '?'}). Revisa los campos obligatorios.`
+        );
       }
     });
+  }
+
+  onImagesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        this.selectedImages.update(imgs => [...imgs, { file, preview: e.target!.result as string }]);
+      };
+      reader.readAsDataURL(file);
+    });
+    input.value = '';
+  }
+
+  removeImage(index: number): void {
+    this.selectedImages.update(imgs => imgs.filter((_, i) => i !== index));
   }
 
   readonly currencies = ['EUR', 'USD', 'GBP', 'MAD', 'JPY'];
