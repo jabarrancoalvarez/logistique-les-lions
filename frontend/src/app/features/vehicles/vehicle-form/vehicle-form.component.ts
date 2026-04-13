@@ -161,6 +161,9 @@ export class VehicleFormComponent {
         });
       },
       error: (err) => {
+        console.error('[VehicleForm] POST /vehicles failed:', err);
+        console.error('[VehicleForm] Error body:', JSON.stringify(err?.error, null, 2));
+        console.error('[VehicleForm] Payload enviado:', JSON.stringify(payload, null, 2));
         this.isSubmitting.set(false);
         const detail = err?.error?.error ?? err?.error?.title ?? err?.error?.message
           ?? (typeof err?.error === 'string' ? err.error : null);
@@ -168,7 +171,7 @@ export class VehicleFormComponent {
           ? Object.entries(err.error.errors).map(([k, v]) => `${k}: ${(v as string[]).join(', ')}`).join(' · ')
           : null;
         this.submitError.set(
-          validation ?? detail ?? `Error al publicar (${err?.status ?? '?'}). Revisa los campos obligatorios.`
+          validation ?? detail ?? `Error ${err?.status ?? '?'} al publicar. Abre F12 → Console para ver el detalle completo.`
         );
       }
     });
