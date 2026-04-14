@@ -163,6 +163,24 @@ try
                     System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
                 ClockSkew = TimeSpan.FromSeconds(30)
             };
+
+            // SignalR/WebSocket: los navegadores no permiten cabeceras custom en
+            // handshakes WS, así que el cliente manda el JWT como ?access_token=.
+            // Este handler lo extrae SOLO para rutas de hubs (resto usa el header).
+            options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) &&
+                        path.StartsWithSegments("/hubs"))
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+                }
+            };
         });
 
     // ─── Authorization policies ─────────────────────────────────────────────────
