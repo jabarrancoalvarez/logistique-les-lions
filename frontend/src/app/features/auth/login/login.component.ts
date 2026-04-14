@@ -33,7 +33,7 @@ export class LoginComponent {
 
     const { email, password } = this.form.value;
     this.auth.login(email, password).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => this.router.navigate(['/dashboard']),
       error: (err) => {
         this.error.set(err?.error?.error ?? 'Credenciales incorrectas.');
         this.loading.set(false);

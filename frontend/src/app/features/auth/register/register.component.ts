@@ -58,7 +58,7 @@ export class RegisterComponent {
       companyName: v.companyName || undefined,
       companyVat:  v.companyVat || undefined
     }).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => this.router.navigate(['/dashboard']),
       error: (err) => {
         this.error.set(err?.error?.error ?? 'Error al registrarse. Inténtalo de nuevo.');
         this.loading.set(false);

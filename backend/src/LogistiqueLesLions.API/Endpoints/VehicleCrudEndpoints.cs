@@ -14,6 +14,7 @@ using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicles;
 using LogistiqueLesLions.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace LogistiqueLesLions.API.Endpoints;
@@ -143,10 +144,15 @@ public static class VehicleCrudEndpoints
         // ─── DELETE /api/v1/vehicles/{id} ─────────────────────────────────────
         group.MapDelete("/{id:guid}", async (
             Guid id,
-            [FromQuery] Guid requesterId,
+            ClaimsPrincipal user,
             IMediator mediator,
             CancellationToken ct) =>
         {
+            var sub = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                   ?? user.FindFirst("sub")?.Value;
+            if (!Guid.TryParse(sub, out var requesterId))
+                return Results.Unauthorized();
+
             var result = await mediator.Send(new DeleteVehicleCommand(id, requesterId), ct);
             return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
         })

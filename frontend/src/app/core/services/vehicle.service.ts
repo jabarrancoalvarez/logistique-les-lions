@@ -210,10 +210,8 @@ export class VehicleService {
     return this.http.put<void>(`${this.baseUrl}/${id}`, data);
   }
 
-  deleteVehicle(id: string, requesterId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`, {
-      params: { requesterId }
-    });
+  deleteVehicle(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
   uploadImage(vehicleId: string, data: unknown): Observable<{ id: string }> {

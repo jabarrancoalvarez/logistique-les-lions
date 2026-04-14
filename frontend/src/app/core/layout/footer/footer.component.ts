@@ -14,7 +14,7 @@ export class FooterComponent {
 
   readonly platformLinks = [
     { label: 'Buscar vehículos', path: '/vehiculos' },
-    { label: 'Publicar anuncio', path: '/vehiculos/publicar' },
+    { label: 'Publicar anuncio', path: '/vehiculos/nuevo' },
     { label: 'Precios de mercado', path: '/precios' },
     { label: 'Calculadora de costes', path: '/calculadora' },
     { label: 'Inspectores certificados', path: '/inspectores' },
