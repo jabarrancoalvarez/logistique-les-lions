@@ -57,6 +57,8 @@ export class MessagingService {
   readonly readReceipt        = signal<ReadReceipt | null>(null);
   readonly isConnected     = signal(false);
 
+  private startPromise?: Promise<void>;
+
   constructor(private http: HttpClient, private auth: AuthService) {}
 
   // ─── REST ────────────────────────────────────────────────────────────────
@@ -79,9 +81,11 @@ export class MessagingService {
 
   // ─── SignalR ──────────────────────────────────────────────────────────────
 
-  startConnection(): void {
+  startConnection(): Promise<void> {
+    if (this.startPromise) return this.startPromise;
+
     const token = this.auth.accessToken();
-    if (!token || this.isConnected()) return;
+    if (!token) return Promise.resolve();
 
     const hubUrl = environment.apiUrl.replace('/api', '') + '/hubs/chat';
 
@@ -103,33 +107,57 @@ export class MessagingService {
       this.readReceipt.set(r);
     });
 
-    this.hubConnection
+    this.startPromise = this.hubConnection
       .start()
-      .then(() => this.isConnected.set(true))
-      .catch(err => console.error('SignalR error:', err));
+      .then(() => { this.isConnected.set(true); })
+      .catch(err => {
+        console.error('SignalR error:', err);
+        this.startPromise = undefined;
+      });
+
+    return this.startPromise;
+  }
+
+  private async ensureConnected(): Promise<boolean> {
+    if (!this.hubConnection) await this.startConnection();
+    if (this.startPromise) await this.startPromise;
+    return this.hubConnection?.state === signalR.HubConnectionState.Connected;
   }
 
   stopConnection(): void {
-    this.hubConnection?.stop().then(() => this.isConnected.set(false));
+    this.hubConnection?.stop().then(() => {
+      this.isConnected.set(false);
+      this.startPromise = undefined;
+    });
   }
 
-  sendMessageHub(recipientId: string, vehicleId: string, body: string): void {
-    this.hubConnection?.invoke('SendMessage', recipientId, vehicleId, body);
+  async sendMessageHub(recipientId: string, vehicleId: string, body: string): Promise<void> {
+    if (await this.ensureConnected()) {
+      await this.hubConnection!.invoke('SendMessage', recipientId, vehicleId, body);
+    }
   }
 
-  joinConversation(conversationId: string): void {
-    this.hubConnection?.invoke('JoinConversation', conversationId);
+  async joinConversation(conversationId: string): Promise<void> {
+    if (await this.ensureConnected()) {
+      await this.hubConnection!.invoke('JoinConversation', conversationId);
+    }
   }
 
-  leaveConversation(conversationId: string): void {
-    this.hubConnection?.invoke('LeaveConversation', conversationId);
+  async leaveConversation(conversationId: string): Promise<void> {
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
+      await this.hubConnection.invoke('LeaveConversation', conversationId);
+    }
   }
 
-  startTyping(recipientId: string, vehicleId: string): void {
-    this.hubConnection?.invoke('StartTyping', recipientId, vehicleId);
+  async startTyping(recipientId: string, vehicleId: string): Promise<void> {
+    if (await this.ensureConnected()) {
+      await this.hubConnection!.invoke('StartTyping', recipientId, vehicleId);
+    }
   }
 
-  markAsRead(senderId: string, vehicleId: string): void {
-    this.hubConnection?.invoke('MarkAsRead', senderId, vehicleId);
+  async markAsRead(senderId: string, vehicleId: string): Promise<void> {
+    if (await this.ensureConnected()) {
+      await this.hubConnection!.invoke('MarkAsRead', senderId, vehicleId);
+    }
   }
 }
