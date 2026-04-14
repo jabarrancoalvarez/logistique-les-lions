@@ -7,7 +7,7 @@
         Cargando mensajes...
       </div>
     } @else {
-      @for (msg of messages(); track msg.id) {
+      @for (msg of messages(); track msg.id; let last = $last) {
         <div class="flex"
              [class.justify-end]="msg.senderId === auth.user()?.id"
              [class.justify-start]="msg.senderId !== auth.user()?.id">
@@ -16,12 +16,42 @@
                  ? 'bg-gold'
                  : 'bg-white border border-navy/10'">
             <p>{{ msg.body }}</p>
-            <p class="text-xs mt-1 opacity-60 text-right">{{ msg.createdAt | date:'HH:mm' }}</p>
+            <p class="text-xs mt-1 opacity-60 text-right flex items-center justify-end gap-1">
+              <span>{{ msg.createdAt | date:'HH:mm' }}</span>
+              @if (msg.senderId === auth.user()?.id && last && lastReadAt()) {
+                <span class="text-navy/70" title="Leído">✓✓</span>
+              } @else if (msg.senderId === auth.user()?.id) {
+                <span class="text-navy/40" title="Enviado">✓</span>
+              }
+            </p>
+          </div>
+        </div>
+      }
+
+      @if (otherTyping()) {
+        <div class="flex justify-start">
+          <div class="bg-white border border-navy/10 rounded-2xl px-4 py-2 text-xs text-navy/60 italic">
+            {{ conversation()?.otherUserName ?? 'El usuario' }} está escribiendo…
           </div>
         </div>
       }
     }
   </div>
+
+  <!-- Quick-reply templates -->
+  @if (!loading()) {
+    <div class="border-t border-navy/10 bg-white px-4 pt-3">
+      <div class="flex gap-2 overflow-x-auto max-w-2xl mx-auto pb-2">
+        @for (t of templates; track t) {
+          <button type="button"
+                  (click)="useTemplate(t)"
+                  class="whitespace-nowrap text-xs px-3 py-1.5 rounded-full border border-navy/15 text-navy/70 hover:border-gold hover:text-navy transition-colors">
+            {{ t }}
+          </button>
+        }
+      </div>
+    </div>
+  }
 
   <!-- Input area -->
   <div class="border-t border-navy/10 bg-white p-4">
@@ -30,12 +60,13 @@
         type="text"
         [formControl]="bodyCtrl"
         placeholder="Escribe un mensaje..."
+        (input)="onInput()"
         (keydown.enter)="send()"
         class="flex-1 px-4 py-2.5 rounded-full border border-navy/20 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none text-navy text-sm"
       >
       <button
         (click)="send()"
-        [disabled]="!bodyCtrl.value?.trim() || sending()"
+        [disabled]="!bodyCtrl.value?.trim() || sending() || !conversation()"
         class="btn-gold px-4 py-2.5 rounded-full disabled:opacity-40"
         aria-label="Enviar mensaje"
       >

@@ -51,6 +51,37 @@ public class ChatHub(ISender sender, ICurrentUser currentUser) : Hub
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, conversationId.ToString());
     }
 
+    /// <summary>
+    /// Indicar que el usuario está escribiendo. Se reenvía al destinatario.
+    /// Cliente llama: connection.invoke("StartTyping", recipientId, vehicleId)
+    /// </summary>
+    public async Task StartTyping(Guid recipientId, Guid vehicleId)
+    {
+        if (!currentUser.IsAuthenticated || currentUser.UserId is null) return;
+
+        await Clients.User(recipientId.ToString()).SendAsync("UserTyping", new
+        {
+            SenderId  = currentUser.UserId.Value,
+            VehicleId = vehicleId
+        });
+    }
+
+    /// <summary>
+    /// Marcar mensajes como leídos. Notifica al emisor con el evento MessageRead.
+    /// Cliente llama: connection.invoke("MarkAsRead", senderId, vehicleId)
+    /// </summary>
+    public async Task MarkAsRead(Guid senderId, Guid vehicleId)
+    {
+        if (!currentUser.IsAuthenticated || currentUser.UserId is null) return;
+
+        await Clients.User(senderId.ToString()).SendAsync("MessageRead", new
+        {
+            ReaderId  = currentUser.UserId.Value,
+            VehicleId = vehicleId,
+            ReadAt    = DateTimeOffset.UtcNow
+        });
+    }
+
     public override async Task OnConnectedAsync()
     {
         if (currentUser.UserId is not null)

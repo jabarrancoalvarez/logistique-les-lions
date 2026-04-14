@@ -36,12 +36,25 @@ export interface IncomingMessage {
   createdAt: string;
 }
 
+export interface TypingNotification {
+  senderId: string;
+  vehicleId: string;
+}
+
+export interface ReadReceipt {
+  readerId: string;
+  vehicleId: string;
+  readAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class MessagingService {
   private readonly apiUrl = `${environment.apiUrl}/v1/messaging`;
   private hubConnection?: signalR.HubConnection;
 
   readonly incomingMessage = signal<IncomingMessage | null>(null);
+  readonly typingNotification = signal<TypingNotification | null>(null);
+  readonly readReceipt        = signal<ReadReceipt | null>(null);
   readonly isConnected     = signal(false);
 
   constructor(private http: HttpClient, private auth: AuthService) {}
@@ -82,6 +95,14 @@ export class MessagingService {
       this.incomingMessage.set(msg);
     });
 
+    this.hubConnection.on('UserTyping', (n: TypingNotification) => {
+      this.typingNotification.set(n);
+    });
+
+    this.hubConnection.on('MessageRead', (r: ReadReceipt) => {
+      this.readReceipt.set(r);
+    });
+
     this.hubConnection
       .start()
       .then(() => this.isConnected.set(true))
@@ -102,5 +123,13 @@ export class MessagingService {
 
   leaveConversation(conversationId: string): void {
     this.hubConnection?.invoke('LeaveConversation', conversationId);
+  }
+
+  startTyping(recipientId: string, vehicleId: string): void {
+    this.hubConnection?.invoke('StartTyping', recipientId, vehicleId);
+  }
+
+  markAsRead(senderId: string, vehicleId: string): void {
+    this.hubConnection?.invoke('MarkAsRead', senderId, vehicleId);
   }
 }

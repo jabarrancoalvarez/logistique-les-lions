@@ -1,10 +1,17 @@
-import { Component, OnInit, OnDestroy, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, ElementRef, ViewChild, AfterViewChecked, effect, computed } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
-import { MessagingService, MessageItem } from '@core/services/messaging.service';
+import { MessagingService, MessageItem, ConversationSummary } from '@core/services/messaging.service';
 import { AuthService } from '@core/auth/auth.service';
-import { effect } from '@angular/core';
+
+const MESSAGE_TEMPLATES: string[] = [
+  '¿Sigue disponible el vehículo?',
+  '¿Aceptas negociar el precio?',
+  '¿Puedo verlo en persona?',
+  '¿Tiene algún daño o golpe?',
+  '¿Está listo para exportación?'
+];
 
 @Component({
   selector: 'lll-conversation',
@@ -15,11 +22,26 @@ import { effect } from '@angular/core';
 export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messagesList') messagesList!: ElementRef;
 
+  readonly templates = MESSAGE_TEMPLATES;
+
   conversationId!: string;
-  messages  = signal<MessageItem[]>([]);
-  loading   = signal(true);
-  sending   = signal(false);
-  bodyCtrl  = new FormControl('', [Validators.required, Validators.maxLength(4000)]);
+  conversation = signal<ConversationSummary | null>(null);
+  messages     = signal<MessageItem[]>([]);
+  loading      = signal(true);
+  sending      = signal(false);
+  otherTyping  = signal(false);
+  bodyCtrl     = new FormControl('', [Validators.required, Validators.maxLength(4000)]);
+
+  private typingTimer?: ReturnType<typeof setTimeout>;
+  private lastTypingEmit = 0;
+
+  readonly lastReadAt = computed(() => {
+    const r = this.messaging.readReceipt();
+    const c = this.conversation();
+    if (!r || !c) return null;
+    if (r.readerId === c.otherUserId && r.vehicleId === c.vehicleId) return r.readAt;
+    return null;
+  });
 
   constructor(
     private route: ActivatedRoute,
@@ -30,7 +52,21 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
       const incoming = this.messaging.incomingMessage();
       if (incoming && incoming.senderId !== this.auth.user()?.id) {
         this.loadMessages();
+        const c = this.conversation();
+        if (c && incoming.senderId === c.otherUserId) {
+          this.messaging.markAsRead(c.otherUserId, c.vehicleId);
+        }
       }
+    });
+
+    effect(() => {
+      const n = this.messaging.typingNotification();
+      const c = this.conversation();
+      if (!n || !c) return;
+      if (n.senderId !== c.otherUserId || n.vehicleId !== c.vehicleId) return;
+      this.otherTyping.set(true);
+      if (this.typingTimer) clearTimeout(this.typingTimer);
+      this.typingTimer = setTimeout(() => this.otherTyping.set(false), 3000);
     });
   }
 
@@ -39,10 +75,18 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
     this.messaging.startConnection();
     this.messaging.joinConversation(this.conversationId);
     this.loadMessages();
+    this.messaging.getConversations().subscribe(list => {
+      const current = list.find(c => c.id === this.conversationId) ?? null;
+      this.conversation.set(current);
+      if (current) {
+        this.messaging.markAsRead(current.otherUserId, current.vehicleId);
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.messaging.leaveConversation(this.conversationId);
+    if (this.typingTimer) clearTimeout(this.typingTimer);
   }
 
   ngAfterViewChecked(): void {
@@ -59,26 +103,41 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
     });
   }
 
+  onInput(): void {
+    const c = this.conversation();
+    if (!c) return;
+    const now = Date.now();
+    if (now - this.lastTypingEmit < 1500) return;
+    this.lastTypingEmit = now;
+    this.messaging.startTyping(c.otherUserId, c.vehicleId);
+  }
+
+  useTemplate(text: string): void {
+    this.bodyCtrl.setValue(text);
+  }
+
   send(): void {
     const body = this.bodyCtrl.value?.trim();
-    if (!body || this.sending()) return;
+    const c = this.conversation();
+    if (!body || this.sending() || !c) return;
 
     this.sending.set(true);
-    // Use REST for reliability; SignalR notifies the other party
-    this.messaging.getConversations().subscribe(); // refresh list
-
-    // Optimistic add
-    const optimistic: MessageItem = {
-      id:          crypto.randomUUID(),
-      senderId:    this.auth.user()!.id,
-      senderName:  `${this.auth.user()!.firstName} ${this.auth.user()!.lastName}`,
-      body,
-      isRead:      false,
-      createdAt:   new Date().toISOString()
-    };
-    this.messages.update(msgs => [...msgs, optimistic]);
-    this.bodyCtrl.reset();
-    this.sending.set(false);
+    this.messaging.sendMessageRest(c.otherUserId, c.vehicleId, body).subscribe({
+      next: () => {
+        const optimistic: MessageItem = {
+          id:         crypto.randomUUID(),
+          senderId:   this.auth.user()!.id,
+          senderName: `${this.auth.user()!.firstName} ${this.auth.user()!.lastName}`,
+          body,
+          isRead:     false,
+          createdAt:  new Date().toISOString()
+        };
+        this.messages.update(msgs => [...msgs, optimistic]);
+        this.bodyCtrl.reset();
+        this.sending.set(false);
+      },
+      error: () => this.sending.set(false)
+    });
   }
 
   private scrollToBottom(): void {
