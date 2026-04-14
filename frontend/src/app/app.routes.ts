@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   {
@@ -28,7 +29,7 @@ export const routes: Routes = [
   },
   {
     path: 'mis-vehiculos',
-    canActivate: [() => import('./core/auth/auth.guard').then(m => m.authGuard)],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/vehicles/my-vehicles/my-vehicles.component').then(m => m.MyVehiclesComponent),
     title: 'Mis vehículos — Logistique Les Lions'
