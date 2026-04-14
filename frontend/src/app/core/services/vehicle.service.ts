@@ -226,6 +226,12 @@ export class VehicleService {
     });
   }
 
+  getMyFavorites(userId: string): Observable<VehicleListItem[]> {
+    return this.http.get<VehicleListItem[]>(`${this.baseUrl}/favorites`, {
+      params: { userId }
+    });
+  }
+
   // ─── IA generativa ──────────────────────────────────────────────────────
   previewAiDescription(context: VehicleAiContext): Observable<AiVehicleDescription> {
     return this.http.post<AiVehicleDescription>(`${this.baseUrl}/ai/preview-description`, context);

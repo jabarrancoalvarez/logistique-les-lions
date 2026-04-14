@@ -36,13 +36,17 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    redirectTo: '/mis-vehiculos',
-    pathMatch: 'full'
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    title: 'Mi panel — Logistique Les Lions'
   },
   {
     path: 'favoritos',
-    redirectTo: '/perfil',
-    pathMatch: 'full'
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/vehicles/favorites/favorites.component').then(m => m.FavoritesComponent),
+    title: 'Mis favoritos — Logistique Les Lions'
   },
   {
     path: 'perfil',

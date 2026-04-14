@@ -272,10 +272,11 @@ import { VehicleDetailComponent } from './features/vehicles/...';
 /legal/cookies            → LegalPageComponent (slug: cookies)
 /legal/terminos           → LegalPageComponent (slug: terminos)
 /legal/rgpd               → LegalPageComponent (slug: rgpd)
-/dashboard                → DashboardComponent (authGuard)
+/dashboard                → DashboardComponent (authGuard) — panel personal con stats y accesos
+/mis-vehiculos            → MyVehiclesComponent (authGuard)
+/favoritos                → FavoritesComponent (authGuard)
 /admin/**                 → AdminModule (adminGuard)
 /mensajes                 → MessagesComponent (authGuard)
-/favoritos                → FavoritesComponent (authGuard)
 /perfil                   → ProfileComponent (authGuard)
 ```
 

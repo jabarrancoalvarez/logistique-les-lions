@@ -1,0 +1,88 @@
+<div class="container mx-auto px-4 py-8 max-w-5xl">
+
+  <div class="mb-8">
+    <p class="text-sm text-navy/50 uppercase tracking-wider mb-1">Panel personal</p>
+    <h1 class="font-heading text-3xl font-bold text-navy">
+      Bienvenido, {{ displayName() }}
+    </h1>
+    <p class="text-navy/60 mt-2">Accesos rápidos y resumen de tu actividad.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+    <div class="bg-white rounded-2xl border border-navy/10 p-6 flex items-center justify-between">
+      <div>
+        <p class="text-sm text-navy/50 mb-1">Mis vehículos publicados</p>
+        <p class="text-3xl font-bold text-navy">
+          {{ myVehiclesCount() ?? '—' }}
+        </p>
+      </div>
+      <a routerLink="/mis-vehiculos" class="text-gold text-sm hover:underline">Ver →</a>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-navy/10 p-6 flex items-center justify-between">
+      <div>
+        <p class="text-sm text-navy/50 mb-1">Vehículos en favoritos</p>
+        <p class="text-3xl font-bold text-navy">
+          {{ favoritesCount() ?? '—' }}
+        </p>
+      </div>
+      <a routerLink="/favoritos" class="text-gold text-sm hover:underline">Ver →</a>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <h2 class="font-heading text-xl font-semibold text-navy mb-4">Acciones rápidas</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+    <a routerLink="/vehiculos/nuevo"
+       class="bg-navy text-ivory rounded-2xl p-5 hover:bg-navy/90 transition-colors group">
+      <div class="w-10 h-10 rounded-lg bg-gold/20 text-gold flex items-center justify-center mb-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+      </div>
+      <p class="font-semibold mb-1">Publicar vehículo</p>
+      <p class="text-ivory/60 text-sm">Crea un nuevo anuncio.</p>
+    </a>
+
+    <a routerLink="/mis-vehiculos"
+       class="bg-white border border-navy/10 rounded-2xl p-5 hover:border-gold/40 transition-colors">
+      <div class="w-10 h-10 rounded-lg bg-navy/5 text-navy flex items-center justify-center mb-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0zM3 7h13l1 6H5L3 7zm0 0L2 4H0"/>
+        </svg>
+      </div>
+      <p class="font-semibold text-navy mb-1">Mis vehículos</p>
+      <p class="text-navy/60 text-sm">Gestiona tus anuncios.</p>
+    </a>
+
+    <a routerLink="/favoritos"
+       class="bg-white border border-navy/10 rounded-2xl p-5 hover:border-gold/40 transition-colors">
+      <div class="w-10 h-10 rounded-lg bg-navy/5 text-navy flex items-center justify-center mb-3">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </div>
+      <p class="font-semibold text-navy mb-1">Favoritos</p>
+      <p class="text-navy/60 text-sm">Vehículos guardados.</p>
+    </a>
+
+    <a routerLink="/mensajes"
+       class="bg-white border border-navy/10 rounded-2xl p-5 hover:border-gold/40 transition-colors">
+      <div class="w-10 h-10 rounded-lg bg-navy/5 text-navy flex items-center justify-center mb-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        </svg>
+      </div>
+      <p class="font-semibold text-navy mb-1">Mensajes</p>
+      <p class="text-navy/60 text-sm">Conversaciones en curso.</p>
+    </a>
+
+  </div>
+
+  <div class="mt-8 text-sm">
+    <a routerLink="/perfil" class="text-navy/60 hover:text-gold">Editar perfil →</a>
+  </div>
+
+</div>

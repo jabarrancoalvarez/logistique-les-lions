@@ -6,6 +6,7 @@ using LogistiqueLesLions.Application.Features.Vehicles.Commands.DeleteVehicle;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.ToggleFavorite;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.UpdateVehicle;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.UploadVehicleImage;
+using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetMyFavorites;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleBySlug;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleFacets;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleHistory;
@@ -204,6 +205,19 @@ public static class VehicleCrudEndpoints
         })
         .WithName("ToggleFavorite")
         .WithSummary("Añadir/quitar vehículo de guardados")
+        .RequireAuthorization();
+
+        // ─── GET /api/v1/vehicles/favorites ──────────────────────────────────
+        group.MapGet("/favorites", async (
+            [FromQuery] Guid userId,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            var result = await mediator.Send(new GetMyFavoritesQuery(userId), ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        })
+        .WithName("GetMyFavorites")
+        .WithSummary("Listar vehículos guardados como favoritos por el usuario")
         .RequireAuthorization();
 
         // ─── POST /api/v1/vehicles/{id}/ai/description ───────────────────────
