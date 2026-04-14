@@ -19,9 +19,6 @@ public class GetMyFavoritesQueryHandler(IApplicationDbContext context)
             .OrderByDescending(s => s.CreatedAt)
             .Select(s => s.Vehicle)
             .Where(v => v.Status == VehicleStatus.Active)
-            .Include(v => v.Make)
-            .Include(v => v.Model)
-            .Include(v => v.Images.Where(i => i.IsPrimary).Take(1))
             .Select(v => new VehicleListDto(
                 v.Id,
                 v.Slug,
