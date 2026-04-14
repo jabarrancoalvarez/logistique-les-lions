@@ -2,12 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build -- --configuration=production",
   "outputDirectory": "dist/logistique-les-lions/browser",
-  "framework": "angular",
-  "cleanUrls": true,
+  "framework": null,
+  "cleanUrls": false,
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ],
