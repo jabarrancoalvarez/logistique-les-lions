@@ -34,6 +34,16 @@ export const routes: Routes = [
     title: 'Mis vehículos — Logistique Les Lions'
   },
   {
+    path: 'dashboard',
+    redirectTo: '/mis-vehiculos',
+    pathMatch: 'full'
+  },
+  {
+    path: 'favoritos',
+    redirectTo: '/perfil',
+    pathMatch: 'full'
+  },
+  {
     path: 'perfil',
     loadChildren: () =>
       import('./features/users/users.routes').then(m => m.USERS_ROUTES)
