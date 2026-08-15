@@ -29,7 +29,7 @@
 | 7 | **Selección del comparador en `localStorage`** | No viaja entre dispositivos | P10 |
 | 15 | **«Supprimer mon compte»** | Paramètres no lo ofrece: no existe endpoint de baja de cuenta. Tampoco hay pantallas de privacidad ni de seguridad | P25 |
 | 18 | **Envío masivo de comunicaciones** | Una comunicación a «todos» crea una notificación por usuario en una sola operación. Con miles de cuentas debe pasar a un proceso en segundo plano | P32 |
-| 8 | **Puntos de fidelización** | El documento los menciona sin concretarlos. Pendiente de definir | P16a, se retoma en P34 |
+| ~~8~~ | ~~**Puntos de fidelización**~~ | ✅ **Resuelto en P34**: libro de movimientos append-only, +100 por venta verificada (configurable), ajuste manual con motivo y compensación al invalidar | P16a → P34 |
 
 ## 🟡 Calidad y mantenimiento
 
@@ -39,6 +39,7 @@
 | 10 | **Namespaces `LogistiqueLesLions.*`** | Renombrado a `YoonUAuto.*` aplazado a propósito hasta el final | Decisión del usuario, P1 |
 | ~~11~~ | ~~**Menú de usuario en español**~~ | ✅ **Resuelto en P25**: navegación, menú del avatar y panel personal en francés | P25 |
 | 12 | **Rutas en español** | `/mis-negociaciones`, `/mi-garaje`, `/mis-busquedas`, `/ajustes`… conviven con una interfaz en francés. Decidir si se traducen (rompe enlaces existentes) o se dejan | Transversal |
+| 20 | **Componentes de portada huérfanos** | `country-map`, `newsletter` y `stats-counters` ya no se usan tras reescribir la portada en P35. Se decide con el resto del legacy | P35 |
 | 17 | **`dashboard-kpis.component.ts` huérfano** | Renderiza KPIs del producto anterior (procesos, lead time, incidencias). Al reescribir el Tableau de bord dejó de usarse. No se borra porque su módulo sigue pendiente de decisión | P26, ligado a **P35** |
 | 19 | **Estadísticas agregadas en memoria** | `GetStatisticsQuery` trae los anuncios activos, las regiones de todos los usuarios y todas las búsquedas guardadas al proceso para agruparlos con LINQ. Es correcto y agnóstico del proveedor, pero con decenas de miles de filas hay que llevar las agregaciones a SQL (`GROUP BY`, y funciones JSONB para `filters_json`) o cachear el resultado | P33 |
 | 13 | **Avisos del compilador** | `CS9107` en los handlers con clase base y parámetros primarios; `RouterLink` sin usar en `AdminDashboardComponent` | Varias |

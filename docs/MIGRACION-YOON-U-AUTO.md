@@ -79,7 +79,7 @@ Leyenda: ☐ pendiente · ◐ en curso · ☑ completada
   *(cierra tres pendientes: filtro «reportado» en anuncios, reportes en la ficha de usuario y «anuncios pendientes de moderación» en el tableau de bord)*
 - ☑ **P32** — Communications (avisos, mantenimiento, información importante y soporte individual)
 - ☑ **P33** — Statistiques (usuarios, oferta, demanda, desajuste oferta/demanda y embudo de conversión)
-- ☐ **P34** — Configuration: catálogos, parámetros, feature flags, audit log y puntos
+- ☑ **P34** — Configuration: parámetros, feature flags, catálogos, journal d'activité, puntos de fidelización y «Prochainement»
 
 ## Desviaciones conscientes respecto al documento
 
@@ -102,6 +102,15 @@ Leyenda: ☐ pendiente · ◐ en curso · ☑ completada
 | P31 | «Reportado» significa **tener signalements abiertos**, no haberlos tenido alguna vez | Un reporte ya resuelto no puede dejar un anuncio marcado para siempre |
 | P31 | Un usuario no abre dos signalements abiertos sobre lo mismo | Sería ruido en la bandeja, no más información. Cerrado el anterior, sí puede volver a reportar |
 | P31 | Cerrar un signalement exige explicar la decisión; pasarlo a examen, no | Al cerrar hay algo que contar a quien lo abrió y que recordar en el equipo. Ponerlo en examen es solo decir «lo estoy mirando» |
+| P34 | Los **feature flags son filas**, no columnas de `platform_settings` | Un flag nace para una campaña y se retira dos meses después. Como columna, cada uno costaría una migración |
+| P34 | Los puntos son un **libro de movimientos**, con el saldo denormalizado en `UserProfile` | El documento pide consultar «saldo, origen, fecha y movimiento», y eso solo se responde si cada suma dejó su fila. El saldo se guarda aparte para no recorrer el libro al pintar un listado; ambos se escriben en la misma transacción |
+| P34 | Invalidar un contrato **compensa** los puntos con un movimiento en negativo | El libro cuenta lo que pasó, incluido lo que se deshizo. Borrar el movimiento original haría desaparecer la venta de la historia |
+| P34 | El **código** de un equipamiento no cambia una vez creado | Los anuncios ya enlazados dejarían de significar lo mismo. El nombre visible sí se puede corregir |
+| P34 | Retirar del catálogo **no borra** | Una marca usada por doscientos anuncios no puede desaparecer. `IsActive` la esconde de los formularios y deja los anuncios intactos |
+| P34 | «Prochainement» cuelga del **perfil**, no del menú principal | El documento lo dice literalmente: «no debemos llenar el menú con algo que todavía no existe» |
+| P34 | Retirar un «Ça m'intéresse» es **soft delete** con índice único parcial | La regla del proyecto prohíbe el borrado físico. El índice parcial permite volver a declarar el interés después de retirarlo |
+| P35 | La portada **no cita testimonios** | Los del producto anterior eran inventados. Una plataforma que no tiene todavía clientes no puede citarlos |
+| P35 | La portada **no muestra recuentos** por carrocería | Dependen de lo publicado en cada momento; una cifra fija es una promesa que la búsqueda no cumple |
 | P33 | **«Vehículos más comparados» no se mide** | La selección del comparador vive en `localStorage` (desviación de P10): el servidor nunca ve qué se compara. Medirlo exigiría persistir la selección o enviar eventos de uso, que es otra decisión de producto. La pantalla lo dice en su pie |
 | P33 | Los precios se muestran por su **mediana**, con la media al lado en letra pequeña | Un puñado de anuncios muy caros desplaza la media y da una idea falsa del mercado. La media se conserva porque el contraste entre las dos cifras es en sí mismo informativo |
 | P33 | «Activo» significa **haberse conectado** en el periodo | Es lo único que la aplicación registra hoy sobre actividad (`LastLoginAt`). Medir actividad real exigiría instrumentar la navegación |
@@ -160,4 +169,7 @@ Leyenda: ☐ pendiente · ◐ en curso · ☑ completada
 | P17 | El enlace a Mon Garage se ha añadido al menú actual sin rehacerlo | La navegación con los cuatro espacios es P25. Sin el enlace la pantalla solo sería accesible escribiendo la URL |
 
 ### Bloque 6 — Cierre
-- ☐ **P35** — Decisión final sobre los módulos legacy
+- ◐ **P35** — Módulos legacy y portada
+  - ☑ Portada, buscador, «comment ça marche» y pie reescritos en francés para Senegal
+  - ☑ Los 30 bloques del producto anterior, inventariados en `flujopruebas.md` §9
+  - ☐ **Decisión pendiente del usuario**, bloque a bloque, tras probar en producción

@@ -168,6 +168,19 @@ El proveedor en memoria **no los valida**: solo se comprueban contra PostgreSQL 
 - [ ] Las medianas de precio, kilometraje y año se calculan sobre anuncios `Actif` y
       `Reserve`: verificar que no cuentan borradores ni archivados
 
+### Configuration et points (P34)
+
+- [ ] Los `HasData` sembraron: 1 fila en `platform_settings`, 5 `feature_flags`,
+      5 `upcoming_features`
+- [ ] El índice único parcial de `feature_interests` permite volver a declarar un
+      interés retirado (el proveedor en memoria no lo valida)
+- [ ] Cambiar el límite del comparador en `/admin/configuration` lo cambia en el front
+      **sin desplegar**
+- [ ] Validar un contrato suma los puntos configurados; invalidarlo los retira con un
+      movimiento en negativo, sin borrar el original
+- [ ] Un ajuste manual sin motivo es rechazado
+- [ ] El journal registra valor anterior y nuevo en los cambios de parámetros
+
 ## 13. Tiempo real y correo
 
 - [ ] SignalR: las notificaciones de oferta y de contrato llegan en vivo a la campana
