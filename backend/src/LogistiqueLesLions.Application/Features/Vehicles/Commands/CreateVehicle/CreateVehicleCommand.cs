@@ -1,4 +1,3 @@
-using System.Text.Json;
 using LogistiqueLesLions.Application.Common.Models;
 using LogistiqueLesLions.Domain.Enums;
 using MediatR;
@@ -7,10 +6,13 @@ namespace LogistiqueLesLions.Application.Features.Vehicles.Commands.CreateVehicl
 
 public record CreateVehicleCommand(
     string Title,
-    string? DescriptionEs,
-    string? DescriptionEn,
+    /// <summary>Texto libre del vendedor. Nunca se genera ni se reescribe con IA.</summary>
+    string? Description,
+
+    // ─── Información general ───────────────────────────────────────────────
     Guid MakeId,
     Guid? ModelId,
+    string? Version,
     int Year,
     int? Mileage,
     VehicleCondition Condition,
@@ -18,16 +20,34 @@ public record CreateVehicleCommand(
     FuelType? FuelType,
     TransmissionType? Transmission,
     string? Color,
+    int? Doors,
+    int? Seats,
     string? Vin,
+
+    // ─── Motor ─────────────────────────────────────────────────────────────
+    int? PowerCv,
+    int? EngineDisplacementCc,
+    Drivetrain? Drivetrain,
+    string? EngineName,
+
+    // ─── Situación aduanera ────────────────────────────────────────────────
+    CustomsStatus CustomsStatus,
+
+    // ─── Precio ────────────────────────────────────────────────────────────
     decimal Price,
-    string Currency,
     bool PriceNegotiable,
-    string CountryOrigin,
+
+    // ─── Ubicación ─────────────────────────────────────────────────────────
+    string? Region,
     string? City,
-    string? PostalCode,
-    bool IsExportReady,
-    Guid SellerId,
-    Guid? DealerId,
-    JsonDocument? Specs,
-    JsonDocument? Features
+    string? District,
+
+    // ─── Equipamiento ──────────────────────────────────────────────────────
+    IReadOnlyList<Guid> EquipmentIds,
+
+    // ─── Publicación ───────────────────────────────────────────────────────
+    /// <summary>Si es false el anuncio queda en Brouillon y no se publica.</summary>
+    bool Publish,
+
+    Guid SellerId
 ) : IRequest<Result<Guid>>;

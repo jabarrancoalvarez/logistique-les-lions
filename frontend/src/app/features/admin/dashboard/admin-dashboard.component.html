@@ -1,125 +1,193 @@
-<div class="min-h-screen bg-navy/3 p-6">
+<section class="p-6 lg:p-8 max-w-6xl">
 
-  <div class="max-w-7xl mx-auto">
-    <h1 class="font-heading text-3xl font-bold text-navy mb-8">Panel de administración</h1>
+  <header class="mb-6">
+    <h1 class="font-heading text-2xl font-bold text-navy">Tableau de bord</h1>
+    <p class="text-sm text-navy/60 mt-1">
+      Ce qui se passe aujourd'hui sur Yoon u Auto.
+    </p>
+  </header>
 
-    <!-- KPIs avanzados (charts) -->
-    <div class="mb-8">
-      <lll-dashboard-kpis />
-    </div>
+  @if (loading()) {
+    <p class="text-sm text-navy/50 py-10">Chargement…</p>
+  }
 
-    <!-- KPI Cards -->
-    @if (stats()) {
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white rounded-xl border border-navy/10 p-5">
-          <p class="text-xs font-medium text-navy/50 uppercase tracking-wide">Vehículos activos</p>
-          <p class="text-3xl font-bold text-navy mt-1">{{ stats()!.activeListings }}</p>
-          <p class="text-xs text-navy/40 mt-0.5">de {{ stats()!.totalVehicles }} totales</p>
-        </div>
-        <div class="bg-white rounded-xl border border-navy/10 p-5">
-          <p class="text-xs font-medium text-navy/50 uppercase tracking-wide">Usuarios</p>
-          <p class="text-3xl font-bold text-navy mt-1">{{ stats()!.totalUsers }}</p>
-          <p class="text-xs text-navy/40 mt-0.5">+{{ stats()!.newUsersThisMonth }} este mes</p>
-        </div>
-        <div class="bg-white rounded-xl border border-navy/10 p-5">
-          <p class="text-xs font-medium text-navy/50 uppercase tracking-wide">Procesos activos</p>
-          <p class="text-3xl font-bold text-navy mt-1">{{ stats()!.activeProcesses }}</p>
-          <p class="text-xs text-navy/40 mt-0.5">{{ stats()!.completedProcesses }} completados</p>
-        </div>
-        <div class="bg-white rounded-xl border border-gold/30 p-5 bg-gradient-to-br from-gold/5">
-          <p class="text-xs font-medium text-gold/80 uppercase tracking-wide">Valor en catálogo</p>
-          <p class="text-3xl font-bold text-navy mt-1">
-            {{ stats()!.totalListingValue | currency:'EUR':'symbol':'1.0-0' }}
+  @if (error()) {
+    <p class="text-sm text-red-600 py-10" role="alert">
+      Impossible de charger le tableau de bord.
+    </p>
+  }
+
+  @if (data(); as d) {
+
+    <!-- ─── Utilisateurs ────────────────────────────────────────────────── -->
+    <h2 class="font-heading font-semibold text-navy mb-3">Utilisateurs</h2>
+    <ul class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8" role="list">
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Total</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.users.total }}</p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Aujourd'hui</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.users.newToday }}</p>
+        <p class="text-xs text-navy/40 mt-1">
+          {{ d.users.newLast7Days }} sur 7 j · {{ d.users.newLast30Days }} sur 30 j
+        </p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Particuliers / Professionnels</p>
+        <p class="font-heading text-2xl font-bold text-navy">
+          {{ d.users.particuliers }} / {{ d.users.professionnels }}
+        </p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Téléphone vérifié</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.users.phoneVerified }}</p>
+      </li>
+    </ul>
+
+    <!-- ─── Marketplace ─────────────────────────────────────────────────── -->
+    <h2 class="font-heading font-semibold text-navy mb-3">Marketplace</h2>
+    <ul class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8" role="list">
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Annonces actives</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.marketplace.active }}</p>
+        <p class="text-xs text-navy/40 mt-1">
+          {{ d.marketplace.newLast7Days }} publiées sur 7 j
+        </p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Réservés</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.marketplace.reserved }}</p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Vendus</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.marketplace.sold }}</p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Brouillons / En pause</p>
+        <p class="font-heading text-2xl font-bold text-navy">
+          {{ d.marketplace.drafts }} / {{ d.marketplace.paused }}
+        </p>
+        <p class="text-xs text-navy/40 mt-1">{{ d.marketplace.archived }} archivées</p>
+      </li>
+    </ul>
+
+    <!-- ─── Activité ────────────────────────────────────────────────────── -->
+    <h2 class="font-heading font-semibold text-navy mb-1">Activité</h2>
+    <p class="text-xs text-navy/50 mb-3">Sur les 30 derniers jours, sauf indication.</p>
+    <ul class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8" role="list">
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Négociations ouvertes</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.activity.negotiationsActive }}</p>
+        <p class="text-xs text-navy/40 mt-1">
+          {{ d.activity.negotiationsStarted }} démarrées
+        </p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Messages</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.activity.messagesSent }}</p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Offres</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.activity.offersMade }}</p>
+        <p class="text-xs text-navy/40 mt-1">{{ d.activity.offersAccepted }} acceptées</p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Ventes vérifiées</p>
+        <p class="font-heading text-2xl font-bold text-green-700">{{ d.activity.verifiedSales }}</p>
+        <p class="text-xs text-navy/40 mt-1">
+          {{ d.activity.contractsCreated }} contrats créés
+        </p>
+      </li>
+    </ul>
+
+    <!-- ─── Demande ─────────────────────────────────────────────────────── -->
+    <h2 class="font-heading font-semibold text-navy mb-3">Demande</h2>
+    <div class="grid lg:grid-cols-2 gap-4 mb-8">
+      <ul class="grid grid-cols-2 gap-3" role="list">
+        <li class="bg-white rounded-xl border border-navy/10 p-4">
+          <p class="text-xs text-navy/50">Recherches enregistrées</p>
+          <p class="font-heading text-2xl font-bold text-navy">{{ d.demand.savedSearches }}</p>
+          <p class="text-xs text-navy/40 mt-1">
+            {{ d.demand.savedSearchesWithAlert }} avec alerte
           </p>
-          <p class="text-xs text-navy/40 mt-0.5">{{ stats()!.totalConversations }} conversaciones</p>
-        </div>
-      </div>
-    }
+        </li>
+        <li class="bg-white rounded-xl border border-navy/10 p-4">
+          <p class="text-xs text-navy/50">Favoris</p>
+          <p class="font-heading text-2xl font-bold text-navy">{{ d.demand.favoritesTotal }}</p>
+        </li>
+        <li class="bg-white rounded-xl border border-navy/10 p-4 col-span-2">
+          <p class="text-xs text-navy/50">Demandes «&nbsp;Trouvez-moi cette voiture&nbsp;»</p>
+          <p class="font-heading text-2xl font-bold text-navy">
+            {{ d.demand.requestsPending }}
+            <span class="text-sm font-normal text-navy/60">en attente</span>
+          </p>
+          <p class="text-xs text-navy/40 mt-1">
+            {{ d.demand.requestsSearching }} en recherche
+          </p>
+        </li>
+      </ul>
 
-    <!-- Vehicles table -->
-    <div class="bg-white rounded-xl border border-navy/10 overflow-hidden">
-      <div class="flex items-center justify-between p-5 border-b border-navy/10">
-        <h2 class="font-heading font-semibold text-navy">Vehículos</h2>
-        <!-- Status filter -->
-        <div class="flex gap-2">
-          @for (s of ['', 'Reviewing', 'Active', 'Sold', 'Expired']; track s) {
-            <button
-              (click)="filterByStatus(s)"
-              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-              [ngClass]="statusFilter() === s
-                ? 'bg-navy text-ivory'
-                : 'bg-navy/5 text-navy/60'"
-            >
-              {{ s || 'Todos' }}
-            </button>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl border border-navy/10 p-4">
+          <p class="text-sm font-medium text-navy mb-2">Modèles les plus suivis</p>
+          @if (d.demand.topFavoritedModels.length === 0) {
+            <p class="text-xs text-navy/40">Aucune donnée.</p>
+          } @else {
+            <ol class="space-y-1 text-sm" role="list">
+              @for (m of d.demand.topFavoritedModels; track m.label) {
+                <li class="flex justify-between gap-3">
+                  <span class="text-navy/70 truncate">{{ m.label }}</span>
+                  <span class="text-navy font-medium">{{ m.count }}</span>
+                </li>
+              }
+            </ol>
+          }
+        </div>
+
+        <div class="bg-white rounded-xl border border-navy/10 p-4">
+          <p class="text-sm font-medium text-navy mb-2">Modèles les plus demandés</p>
+          @if (d.demand.topRequestedModels.length === 0) {
+            <p class="text-xs text-navy/40">Aucune donnée.</p>
+          } @else {
+            <ol class="space-y-1 text-sm" role="list">
+              @for (m of d.demand.topRequestedModels; track m.label) {
+                <li class="flex justify-between gap-3">
+                  <span class="text-navy/70 truncate">{{ m.label }}</span>
+                  <span class="text-navy font-medium">{{ m.count }}</span>
+                </li>
+              }
+            </ol>
           }
         </div>
       </div>
-
-      @if (loading()) {
-        <div class="p-8 text-center text-navy/40">Cargando...</div>
-      } @else {
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="bg-navy/3 text-left">
-                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Vehículo</th>
-                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Estado</th>
-                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Precio</th>
-                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Vendedor</th>
-                <th class="px-5 py-3 text-xs font-semibold text-navy/60 uppercase tracking-wide">Acciones</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-navy/5">
-              @for (v of vehicles(); track v.id) {
-                <tr class="hover:bg-navy/2 transition-colors">
-                  <td class="px-5 py-3">
-                    <p class="font-medium text-navy text-sm">{{ v.title }}</p>
-                    <p class="text-xs text-navy/40">{{ v.makeName }} · {{ v.year }}</p>
-                  </td>
-                  <td class="px-5 py-3">
-                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium"
-                          [ngClass]="v.status === 'Reviewing'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : v.status === 'Active'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-navy/10 text-navy/60'">
-                      {{ v.status }}
-                    </span>
-                  </td>
-                  <td class="px-5 py-3 text-sm text-navy font-medium">
-                    {{ v.price | currency:v.currency:'symbol':'1.0-0' }}
-                  </td>
-                  <td class="px-5 py-3 text-xs text-navy/60">{{ v.sellerEmail }}</td>
-                  <td class="px-5 py-3">
-                    @if (v.status === 'Reviewing') {
-                      <button
-                        (click)="approve(v.id)"
-                        class="text-xs btn-gold py-1.5 px-3"
-                      >
-                        Aprobar
-                      </button>
-                    }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pagination -->
-        @if (totalPages() > 1) {
-          <div class="flex items-center justify-between px-5 py-4 border-t border-navy/10">
-            <button (click)="prevPage()" [disabled]="page() === 1" class="btn-outline py-1.5 px-3 text-sm disabled:opacity-40">
-              Anterior
-            </button>
-            <span class="text-sm text-navy/60">Página {{ page() }} de {{ totalPages() }}</span>
-            <button (click)="nextPage()" [disabled]="page() === totalPages()" class="btn-outline py-1.5 px-3 text-sm disabled:opacity-40">
-              Siguiente
-            </button>
-          </div>
-        }
-      }
     </div>
-  </div>
-</div>
+
+    <!-- ─── Mon Garage ──────────────────────────────────────────────────── -->
+    <h2 class="font-heading font-semibold text-navy mb-3">Mon Garage</h2>
+    <ul class="grid grid-cols-2 lg:grid-cols-4 gap-3" role="list">
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Véhicules</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.garage.vehiclesTotal }}</p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Achetés sur Yoon u Auto</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.garage.fromYoonUAuto }}</p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Ajoutés manuellement</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.garage.addedManually }}</p>
+      </li>
+      <li class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Remis en vente</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ d.garage.convertedToListings }}</p>
+      </li>
+    </ul>
+
+    <p class="text-sm mt-8">
+      <a routerLink="/admin/vehiculos" class="text-azure-dark hover:underline">
+        Voir les annonces →
+      </a>
+    </p>
+  }
+</section>

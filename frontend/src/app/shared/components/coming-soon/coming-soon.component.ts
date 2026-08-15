@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [RouterLink],
   template: `
-    <div class="min-h-screen bg-ivory/50 flex items-center">
+    <div class="min-h-screen bg-frost/50 flex items-center">
       <div class="container mx-auto px-4 py-20 text-center max-w-xl">
         <div class="w-20 h-20 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-6">
           <svg class="w-10 h-10 text-navy/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,7 +18,7 @@ import { RouterLink } from '@angular/router';
         <p class="text-navy/60 mb-8 leading-relaxed">
           Este módulo está en desarrollo y estará disponible próximamente.
         </p>
-        <a routerLink="/" class="btn-gold py-3 px-6">Volver al inicio</a>
+        <a routerLink="/" class="btn-azure py-3 px-6">Volver al inicio</a>
       </div>
     </div>
   `

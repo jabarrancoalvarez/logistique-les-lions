@@ -1,0 +1,99 @@
+<section class="bg-frost min-h-[70vh] py-8">
+  <div class="max-w-4xl mx-auto px-4">
+
+    <div class="mb-6">
+      <h1 class="font-heading font-bold text-navy text-2xl sm:text-3xl">Mes recherches</h1>
+      <p class="text-sm text-navy/60 mt-1">
+        Tout ce qui vous aide à trouver votre véhicule&nbsp;: ce que vous suivez, ce que
+        vous comparez et ce que vous avez demandé.
+      </p>
+    </div>
+
+    <ul class="grid sm:grid-cols-2 gap-4" role="list">
+
+      <!-- ─── Favoris ─────────────────────────────────────────────────── -->
+      <li>
+        <a routerLink="/favoritos"
+          class="block h-full bg-white rounded-xl border border-navy/10 p-5
+                 hover:border-azure/40 transition-colors">
+          <div class="flex items-start justify-between gap-3">
+            <h2 class="font-heading font-semibold text-navy">Favoris</h2>
+            @if (favoritesCount() !== null) {
+              <span class="text-sm font-medium text-navy/60">{{ favoritesCount() }}</span>
+            }
+          </div>
+          <p class="text-sm text-navy/60 mt-1">
+            Les véhicules que vous suivez. Vous êtes prévenu si le prix baisse.
+          </p>
+        </a>
+      </li>
+
+      <!-- ─── Recherches enregistrées ─────────────────────────────────── -->
+      <li>
+        <a routerLink="/busquedas-guardadas"
+          class="block h-full bg-white rounded-xl border border-navy/10 p-5
+                 hover:border-azure/40 transition-colors">
+          <div class="flex items-start justify-between gap-3">
+            <h2 class="font-heading font-semibold text-navy">Recherches enregistrées</h2>
+            @if (savedSearchesCount() !== null) {
+              <span class="text-sm font-medium text-navy/60">{{ savedSearchesCount() }}</span>
+            }
+          </div>
+          <p class="text-sm text-navy/60 mt-1">
+            Vos critères conservés, avec alerte quand une nouvelle voiture y correspond.
+          </p>
+          @if (activeAlerts() > 0) {
+            <p class="text-xs text-green-700 mt-2">
+              {{ activeAlerts() }}
+              {{ activeAlerts() === 1 ? 'alerte active' : 'alertes actives' }}
+            </p>
+          }
+        </a>
+      </li>
+
+      <!-- ─── Comparateur ─────────────────────────────────────────────── -->
+      <li>
+        <a routerLink="/comparateur"
+          class="block h-full bg-white rounded-xl border border-navy/10 p-5
+                 hover:border-azure/40 transition-colors">
+          <div class="flex items-start justify-between gap-3">
+            <h2 class="font-heading font-semibold text-navy">Comparateur</h2>
+            <span class="text-sm font-medium text-navy/60">{{ comparator.count() }}</span>
+          </div>
+          <p class="text-sm text-navy/60 mt-1">
+            Jusqu'à trois véhicules côte à côte, ligne par ligne.
+          </p>
+        </a>
+      </li>
+
+      <!-- ─── Mes demandes ────────────────────────────────────────────── -->
+      <li>
+        <a routerLink="/mis-pedidos"
+          class="block h-full bg-white rounded-xl border border-navy/10 p-5
+                 hover:border-azure/40 transition-colors">
+          <div class="flex items-start justify-between gap-3">
+            <h2 class="font-heading font-semibold text-navy">Mes demandes</h2>
+            @if (requestsCount() !== null) {
+              <span class="text-sm font-medium text-navy/60">{{ requestsCount() }}</span>
+            }
+          </div>
+          <p class="text-sm text-navy/60 mt-1">
+            Vos demandes «&nbsp;Trouvez-moi cette voiture&nbsp;» et leur suivi.
+          </p>
+          @if (newProposals() > 0) {
+            <p class="text-xs text-azure-dark font-medium mt-2">
+              {{ newProposals() }}
+              {{ newProposals() === 1 ? 'nouvelle proposition' : 'nouvelles propositions' }}
+            </p>
+          }
+        </a>
+      </li>
+    </ul>
+
+    <p class="text-center mt-8">
+      <a routerLink="/vehiculos" class="btn-primary text-sm inline-block">
+        Chercher un véhicule
+      </a>
+    </p>
+  </div>
+</section>

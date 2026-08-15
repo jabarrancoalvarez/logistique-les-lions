@@ -1,0 +1,90 @@
+<div class="relative">
+
+  <!-- ─── Cloche ──────────────────────────────────────────────────────── -->
+  <button
+    type="button"
+    (click)="toggle()"
+    class="relative flex items-center justify-center w-9 h-9 rounded-full text-frost/80 hover:text-azure-light hover:bg-white/5 transition-colors"
+    [attr.aria-expanded]="open()"
+    [attr.aria-label]="notifications.unreadCount() > 0
+      ? notifications.unreadCount() + ' notifications non lues'
+      : 'Notifications'"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+    </svg>
+
+    @if (notifications.hasUnread()) {
+      <span class="absolute -top-0.5 -right-0.5 min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-red-500 text-white text-[0.65rem] font-bold flex items-center justify-center">
+        {{ notifications.unreadCount() > 99 ? '99+' : notifications.unreadCount() }}
+      </span>
+    }
+  </button>
+
+  <!-- ─── Panneau ─────────────────────────────────────────────────────── -->
+  @if (open()) {
+    <div
+      class="absolute right-0 top-full mt-2 w-[22rem] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-navy/10 overflow-hidden z-[110]"
+      role="dialog"
+      aria-label="Notifications"
+    >
+      <div class="flex items-center justify-between px-4 py-3 border-b border-navy/10">
+        <p class="font-heading font-semibold text-navy text-sm">Notifications</p>
+        @if (notifications.hasUnread()) {
+          <button type="button" (click)="markAllRead($event)"
+            class="text-xs font-medium text-azure-dark hover:underline">
+            Tout marquer comme lu
+          </button>
+        }
+      </div>
+
+      @if (notifications.items().length === 0) {
+        <div class="px-4 py-10 text-center">
+          <svg class="w-10 h-10 mx-auto mb-2 text-navy/15" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          <p class="text-sm text-navy/50">Aucune notification pour le moment.</p>
+        </div>
+      } @else {
+        <ul class="max-h-[26rem] overflow-y-auto divide-y divide-navy/5" role="list">
+          @for (n of notifications.items(); track n.id) {
+            <li>
+              <button
+                type="button"
+                (click)="openNotification(n)"
+                class="w-full text-left px-4 py-3 flex gap-3 hover:bg-frost transition-colors"
+                [class.bg-azure]="!n.isRead"
+                [class.bg-opacity-5]="!n.isRead"
+              >
+                <!-- Icône de catégorie -->
+                <span class="shrink-0 w-8 h-8 rounded-full bg-navy/5 flex items-center justify-center mt-0.5"
+                      [title]="categoryLabel(n.category)">
+                  <svg class="w-4 h-4 text-navy/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      [attr.d]="categoryIcon(n.category)"/>
+                  </svg>
+                </span>
+
+                <span class="min-w-0 flex-1">
+                  <span class="block text-sm text-navy" [class.font-semibold]="!n.isRead">
+                    {{ n.title }}
+                  </span>
+                  @if (n.body) {
+                    <span class="block text-xs text-navy/60 mt-0.5 line-clamp-2">{{ n.body }}</span>
+                  }
+                  <span class="block text-xs text-navy/40 mt-1">{{ timeAgo(n.createdAt) }}</span>
+                </span>
+
+                @if (!n.isRead) {
+                  <span class="shrink-0 w-2 h-2 rounded-full bg-azure mt-2" aria-hidden="true"></span>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

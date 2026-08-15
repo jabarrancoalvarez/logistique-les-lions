@@ -19,15 +19,15 @@ interface Inspector {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, CommonModule],
   template: `
-    <div class="min-h-screen bg-ivory">
+    <div class="min-h-screen bg-frost">
       <!-- Header -->
       <div class="bg-navy py-20 px-4">
         <div class="container mx-auto max-w-4xl text-center">
-          <p class="divider-gold justify-center mb-6">Red de confianza</p>
-          <h1 class="font-heading text-4xl lg:text-5xl font-bold text-ivory mb-4">
-            Inspectores <span class="text-gold">Certificados</span>
+          <p class="divider-azure justify-center mb-6">Red de confianza</p>
+          <h1 class="font-heading text-4xl lg:text-5xl font-bold text-frost mb-4">
+            Inspectores <span class="text-azure">Certificados</span>
           </h1>
-          <p class="text-ivory/70 text-lg leading-relaxed max-w-2xl mx-auto">
+          <p class="text-frost/70 text-lg leading-relaxed max-w-2xl mx-auto">
             Antes de comprar un vehículo importado, nuestros inspectores certificados realizan una revisión técnica exhaustiva in situ. Compra con total confianza.
           </p>
         </div>
@@ -39,8 +39,8 @@ interface Inspector {
           <div class="grid sm:grid-cols-3 gap-6 text-center">
             @for (benefit of benefits; track benefit.title) {
               <div class="flex flex-col items-center gap-3">
-                <div class="w-12 h-12 bg-gold/10 rounded-xl flex items-center justify-center">
-                  <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-12 h-12 bg-azure/10 rounded-xl flex items-center justify-center">
+                  <svg class="w-6 h-6 text-azure" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="benefit.icon"/>
                   </svg>
                 </div>
@@ -77,7 +77,7 @@ interface Inspector {
               <div class="flex items-center gap-1.5 mb-3">
                 <div class="flex">
                   @for (star of [1,2,3,4,5]; track star) {
-                    <svg [class]="star <= inspector.rating ? 'w-3.5 h-3.5 text-gold' : 'w-3.5 h-3.5 opacity-20 text-navy'" fill="currentColor" viewBox="0 0 20 20">
+                    <svg [class]="star <= inspector.rating ? 'w-3.5 h-3.5 text-azure' : 'w-3.5 h-3.5 opacity-20 text-navy'" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                     </svg>
                   }
@@ -101,15 +101,15 @@ interface Inspector {
 
         <!-- Process -->
         <div class="bg-navy rounded-2xl p-8 mb-12 text-white">
-          <h2 class="font-heading text-2xl font-bold text-ivory mb-8 text-center">¿Cómo funciona la inspección?</h2>
+          <h2 class="font-heading text-2xl font-bold text-frost mb-8 text-center">¿Cómo funciona la inspección?</h2>
           <div class="grid sm:grid-cols-4 gap-6">
             @for (step of inspectionSteps; track step.num) {
               <div class="text-center">
-                <div class="w-10 h-10 rounded-full bg-gold flex items-center justify-center text-navy font-bold font-heading mx-auto mb-3">
+                <div class="w-10 h-10 rounded-full bg-azure flex items-center justify-center text-navy font-bold font-heading mx-auto mb-3">
                   {{ step.num }}
                 </div>
-                <h3 class="font-semibold text-ivory text-sm mb-1">{{ step.title }}</h3>
-                <p class="text-ivory/50 text-xs">{{ step.desc }}</p>
+                <h3 class="font-semibold text-frost text-sm mb-1">{{ step.title }}</h3>
+                <p class="text-frost/50 text-xs">{{ step.desc }}</p>
               </div>
             }
           </div>
@@ -119,7 +119,7 @@ interface Inspector {
         <div class="text-center">
           <h2 class="font-heading text-2xl font-bold text-navy mb-3">¿Quieres ser inspector certificado?</h2>
           <p class="text-navy/60 mb-6">Únete a nuestra red de inspectores y ofrece tus servicios a miles de compradores</p>
-          <a routerLink="/auth/register" class="btn-gold py-3 px-8">Solicitar certificación</a>
+          <a routerLink="/auth/register" class="btn-azure py-3 px-8">Solicitar certificación</a>
         </div>
       </div>
     </div>

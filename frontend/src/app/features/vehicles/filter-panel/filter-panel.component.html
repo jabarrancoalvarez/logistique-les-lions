@@ -1,109 +1,259 @@
-<div class="card p-5 space-y-5">
-  <div class="flex items-center justify-between">
-    <h2 class="font-heading font-semibold text-navy">Filtros</h2>
-    <button (click)="reset()" class="text-xs text-gold hover:underline">Limpiar todo</button>
+<div class="bg-white rounded-2xl border border-navy/10 p-5 space-y-5">
+
+  <!-- ─── Barre de recherche ────────────────────────────────────────────── -->
+  <div>
+    <label for="f-search" class="block text-sm font-medium text-navy mb-1.5">Rechercher</label>
+    <input id="f-search" type="search" [(ngModel)]="search" (ngModelChange)="requestCount()"
+      class="input" placeholder="Toyota Corolla, Hilux, YU12345…">
   </div>
 
-  <!-- Búsqueda -->
-  <div>
-    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Búsqueda</label>
-    <input
-      type="text"
-      class="input"
-      placeholder="BMW, Mercedes, Tesla..."
-      [(ngModel)]="search"
-    >
-  </div>
-
-  <!-- Marca -->
-  <div>
-    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Marca</label>
-    <select class="input" [(ngModel)]="makeId">
-      <option value="">Todas las marcas</option>
-      @for (make of makes(); track make.id) {
-        <option [value]="make.id">{{ make.name }}</option>
+  <!-- ─── Statut douanier : mis en avant par son importance au Sénégal ──── -->
+  <fieldset class="rounded-xl border-2 border-azure/40 bg-azure/5 p-3">
+    <legend class="px-1.5 text-sm font-semibold text-navy">Statut douanier</legend>
+    <div class="grid grid-cols-3 gap-1.5">
+      <button type="button" (click)="customsStatus = ''; requestCount()"
+        class="px-2 py-2 rounded-lg text-xs font-medium border transition-colors"
+        [class]="customsStatus === '' ? 'border-azure bg-white text-navy' : 'border-transparent text-navy/60 hover:bg-white/60'">
+        Tous
+      </button>
+      @for (c of customsStatuses; track c.value) {
+        <button type="button" (click)="customsStatus = c.value; requestCount()"
+          class="px-2 py-2 rounded-lg text-xs font-medium border transition-colors"
+          [class]="customsStatus === c.value ? 'border-azure bg-white text-navy' : 'border-transparent text-navy/60 hover:bg-white/60'">
+          {{ c.label }}
+        </button>
       }
-    </select>
-  </div>
-
-  <!-- País de origen -->
-  <div>
-    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">País de origen</label>
-    <select class="input" [(ngModel)]="countryOrigin">
-      <option value="">Todos los países</option>
-      @for (c of countries; track c.code) {
-        <option [value]="c.code">{{ c.name }}</option>
-      }
-    </select>
-  </div>
-
-  <!-- Precio -->
-  <div>
-    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Precio (EUR)</label>
-    <div class="flex gap-2">
-      <input type="number" class="input" placeholder="Mín." [(ngModel)]="priceFrom" min="0">
-      <input type="number" class="input" placeholder="Máx." [(ngModel)]="priceTo" min="0">
     </div>
-  </div>
+  </fieldset>
 
-  <!-- Año -->
-  <div>
-    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Año</label>
-    <div class="flex gap-2">
-      <select class="input" [(ngModel)]="yearFrom">
-        <option value="">Desde</option>
-        @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+  <!-- ─── Marque et modèle ─────────────────────────────────────────────── -->
+  <div class="grid grid-cols-1 gap-3">
+    <div>
+      <label for="f-make" class="block text-sm font-medium text-navy mb-1.5">Marque</label>
+      <select id="f-make" [(ngModel)]="makeId" (ngModelChange)="onMakeChange()" class="input">
+        <option value="">Toutes les marques</option>
+        @for (m of makes(); track m.id) { <option [value]="m.id">{{ m.name }}</option> }
       </select>
-      <select class="input" [(ngModel)]="yearTo">
-        <option value="">Hasta</option>
-        @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+    </div>
+    <div>
+      <label for="f-model" class="block text-sm font-medium text-navy mb-1.5">Modèle</label>
+      <select id="f-model" [(ngModel)]="modelId" (ngModelChange)="requestCount()"
+        [disabled]="models().length === 0" class="input disabled:bg-navy/5 disabled:text-navy/40">
+        <option value="">{{ makeId ? 'Tous les modèles' : 'Choisissez d\'abord une marque' }}</option>
+        @for (m of models(); track m.id) { <option [value]="m.id">{{ m.name }}</option> }
       </select>
     </div>
   </div>
 
-  <!-- Condición -->
-  <div>
-    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Estado</label>
-    <select class="input" [(ngModel)]="condition">
-      <option value="">Cualquiera</option>
-      @for (c of conditions; track c.value) { <option [value]="c.value">{{ c.label }}</option> }
-    </select>
+  <!-- ─── Prix ─────────────────────────────────────────────────────────── -->
+  <fieldset>
+    <legend class="block text-sm font-medium text-navy mb-1.5">Prix (FCFA)</legend>
+    <div class="grid grid-cols-2 gap-2">
+      <input type="number" min="0" [(ngModel)]="priceFrom" (ngModelChange)="requestCount()"
+        class="input" placeholder="Minimum" aria-label="Prix minimum">
+      <input type="number" min="0" [(ngModel)]="priceTo" (ngModelChange)="requestCount()"
+        class="input" placeholder="Maximum" aria-label="Prix maximum">
+    </div>
+  </fieldset>
+
+  <!-- ─── Année ────────────────────────────────────────────────────────── -->
+  <fieldset>
+    <legend class="block text-sm font-medium text-navy mb-1.5">Année</legend>
+    <div class="grid grid-cols-2 gap-2">
+      <select [(ngModel)]="yearFrom" (ngModelChange)="requestCount()" class="input" aria-label="Année depuis">
+        <option value="">Depuis</option>
+        @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+      </select>
+      <select [(ngModel)]="yearTo" (ngModelChange)="requestCount()" class="input" aria-label="Année jusqu'à">
+        <option value="">Jusqu'à</option>
+        @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+      </select>
+    </div>
+  </fieldset>
+
+  <!-- ─── Kilométrage ──────────────────────────────────────────────────── -->
+  <fieldset>
+    <legend class="block text-sm font-medium text-navy mb-1.5">Kilométrage</legend>
+    <div class="grid grid-cols-2 gap-2">
+      <input type="number" min="0" [(ngModel)]="mileageFrom" (ngModelChange)="requestCount()"
+        class="input" placeholder="Depuis" aria-label="Kilométrage depuis">
+      <input type="number" min="0" [(ngModel)]="mileageTo" (ngModelChange)="requestCount()"
+        class="input" placeholder="Jusqu'à" aria-label="Kilométrage jusqu'à">
+    </div>
+  </fieldset>
+
+  <!-- ─── Localisation ─────────────────────────────────────────────────── -->
+  <fieldset>
+    <legend class="block text-sm font-medium text-navy mb-1.5">Localisation</legend>
+    <div class="grid grid-cols-1 gap-2">
+      <select [(ngModel)]="region" (ngModelChange)="onRegionChange()" class="input" aria-label="Région">
+        <option value="">Toutes les régions</option>
+        @for (r of regions; track r.code) { <option [value]="r.code">{{ r.name }}</option> }
+      </select>
+      <select [(ngModel)]="city" (ngModelChange)="requestCount()" [disabled]="cities().length === 0"
+        class="input disabled:bg-navy/5 disabled:text-navy/40" aria-label="Ville">
+        <option value="">Toutes les villes</option>
+        @for (c of cities(); track c) { <option [value]="c">{{ c }}</option> }
+      </select>
+    </div>
+  </fieldset>
+
+  <!-- ─── Carburant, boîte, carrosserie ────────────────────────────────── -->
+  <div class="grid grid-cols-1 gap-3">
+    <div>
+      <label for="f-fuel" class="block text-sm font-medium text-navy mb-1.5">Carburant</label>
+      <select id="f-fuel" [(ngModel)]="fuelType" (ngModelChange)="requestCount()" class="input">
+        <option value="">Tous</option>
+        @for (f of fuelTypes; track f.value) { <option [value]="f.value">{{ f.label }}</option> }
+      </select>
+    </div>
+    <div>
+      <label for="f-tx" class="block text-sm font-medium text-navy mb-1.5">Boîte de vitesses</label>
+      <select id="f-tx" [(ngModel)]="transmission" (ngModelChange)="requestCount()" class="input">
+        <option value="">Toutes</option>
+        @for (t of transmissions; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+      </select>
+    </div>
+    <div>
+      <label for="f-body" class="block text-sm font-medium text-navy mb-1.5">Carrosserie</label>
+      <select id="f-body" [(ngModel)]="bodyType" (ngModelChange)="requestCount()" class="input">
+        <option value="">Toutes</option>
+        @for (b of bodyTypes; track b.value) { <option [value]="b.value">{{ b.label }}</option> }
+      </select>
+    </div>
   </div>
 
-  <!-- Combustible -->
-  <div>
-    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Combustible</label>
-    <select class="input" [(ngModel)]="fuelType">
-      <option value="">Todos</option>
-      @for (f of fuelTypes; track f.value) { <option [value]="f.value">{{ f.label }}</option> }
-    </select>
+  <!-- ─── Filtres avancés ──────────────────────────────────────────────── -->
+  <div class="border-t border-navy/10 pt-4">
+    <button type="button" (click)="toggleAdvanced()"
+      class="w-full flex items-center justify-between text-sm font-medium text-navy"
+      [attr.aria-expanded]="advancedOpen()">
+      <span>Filtres avancés</span>
+      <svg class="w-4 h-4 transition-transform" [class.rotate-180]="advancedOpen()"
+        fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </button>
+
+    @if (advancedOpen()) {
+      <div class="mt-4 space-y-4">
+
+        <fieldset>
+          <legend class="block text-sm font-medium text-navy mb-1.5">Puissance (CV)</legend>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="number" min="0" [(ngModel)]="powerFrom" (ngModelChange)="requestCount()"
+              class="input" placeholder="Depuis" aria-label="Puissance depuis">
+            <input type="number" min="0" [(ngModel)]="powerTo" (ngModelChange)="requestCount()"
+              class="input" placeholder="Jusqu'à" aria-label="Puissance jusqu'à">
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="block text-sm font-medium text-navy mb-1.5">Cylindrée (cm³)</legend>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="number" min="0" [(ngModel)]="displacementFrom" (ngModelChange)="requestCount()"
+              class="input" placeholder="Depuis" aria-label="Cylindrée depuis">
+            <input type="number" min="0" [(ngModel)]="displacementTo" (ngModelChange)="requestCount()"
+              class="input" placeholder="Jusqu'à" aria-label="Cylindrée jusqu'à">
+          </div>
+        </fieldset>
+
+        <div>
+          <label for="f-drive" class="block text-sm font-medium text-navy mb-1.5">Transmission</label>
+          <select id="f-drive" [(ngModel)]="drivetrain" (ngModelChange)="requestCount()" class="input">
+            <option value="">Toutes</option>
+            @for (d of drivetrains; track d.value) { <option [value]="d.value">{{ d.label }}</option> }
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="f-doors" class="block text-sm font-medium text-navy mb-1.5">Portes</label>
+            <select id="f-doors" [(ngModel)]="doorRange" (ngModelChange)="requestCount()" class="input">
+              <option value="">Toutes</option>
+              @for (d of doorRanges; track d.value) { <option [value]="d.value">{{ d.label }}</option> }
+            </select>
+          </div>
+          <div>
+            <label for="f-seats" class="block text-sm font-medium text-navy mb-1.5">Places</label>
+            <select id="f-seats" [(ngModel)]="seatRange" (ngModelChange)="requestCount()" class="input">
+              <option value="">Toutes</option>
+              @for (s of seatRanges; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="f-color" class="block text-sm font-medium text-navy mb-1.5">Couleur</label>
+          <select id="f-color" [(ngModel)]="color" (ngModelChange)="requestCount()" class="input">
+            <option value="">Toutes</option>
+            @for (c of colors(); track c) { <option [value]="c">{{ c }}</option> }
+          </select>
+        </div>
+
+        <!-- Équipements : sélection multiple -->
+        @if (equipments().length > 0) {
+          <fieldset>
+            <legend class="block text-sm font-medium text-navy mb-2">Équipements</legend>
+            <div class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+              @for (e of equipments(); track e.id) {
+                <label class="flex items-center gap-2 cursor-pointer text-sm text-navy/80">
+                  <input type="checkbox" class="w-4 h-4 accent-azure"
+                    [checked]="isEquipmentSelected(e.id)"
+                    (change)="toggleEquipment(e.id)">
+                  <span>{{ e.name }}</span>
+                </label>
+              }
+            </div>
+          </fieldset>
+        }
+
+        <div>
+          <label for="f-seller" class="block text-sm font-medium text-navy mb-1.5">
+            Type de vendeur
+          </label>
+          <select id="f-seller" [(ngModel)]="sellerAccountType" (ngModelChange)="requestCount()" class="input">
+            @for (s of sellerTypes; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+          </select>
+        </div>
+      </div>
+    }
   </div>
 
-  <!-- Transmisión -->
-  <div>
-    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Transmisión</label>
-    <select class="input" [(ngModel)]="transmission">
-      <option value="">Cualquiera</option>
-      @for (t of transmissions; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
-    </select>
-  </div>
+  <!-- ─── Compteur de résultats et boutons ─────────────────────────────── -->
+  <div class="border-t border-navy/10 pt-4 space-y-2">
+    <p class="text-sm text-center" [class]="countingError() ? 'text-red-600' : 'text-navy/60'" aria-live="polite">
+      @if (countingError()) {
+        Impossible de calculer le nombre de résultats.
+      } @else if (previewCount() === null) {
+        Calcul en cours…
+      } @else if (previewCount() === 0) {
+        Aucun véhicule ne correspond
+      } @else {
+        <span class="font-semibold text-navy">{{ previewCount() }}</span>
+        {{ previewCount() === 1 ? 'véhicule correspond' : 'véhicules correspondent' }}
+      }
+    </p>
 
-  <!-- Carrocería -->
-  <div>
-    <label class="text-xs font-semibold text-navy/70 uppercase tracking-wide mb-1.5 block">Carrocería</label>
-    <select class="input" [(ngModel)]="bodyType">
-      <option value="">Todas</option>
-      @for (b of bodyTypes; track b.value) { <option [value]="b.value">{{ b.label }}</option> }
-    </select>
-  </div>
+    <button type="button" (click)="apply()" class="btn-azure w-full py-3">
+      Appliquer les filtres
+    </button>
+    <button type="button" (click)="reset()" class="btn-outline w-full py-2.5 text-sm">
+      Effacer les filtres
+    </button>
+    <button type="button" (click)="saveSearch()" [disabled]="saving()"
+      class="btn-outline w-full py-2.5 text-sm disabled:opacity-50">
+      @if (saving()) { Enregistrement… } @else { Enregistrer la recherche }
+    </button>
 
-  <!-- Listo para exportar -->
-  <div class="flex items-center gap-2">
-    <input type="checkbox" id="export-ready" [(ngModel)]="isExportReady" class="w-4 h-4">
-    <label for="export-ready" class="text-sm text-navy">Solo listo para exportar</label>
+    @if (saved()) {
+      <p class="text-xs text-green-700 text-center" role="status">
+        Recherche enregistrée.
+        <a routerLink="/busquedas-guardadas" class="font-medium underline">Voir mes recherches</a>
+      </p>
+    }
+    @if (saveError()) {
+      <p class="text-xs text-red-600 text-center" role="alert">{{ saveError() }}</p>
+    }
   </div>
-
-  <button (click)="apply()" class="btn-gold w-full py-3">
-    Aplicar filtros
-  </button>
 </div>

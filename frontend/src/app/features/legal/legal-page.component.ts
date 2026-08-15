@@ -24,11 +24,11 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
     sections: [
       {
         title: '1. Datos del titular',
-        body: 'Logistique Les Lions, S.L. (en adelante, "la Empresa") es titular del sitio web logistiqueleslions.com. Domicilio social: Calle de ejemplo, 123, 28001 Madrid, España. NIF: B-12345678. Registro Mercantil de Madrid, Tomo XXXXX, Folio XXX, Hoja M-XXXXXX.'
+        body: 'Yoon U Auto, S.L. (en adelante, "la Empresa") es titular del sitio web yoonuauto.com. Domicilio social: Calle de ejemplo, 123, 28001 Madrid, España. NIF: B-12345678. Registro Mercantil de Madrid, Tomo XXXXX, Folio XXX, Hoja M-XXXXXX.'
       },
       {
         title: '2. Objeto y ámbito de aplicación',
-        body: 'El presente Aviso Legal regula el acceso y uso del sitio web logistiqueleslions.com, plataforma dedicada a la compraventa e importación de vehículos de origen europeo y mundial. El acceso a este sitio web implica la aceptación plena y sin reservas de las presentes condiciones de uso.'
+        body: 'El presente Aviso Legal regula el acceso y uso del sitio web yoonuauto.com, plataforma dedicada a la compraventa e importación de vehículos de origen europeo y mundial. El acceso a este sitio web implica la aceptación plena y sin reservas de las presentes condiciones de uso.'
       },
       {
         title: '3. Propiedad intelectual e industrial',
@@ -47,11 +47,11 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
   'privacidad': {
     heading: 'Política de Privacidad',
     lastUpdate: 'Enero 2025',
-    intro: 'Logistique Les Lions, S.L. se compromete a proteger y respetar su privacidad. Esta política explica cuándo y por qué recopilamos información personal, cómo la usamos y en qué condiciones podemos compartirla con terceros.',
+    intro: 'Yoon U Auto, S.L. se compromete a proteger y respetar su privacidad. Esta política explica cuándo y por qué recopilamos información personal, cómo la usamos y en qué condiciones podemos compartirla con terceros.',
     sections: [
       {
         title: '1. Responsable del tratamiento',
-        body: 'Logistique Les Lions, S.L., NIF B-12345678, con domicilio en Calle de ejemplo, 123, 28001 Madrid. Email de contacto: privacidad@logistiqueleslions.com.'
+        body: 'Yoon U Auto, S.L., NIF B-12345678, con domicilio en Calle de ejemplo, 123, 28001 Madrid. Email de contacto: privacidad@yoonuauto.com.'
       },
       {
         title: '2. Datos que recopilamos',
@@ -71,7 +71,7 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
       },
       {
         title: '6. Sus derechos',
-        body: 'Tiene derecho a acceder a sus datos, rectificarlos, suprimirlos, oponerse al tratamiento, solicitar la limitación del tratamiento y la portabilidad de los datos. Puede ejercer estos derechos escribiendo a privacidad@logistiqueleslions.com, adjuntando copia de su DNI. Tiene derecho a presentar reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).'
+        body: 'Tiene derecho a acceder a sus datos, rectificarlos, suprimirlos, oponerse al tratamiento, solicitar la limitación del tratamiento y la portabilidad de los datos. Puede ejercer estos derechos escribiendo a privacidad@yoonuauto.com, adjuntando copia de su DNI. Tiene derecho a presentar reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).'
       },
       {
         title: '7. Transferencias internacionales',
@@ -109,11 +109,11 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
   'terminos': {
     heading: 'Términos y Condiciones',
     lastUpdate: 'Enero 2025',
-    intro: 'Los presentes Términos y Condiciones regulan el uso de la plataforma Logistique Les Lions y los servicios ofrecidos a través de ella. Al registrarse o utilizar nuestra plataforma, usted acepta estos términos en su totalidad.',
+    intro: 'Los presentes Términos y Condiciones regulan el uso de la plataforma Yoon U Auto y los servicios ofrecidos a través de ella. Al registrarse o utilizar nuestra plataforma, usted acepta estos términos en su totalidad.',
     sections: [
       {
         title: '1. Descripción del servicio',
-        body: 'Logistique Les Lions es una plataforma online que conecta a compradores y vendedores de vehículos de origen internacional, facilitando además servicios de tramitación documental, homologación e importación. Actuamos como intermediarios y no somos parte en las transacciones entre usuarios.'
+        body: 'Yoon U Auto es una plataforma online que conecta a compradores y vendedores de vehículos de origen internacional, facilitando además servicios de tramitación documental, homologación e importación. Actuamos como intermediarios y no somos parte en las transacciones entre usuarios.'
       },
       {
         title: '2. Registro y cuenta de usuario',
@@ -129,7 +129,7 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
       },
       {
         title: '5. Limitación de responsabilidad',
-        body: 'Logistique Les Lions no asume responsabilidad por el estado real de los vehículos anunciados, la veracidad de la información proporcionada por los usuarios, ni por las transacciones realizadas entre compradores y vendedores. Recomendamos siempre verificar el vehículo antes de la compra.'
+        body: 'Yoon U Auto no asume responsabilidad por el estado real de los vehículos anunciados, la veracidad de la información proporcionada por los usuarios, ni por las transacciones realizadas entre compradores y vendedores. Recomendamos siempre verificar el vehículo antes de la compra.'
       },
       {
         title: '6. Modificaciones',
@@ -144,7 +144,7 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
     sections: [
       {
         title: 'Base de legitimación',
-        body: 'Los tratamientos de datos personales realizados por Logistique Les Lions tienen como base jurídica: (a) el consentimiento del interesado para el envío de comunicaciones comerciales; (b) la ejecución del contrato de uso de la plataforma; (c) el cumplimiento de obligaciones legales; (d) el interés legítimo de la empresa en la mejora de sus servicios y la prevención del fraude.'
+        body: 'Los tratamientos de datos personales realizados por Yoon U Auto tienen como base jurídica: (a) el consentimiento del interesado para el envío de comunicaciones comerciales; (b) la ejecución del contrato de uso de la plataforma; (c) el cumplimiento de obligaciones legales; (d) el interés legítimo de la empresa en la mejora de sus servicios y la prevención del fraude.'
       },
       {
         title: 'Categorías de datos tratados',
@@ -160,11 +160,11 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
       },
       {
         title: 'Ejercicio de derechos',
-        body: 'El interesado tiene derecho a: acceso, rectificación, supresión ("derecho al olvido"), limitación del tratamiento, portabilidad, oposición, y a no ser objeto de decisiones individualizadas automatizadas. Para ejercer estos derechos, dirija una solicitud a: dpo@logistiqueleslions.com. Tiene derecho a presentar reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).'
+        body: 'El interesado tiene derecho a: acceso, rectificación, supresión ("derecho al olvido"), limitación del tratamiento, portabilidad, oposición, y a no ser objeto de decisiones individualizadas automatizadas. Para ejercer estos derechos, dirija una solicitud a: dpo@yoonuauto.com. Tiene derecho a presentar reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).'
       },
       {
         title: 'Delegado de Protección de Datos',
-        body: 'Si tiene cualquier consulta sobre el tratamiento de sus datos personales o el ejercicio de sus derechos, puede contactar con nuestro Delegado de Protección de Datos (DPO) en: dpo@logistiqueleslions.com.'
+        body: 'Si tiene cualquier consulta sobre el tratamiento de sus datos personales o el ejercicio de sus derechos, puede contactar con nuestro Delegado de Protección de Datos (DPO) en: dpo@yoonuauto.com.'
       }
     ]
   }
@@ -176,18 +176,18 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, CommonModule],
   template: `
-    <div class="min-h-screen bg-ivory">
+    <div class="min-h-screen bg-frost">
       <!-- Header -->
       <div class="bg-navy py-16 px-4">
         <div class="container mx-auto max-w-3xl">
-          <a routerLink="/" class="inline-flex items-center gap-2 text-ivory/60 hover:text-gold text-sm mb-6 transition-colors">
+          <a routerLink="/" class="inline-flex items-center gap-2 text-frost/60 hover:text-azure text-sm mb-6 transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
             Volver al inicio
           </a>
-          <h1 class="font-heading text-3xl lg:text-4xl font-bold text-ivory mb-3">{{ content().heading }}</h1>
-          <p class="text-ivory/50 text-sm">Última actualización: {{ content().lastUpdate }}</p>
+          <h1 class="font-heading text-3xl lg:text-4xl font-bold text-frost mb-3">{{ content().heading }}</h1>
+          <p class="text-frost/50 text-sm">Última actualización: {{ content().lastUpdate }}</p>
         </div>
       </div>
 
@@ -197,7 +197,7 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
 
         <div class="space-y-8">
           @for (section of content().sections; track section.title) {
-            <div class="border-l-2 border-gold/30 pl-6">
+            <div class="border-l-2 border-azure/30 pl-6">
               <h2 class="font-heading text-xl font-bold text-navy mb-3">{{ section.title }}</h2>
               <p class="text-navy/70 leading-relaxed">{{ section.body }}</p>
             </div>

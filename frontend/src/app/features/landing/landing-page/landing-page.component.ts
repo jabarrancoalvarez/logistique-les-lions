@@ -1,13 +1,21 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, AfterViewInit, ElementRef } from '@angular/core';
+import {
+  Component, OnInit, ChangeDetectionStrategy, inject
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { HeroSearchComponent } from '../hero-search/hero-search.component';
 import { FeaturedVehiclesComponent } from '../featured-vehicles/featured-vehicles.component';
 import { HowItWorksComponent } from '../how-it-works/how-it-works.component';
-import { CountryMapComponent } from '../country-map/country-map.component';
-import { NewsletterComponent } from '../newsletter/newsletter.component';
-import { StatsCountersComponent } from '../stats-counters/stats-counters.component';
+import { AuthService } from '@core/auth/auth.service';
 
+/**
+ * Portada de Yoon u Auto.
+ *
+ * Cuenta las tres etapas del documento —trouver, négocier, garder— y nada más. Se han
+ * retirado el mapa multi-país, los planes de suscripción y los testimonios inventados
+ * del producto anterior: la plataforma es de Senegal, es gratuita, y no puede citar a
+ * clientes que no existen.
+ */
 @Component({
   selector: 'lll-landing-page',
   standalone: true,
@@ -15,126 +23,111 @@ import { StatsCountersComponent } from '../stats-counters/stats-counters.compone
   imports: [
     RouterLink,
     HeroSearchComponent,
-    StatsCountersComponent,
     FeaturedVehiclesComponent,
-    HowItWorksComponent,
-    CountryMapComponent,
-    NewsletterComponent
+    HowItWorksComponent
   ],
   templateUrl: './landing-page.component.html'
 })
-export class LandingPageComponent implements OnInit, AfterViewInit {
+export class LandingPageComponent implements OnInit {
   private readonly meta = inject(Meta);
   private readonly title = inject(Title);
+  private readonly auth = inject(AuthService);
 
+  readonly isAuthenticated = this.auth.isAuthenticated;
+
+  /**
+   * Carrocerías del catálogo.
+   *
+   * Sin recuentos: el número real depende de lo publicado en cada momento, y una cifra
+   * inventada en la portada es una promesa que la búsqueda no cumple.
+   */
   readonly vehicleCategories = [
-    { id: 'Sedan', emoji: '🚗', label: 'Turismos', count: 340 },
-    { id: 'SUV', emoji: '🚙', label: 'SUV / 4x4', count: 280 },
-    { id: 'Van', emoji: '🚐', label: 'Furgonetas', count: 95 },
-    { id: 'Motorcycle', emoji: '🏍️', label: 'Motos', count: 120 },
-    { id: 'Truck', emoji: '🚛', label: 'Camiones', count: 45 },
-    { id: 'Electric', emoji: '⚡', label: 'Eléctricos', count: 160 }
+    { id: 'Citadine',   emoji: '🚗', label: 'Citadines' },
+    { id: 'Berline',    emoji: '🚘', label: 'Berlines' },
+    { id: 'Suv',        emoji: '🚙', label: 'SUV / 4x4' },
+    { id: 'Break',      emoji: '🚐', label: 'Breaks' },
+    { id: 'Pickup',     emoji: '🛻', label: 'Pick-up' },
+    { id: 'Utilitaire', emoji: '🚚', label: 'Utilitaires' }
   ];
 
-  readonly pricingPlans = [
+  /** Las tres etapas del documento, tal cual. */
+  readonly stages = [
     {
-      tag: 'Para compradores',
-      name: 'Particular',
-      price: 'Gratis',
-      period: 'siempre',
-      description: 'Busca, contacta y compra vehículos importados sin coste.',
-      highlighted: false,
-      cta: 'Empezar gratis',
-      features: [
-        'Hasta 3 anuncios publicados',
-        'Búsqueda avanzada con todos los filtros',
-        'Contacto directo con vendedores',
-        'Guardado de favoritos',
-        'Alertas de nuevos vehículos'
-      ]
+      number: '1',
+      title: 'Trouvez votre voiture',
+      text: 'Cherchez, filtrez et comparez. Enregistrez vos recherches et recevez ' +
+            'une alerte quand la voiture que vous attendez est publiée.',
+      link: '/vehiculos',
+      cta: 'Voir les annonces'
     },
     {
-      tag: 'Para vendedores',
-      name: 'Profesional',
-      price: '49€',
-      period: '/ mes',
-      description: 'Para importadores y vendedores con volumen de vehículos.',
-      highlighted: true,
-      cta: 'Empezar 14 días gratis',
-      features: [
-        'Anuncios ilimitados',
-        'Posición destacada en búsquedas',
-        'Calculadora avanzada de importación',
-        'Estadísticas de tus anuncios',
-        'Soporte prioritario por chat',
-        'Badge de vendedor verificado'
-      ]
+      number: '2',
+      title: 'Négociez et achetez',
+      text: 'Discutez avec le vendeur, faites une offre, remplissez votre checklist ' +
+            'd’inspection et signez un contrat vérifié par les deux parties.',
+      link: '/vehiculos',
+      cta: 'Comment ça marche'
     },
     {
-      tag: 'Para empresas',
-      name: 'Concesionario',
-      price: '199€',
-      period: '/ mes',
-      description: 'Gestión completa de flota y documentación para empresas.',
-      highlighted: false,
-      cta: 'Contactar con ventas',
-      features: [
-        'Todo lo del plan Profesional',
-        'Página de concesionario personalizada',
-        'API para importación de stock',
-        'Hasta 10 usuarios por cuenta',
-        'Gestor de cuenta dedicado',
-        'Informes mensuales de mercado'
-      ]
+      number: '3',
+      title: 'Gardez tout dans Mon Garage',
+      text: 'Papiers, entretiens, factures et rappels au même endroit. Le jour où ' +
+            'vous revendez, tout est déjà prêt.',
+      link: '/mi-garaje',
+      cta: 'Mon Garage'
     }
   ];
 
-  readonly testimonials = [
+  /**
+   * Lo que distingue a Yoon u Auto.
+   *
+   * Todo lo de aquí está construido: nada es una promesa a futuro.
+   */
+  readonly advantages = [
     {
-      id: 1,
-      text: 'Importé un BMW Serie 3 desde Alemania sin salir de casa. La plataforma gestionó todo: homologación, aranceles, ITV. En 3 semanas el coche estaba en mi garaje.',
-      name: 'Carlos M.',
-      initials: 'CM',
-      role: 'Comprador privado',
-      country: '🇪🇸 España'
+      emoji: '🇸🇳',
+      title: 'Pensé pour le Sénégal',
+      text: 'Les 14 régions, les prix en FCFA et le statut douanier affiché sur ' +
+            'chaque annonce.'
     },
     {
-      id: 2,
-      text: 'Como concesionario, hemos abierto un canal de importación desde Japón que antes era impensable. La documentación que genera la plataforma es impecable.',
-      name: 'Jean-Pierre D.',
-      initials: 'JP',
-      role: 'Concesionario',
-      country: '🇫🇷 Francia'
+      emoji: '🆓',
+      title: 'Entièrement gratuit',
+      text: 'Publier, chercher, négocier et acheter ne coûte rien. Sans limite ' +
+            'd’annonces ni abonnement.'
     },
     {
-      id: 3,
-      text: 'Vendí mi Range Rover a un comprador en Alemania. El escrow me dio seguridad total. Los papeles de exportación se generaron automáticamente.',
-      name: 'Fatima A.',
-      initials: 'FA',
-      role: 'Vendedora privada',
-      country: '🇲🇦 Marruecos'
+      emoji: '📄',
+      title: 'Contrat et vente vérifiée',
+      text: 'Un contrat validé par l’acheteur et le vendeur, avec PDF et code QR ' +
+            'de vérification.'
+    },
+    {
+      emoji: '📊',
+      title: 'Indicateur de prix',
+      text: 'Une comparaison statistique avec les véhicules semblables. Sans ' +
+            'intelligence artificielle, sans invention.'
     }
   ];
 
   ngOnInit(): void {
-    this.title.setTitle('Logistique Les Lions — Compraventa Internacional de Vehículos');
-    this.meta.updateTag({ name: 'description', content: 'Plataforma líder en importación y exportación de vehículos entre España, Alemania, Francia, Marruecos y más de 12 países. Gestión documental completa: aduanas, homologaciones, trámites.' });
-    this.meta.updateTag({ property: 'og:title', content: 'Logistique Les Lions — Compraventa Internacional de Vehículos' });
-    this.meta.updateTag({ property: 'og:description', content: 'Compra y vende vehículos a nivel internacional con toda la documentación gestionada.' });
-    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
-  }
+    this.title.setTitle('Yoon u Auto — Acheter et vendre sa voiture au Sénégal');
 
-  ngAfterViewInit(): void {
-    // Intersection Observer para animaciones al scroll
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          observer.unobserve(e.target);
-        }
-      }),
-      { threshold: 0.15 }
-    );
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    this.meta.updateTag({
+      name: 'description',
+      content: 'La plateforme sénégalaise pour acheter et vendre une voiture : ' +
+               'annonces en FCFA, statut douanier, négociation, contrat vérifié et ' +
+               'Mon Garage. Gratuit et sans limite.'
+    });
+    this.meta.updateTag({
+      property: 'og:title',
+      content: 'Yoon u Auto — Acheter et vendre sa voiture au Sénégal'
+    });
+    this.meta.updateTag({
+      property: 'og:description',
+      content: 'Trouvez votre voiture, négociez en confiance et gardez tout son ' +
+               'historique dans Mon Garage. Gratuit.'
+    });
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
   }
 }

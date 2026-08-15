@@ -8,14 +8,26 @@ interface AdminNavItem {
   readonly icon: string;
 }
 
+/**
+ * Secciones del backoffice.
+ *
+ * Las del documento se van incorporando parte a parte; las heredadas del producto
+ * anterior (procesos, incidencias, partners) siguen aquí hasta que se decida su destino.
+ */
 const ADMIN_NAV: AdminNavItem[] = [
-  { path: '',              label: 'Dashboard',     icon: '📊' },
-  { path: 'vehiculos',     label: 'Vehículos',     icon: '🚗' },
-  { path: 'procesos',      label: 'Procesos',      icon: '📦' },
-  { path: 'incidencias',   label: 'Incidencias',   icon: '⚠️' },
-  { path: 'partners',      label: 'Marketplace',   icon: '🤝' },
-  { path: 'usuarios',      label: 'Usuarios',      icon: '👥' },
-  { path: 'notificaciones',label: 'Notificaciones',icon: '🔔' },
+  { path: '',              label: 'Tableau de bord', icon: '📊' },
+  { path: 'vehiculos',     label: 'Annonces',        icon: '🚗' },
+  { path: 'demandes',      label: 'Demandes',        icon: '🔎' },
+  { path: 'negociations',  label: 'Négociations',    icon: '💬' },
+  { path: 'contrats',      label: 'Contrats',        icon: '📄' },
+  { path: 'moderation',    label: 'Modération',      icon: '🚩' },
+  { path: 'usuarios',      label: 'Utilisateurs',    icon: '👥' },
+  { path: 'notificaciones',label: 'Communications',  icon: '🔔' },
+  { path: 'statistiques',  label: 'Statistiques',    icon: '📈' },
+  { path: 'configuration', label: 'Configuration',   icon: '⚙️' },
+  { path: 'procesos',      label: 'Processus',       icon: '📦' },
+  { path: 'incidencias',   label: 'Incidents',       icon: '⚠️' },
+  { path: 'partners',      label: 'Partenaires',     icon: '🤝' },
 ];
 
 @Component({
@@ -24,26 +36,26 @@ const ADMIN_NAV: AdminNavItem[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <div class="flex min-h-screen bg-slate-50">
-      <aside class="w-64 bg-slate-900 text-slate-100 flex flex-col">
-        <div class="px-6 py-5 border-b border-slate-800">
-          <h1 class="text-lg font-semibold">Logistique Les Lions</h1>
-          <p class="text-xs text-slate-400 mt-1">Panel admin</p>
+    <div class="flex min-h-screen bg-frost">
+      <aside class="w-64 bg-navy text-frost flex flex-col">
+        <div class="px-6 py-5 border-b border-white/10">
+          <h1 class="font-heading text-lg font-semibold">Yoon u Auto</h1>
+          <p class="text-xs text-frost/50 mt-1">Administration</p>
         </div>
         <nav class="flex-1 px-3 py-4 space-y-1">
           @for (item of nav; track item.path) {
             <a
               [routerLink]="item.path ? ['/admin', item.path] : ['/admin']"
               [routerLinkActiveOptions]="{ exact: item.path === '' }"
-              routerLinkActive="bg-amber-500 text-slate-900 font-semibold"
-              class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-slate-800 transition-colors">
+              routerLinkActive="bg-azure text-navy font-semibold"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-white/5 transition-colors">
               <span class="text-base">{{ item.icon }}</span>
               <span>{{ item.label }}</span>
             </a>
           }
         </nav>
-        <div class="px-4 py-3 border-t border-slate-800 text-xs text-slate-500">
-          v1.0 — admin
+        <div class="px-4 py-3 border-t border-white/10 text-xs text-frost/40">
+          <a routerLink="/" class="hover:text-azure-light">← Retour au site</a>
         </div>
       </aside>
 

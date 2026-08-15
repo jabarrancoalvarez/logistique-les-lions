@@ -215,7 +215,7 @@ export class AdminPartnersComponent implements OnInit {
 }
 
 const MOCK_USERS = [
-  { id: 'u-001', email: 'admin@logistiqueleslions.com',  fullName: 'Jaime Barranco',      role: 'Admin',     isActive: true  },
+  { id: 'u-001', email: 'admin@yoonuauto.com',  fullName: 'Jaime Barranco',      role: 'Admin',     isActive: true  },
   { id: 'u-002', email: 'laura.garcia@example.com',       fullName: 'Laura García',        role: 'Dealer',    isActive: true  },
   { id: 'u-003', email: 'carlos.ruiz@example.com',        fullName: 'Carlos Ruiz',         role: 'Dealer',    isActive: true  },
   { id: 'u-004', email: 'marta.sanchez@example.com',      fullName: 'Marta Sánchez',       role: 'Buyer',     isActive: true  },

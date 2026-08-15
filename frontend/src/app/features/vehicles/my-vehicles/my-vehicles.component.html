@@ -1,77 +1,206 @@
-<div class="container mx-auto px-4 py-8 max-w-5xl">
+<section class="bg-frost min-h-[70vh] py-8">
+  <div class="max-w-5xl mx-auto px-4">
 
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="font-heading text-2xl font-bold text-navy">Mis vehículos</h1>
-    <a routerLink="/vehiculos/nuevo" class="btn-gold py-2.5 px-5">
-      + Publicar vehículo
-    </a>
-  </div>
+    <!-- ─── En-tête ───────────────────────────────────────────────────── -->
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-5">
+      <div>
+        <h1 class="font-heading font-bold text-navy text-2xl sm:text-3xl">Mes annonces</h1>
+        <p class="text-sm text-navy/60 mt-1">
+          Les véhicules que vous vendez ou avez vendus sur Yoon u Auto.
+        </p>
+      </div>
+      <a routerLink="/vehiculos/nuevo" class="btn-primary text-sm">+ Créer une annonce</a>
+    </div>
 
-  @if (loading()) {
-    <div class="space-y-3">
-      @for (i of [1,2,3]; track i) {
-        <div class="animate-pulse bg-white rounded-xl border border-navy/10 p-4 flex gap-4">
-          <div class="w-24 h-18 bg-navy/10 rounded-lg"></div>
-          <div class="flex-1 space-y-2 py-1">
-            <div class="h-4 bg-navy/10 rounded w-1/2"></div>
-            <div class="h-3 bg-navy/5 rounded w-1/3"></div>
-          </div>
-        </div>
+    <!-- ─── Onglets par statut ────────────────────────────────────────── -->
+    <div class="flex gap-1 mb-5 border-b border-navy/10 overflow-x-auto" role="tablist">
+      <button type="button" (click)="selectTab(null)" role="tab"
+        class="px-3 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors"
+        [class]="activeTab() === null
+          ? 'border-azure text-navy' : 'border-transparent text-navy/50 hover:text-navy'"
+        [attr.aria-selected]="activeTab() === null">
+        Toutes ({{ totalCount() }})
+      </button>
+      @for (tab of tabs; track tab) {
+        <button type="button" (click)="selectTab(tab)" role="tab"
+          class="px-3 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors"
+          [class]="activeTab() === tab
+            ? 'border-azure text-navy' : 'border-transparent text-navy/50 hover:text-navy'"
+          [attr.aria-selected]="activeTab() === tab">
+          {{ statusLabel(tab) }} ({{ countFor(tab) }})
+        </button>
       }
     </div>
-  } @else if (vehicles().length === 0) {
-    <div class="text-center py-20 bg-white rounded-2xl border border-navy/10">
-      <svg class="w-16 h-16 mx-auto mb-4 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
-      </svg>
-      <p class="text-lg font-medium text-navy mb-2">No tienes vehículos publicados</p>
-      <p class="text-navy/50 text-sm mb-6">Publica tu primer anuncio y llega a compradores de todo el mundo.</p>
-      <a routerLink="/vehiculos/nuevo" class="btn-gold">Publicar vehículo</a>
-    </div>
-  } @else {
-    <div class="space-y-3">
-      @for (v of vehicles(); track v.id) {
-        <div class="bg-white rounded-xl border border-navy/10 p-4 flex items-center gap-4 hover:border-gold/40 transition-colors">
-          <!-- Thumbnail -->
-          <div class="w-24 h-16 rounded-lg overflow-hidden bg-navy/5 shrink-0">
-            @if (v.thumbnailUrl || v.primaryImageUrl) {
-              <img [src]="v.thumbnailUrl ?? v.primaryImageUrl" [alt]="v.title" class="w-full h-full object-cover">
-            } @else {
-              <div class="w-full h-full flex items-center justify-center">
-                <svg class="w-8 h-8 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
+
+    @if (loading()) {
+      <p class="text-sm text-navy/50 py-10 text-center">Chargement…</p>
+    }
+
+    @if (error()) {
+      <p class="text-sm text-red-600 mb-4" role="alert">{{ error() }}</p>
+    }
+
+    @if (!loading() && listings().length === 0) {
+      <div class="bg-white rounded-xl border border-navy/10 p-10 text-center">
+        <h2 class="font-heading font-semibold text-navy text-lg">Aucune annonce ici</h2>
+        <p class="text-sm text-navy/60 mt-2 max-w-md mx-auto">
+          Publiez un véhicule, ou mettez en vente un véhicule de
+          <a routerLink="/mi-garaje" class="text-azure-dark hover:underline">Mon Garage</a>.
+        </p>
+      </div>
+    }
+
+    <!-- ─── Liste ─────────────────────────────────────────────────────── -->
+    <ul class="space-y-4" role="list">
+      @for (l of listings(); track l.id) {
+        <li class="bg-white rounded-xl border border-navy/10 overflow-hidden">
+          <div class="flex">
+            <div class="w-28 sm:w-36 bg-frost-dark shrink-0">
+              @if (l.thumbnailUrl) {
+                <img [src]="l.thumbnailUrl" [alt]="l.title"
+                  class="w-full h-full object-cover" loading="lazy" />
+              } @else {
+                <div class="w-full h-full min-h-[8rem] flex items-center justify-center
+                            text-navy/20 text-3xl" aria-hidden="true">🚗</div>
+              }
+            </div>
+
+            <div class="flex-1 p-4 min-w-0">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <h2 class="font-heading font-semibold text-navy truncate">{{ l.title }}</h2>
+                  <p class="text-xs text-navy/50 mt-0.5">
+                    Réf. #{{ l.publicReference }}
+                    @if (l.mileage !== null) { · {{ l.mileage }} km }
+                  </p>
+                </div>
+                <span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap"
+                  [class]="statusClass(l.status)">
+                  {{ statusLabel(l.status) }}
+                </span>
               </div>
-            }
-          </div>
 
-          <!-- Info -->
-          <div class="flex-1 min-w-0">
-            <p class="font-semibold text-navy truncate">{{ v.title }}</p>
-            <p class="text-sm text-navy/50">{{ v.year }} · {{ v.countryOrigin }}</p>
-          </div>
+              <p class="font-heading font-bold text-navy mt-2">
+                @if (l.price > 0) { {{ l.price | fcfa }} } @else {
+                  <span class="text-sm font-normal text-amber-700">Prix à définir</span>
+                }
+              </p>
 
-          <!-- Price -->
-          <div class="text-right shrink-0">
-            <p class="font-bold text-navy">{{ v.price | number:'1.0-0' }} {{ v.currency }}</p>
-            <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium" [class]="statusClass(v.status ?? '')">
-              {{ statusLabel(v.status ?? '') }}
-            </span>
-          </div>
+              <!-- Statistiques -->
+              <ul class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-navy/60 mt-2" role="list">
+                <li>{{ l.viewsCount }} vues</li>
+                <li>{{ l.favoritesCount }} favoris</li>
+                <li>{{ l.contactsCount }} contacts</li>
+                @if (l.negotiationCount > 0) {
+                  <li>
+                    <button type="button" (click)="goToNegotiations()"
+                      class="text-azure-dark font-medium hover:underline">
+                      {{ l.negotiationCount }}
+                      {{ l.negotiationCount === 1 ? 'négociation' : 'négociations' }}
+                    </button>
+                  </li>
+                }
+              </ul>
 
-          <!-- Actions -->
-          <div class="flex items-center gap-2 shrink-0">
-            <a [routerLink]="['/vehiculos', v.slug]"
-               class="p-2 text-navy/40 hover:text-gold transition-colors" title="Ver anuncio">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-              </svg>
-            </a>
+              <!-- Qualité -->
+              <button type="button" (click)="toggleQuality(l)"
+                class="flex items-center gap-2 text-xs mt-2 hover:underline"
+                [class]="l.qualityScore >= 80 ? 'text-green-700' : 'text-amber-700'">
+                <span>Qualité de l'annonce&nbsp;: {{ l.qualityScore }} %</span>
+                <span aria-hidden="true">{{ qualityFor() === l.id ? '▲' : '▼' }}</span>
+              </button>
+
+              @if (qualityFor() === l.id) {
+                @if (quality(); as q) {
+                  <ul class="mt-2 space-y-1 text-xs bg-frost rounded-lg p-3" role="list">
+                    @for (item of q.items; track item.check) {
+                      <li class="flex items-start gap-2"
+                        [class]="item.status === 'Complete' ? 'text-navy/70' : 'text-amber-800'">
+                        <span aria-hidden="true">{{ qualityIcon(item) }}</span>
+                        <span>{{ qualityText(item) }}</span>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="text-xs text-navy/50 mt-2">Chargement…</p>
+                }
+              }
+
+              <!-- Actions -->
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-sm">
+                <a [routerLink]="['/vehiculos', l.slug]" class="text-azure-dark hover:underline">
+                  Voir
+                </a>
+                <button type="button" (click)="openPrice(l)" [disabled]="busy()"
+                  class="text-navy/60 hover:underline">
+                  Prix
+                </button>
+                <button type="button" (click)="openMileage(l)" [disabled]="busy()"
+                  class="text-navy/60 hover:underline">
+                  Kilométrage
+                </button>
+                <button type="button" (click)="duplicate(l)" [disabled]="busy()"
+                  class="text-navy/60 hover:underline">
+                  Dupliquer
+                </button>
+                <button type="button" (click)="shareListing(l)"
+                  class="text-navy/60 hover:underline">
+                  {{ shareCopied() === l.id ? 'Lien copié ✓' : 'Partager' }}
+                </button>
+
+                @for (action of actionsFor(l); track action.status) {
+                  <button type="button" (click)="changeStatus(l, action.status)"
+                    [disabled]="busy()"
+                    [class]="action.status === 'Actif'
+                      ? 'text-green-700 font-medium hover:underline'
+                      : action.status === 'Archive'
+                        ? 'text-red-600 hover:underline'
+                        : 'text-navy/60 hover:underline'">
+                    {{ action.label }}
+                  </button>
+                }
+              </div>
+
+              <!-- Prix rapide -->
+              @if (editingPrice() === l.id) {
+                <div class="flex flex-wrap items-end gap-2 mt-3 bg-frost rounded-lg p-3">
+                  <div>
+                    <label [for]="'price-' + l.id" class="block text-xs text-navy/60 mb-1">
+                      Nouveau prix (FCFA)
+                    </label>
+                    <input [id]="'price-' + l.id" type="number" min="1" [(ngModel)]="priceValue"
+                      class="rounded-lg border border-navy/15 px-3 py-1.5 text-sm w-44" />
+                  </div>
+                  <button type="button" (click)="savePrice(l)" class="btn-primary text-sm"
+                    [disabled]="busy()">
+                    Enregistrer
+                  </button>
+                  <p class="text-xs text-navy/40 w-full">
+                    Une baisse de prix prévient les personnes qui suivent ce véhicule.
+                  </p>
+                </div>
+              }
+
+              <!-- Kilométrage rapide -->
+              @if (editingMileage() === l.id) {
+                <div class="flex flex-wrap items-end gap-2 mt-3 bg-frost rounded-lg p-3">
+                  <div>
+                    <label [for]="'km-' + l.id" class="block text-xs text-navy/60 mb-1">
+                      Kilométrage actuel
+                    </label>
+                    <input [id]="'km-' + l.id" type="number" min="0" [(ngModel)]="mileageValue"
+                      class="rounded-lg border border-navy/15 px-3 py-1.5 text-sm w-44" />
+                  </div>
+                  <button type="button" (click)="saveMileage(l)" class="btn-primary text-sm"
+                    [disabled]="busy()">
+                    Enregistrer
+                  </button>
+                </div>
+              }
+            </div>
           </div>
-        </div>
+        </li>
       }
-    </div>
-  }
-
-</div>
+    </ul>
+  </div>
+</section>

@@ -13,7 +13,7 @@ import { TrackingService, PublicTracking } from '@core/services/tracking.service
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, DatePipe],
   template: `
-    <div class="min-h-screen bg-ivory">
+    <div class="min-h-screen bg-frost">
       <div class="max-w-2xl mx-auto px-6 py-16">
         <h1 class="font-heading text-3xl md:text-4xl font-bold text-navy text-center">
           Seguimiento de tu trámite
@@ -34,7 +34,7 @@ import { TrackingService, PublicTracking } from '@core/services/tracking.service
           <button
             type="submit"
             [disabled]="loading() || !code.trim()"
-            class="px-6 py-3 rounded-xl bg-navy text-ivory font-medium disabled:opacity-40">
+            class="px-6 py-3 rounded-xl bg-navy text-frost font-medium disabled:opacity-40">
             {{ loading() ? 'Buscando…' : 'Buscar' }}
           </button>
         </form>
@@ -60,7 +60,7 @@ import { TrackingService, PublicTracking } from '@core/services/tracking.service
                     [class.bg-rose-100]="r.status === 'Cancelled' || r.status === 'Rejected'"
                     [class.text-rose-700]="r.status === 'Cancelled' || r.status === 'Rejected'"
                     [class.bg-navy]="r.status === 'Draft'"
-                    [class.text-ivory]="r.status === 'Draft'">
+                    [class.text-frost]="r.status === 'Draft'">
                 {{ r.status }}
               </span>
             </header>

@@ -3,14 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map } from 'rxjs';
 import { environment } from '@environments/environment';
 
+/** Tipo de cuenta declarado por el usuario. Campo informativo: no otorga permisos. */
+export type AccountType = 'Particulier' | 'Professionnel';
+
+/** Identidad mínima guardada en sesión. */
 export interface AuthUser {
   id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
+  displayName: string;
+  phone?: string;
+  email?: string;
   role: string;
+  accountType: AccountType;
   avatarUrl?: string;
-  isVerified: boolean;
+  phoneVerified: boolean;
 }
 
 export interface AuthResponse {
@@ -23,22 +28,34 @@ export interface AuthResponse {
   };
 }
 
+/** Datos completos de "Mon profil". */
 export interface ProfileData {
   id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
+  displayName: string;
   phone?: string;
+  phoneVerified: boolean;
+  email?: string;
+  role: string;
+  accountType: AccountType;
   avatarUrl?: string;
-  countryCode?: string;
+  region?: string;
   city?: string;
-  companyName?: string;
-  companyVat?: string;
   bio?: string;
-  isVerified: boolean;
+  allowWhatsAppContact: boolean;
+  verifiedSalesCount: number;
+  activeListingsCount: number;
   lastLoginAt?: string;
   createdAt: string;
+}
+
+export interface RegisterPayload {
+  phone: string;
+  password: string;
+  displayName: string;
+  accountType: AccountType;
+  region?: string;
+  city?: string;
+  email?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -54,42 +71,35 @@ export class AuthService {
   readonly accessToken = this._accessToken.asReadonly();
   readonly isAuthenticated = computed(() => !!this._user());
   readonly isAdmin = computed(() => this._user()?.role === 'Admin');
-  readonly isDealer = computed(() => this._user()?.role === 'Dealer');
-  readonly isModerator = computed(() => this._user()?.role === 'Moderator');
 
-  /** Devuelve true si el usuario tiene exactamente uno de los roles indicados. */
+  /**
+   * Todas las funcionalidades de usuario son gratuitas y sin límites: publicar,
+   * comprar o negociar solo exige estar autenticado. No hay capacidades por rol
+   * más allá del acceso al backoffice.
+   */
+  readonly canPublishVehicle = this.isAuthenticated;
+  readonly canViewAdminPanel = this.isAdmin;
+  readonly canManageUsers = this.isAdmin;
+  readonly canModerate = this.isAdmin;
+
+  /** Devuelve true si el usuario tiene uno de los roles indicados. */
   hasAnyRole(roles: readonly string[]): boolean {
     const role = this._user()?.role;
     return !!role && roles.includes(role);
   }
 
-  /** Helper de capacidades — alineado con las policies del backend. */
-  canModerate       = computed(() => this.hasAnyRole(['Admin', 'Moderator']));
-  canPublishVehicle = computed(() => this.hasAnyRole(['Admin', 'Dealer', 'Seller']));
-  canManageUsers    = computed(() => this.hasAnyRole(['Admin']));
-  canViewAdminPanel = computed(() => this.hasAnyRole(['Admin', 'Moderator']));
-
   constructor(private http: HttpClient) {}
 
-  register(payload: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    role: number;
-    phone?: string;
-    countryCode?: string;
-    companyName?: string;
-    companyVat?: string;
-  }): Observable<AuthUser> {
+  register(payload: RegisterPayload): Observable<AuthUser> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, payload).pipe(
       tap(r => this.storeTokens(r.value)),
       map(r => r.value.user)
     );
   }
 
-  login(email: string, password: string): Observable<AuthUser> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
+  /** `identifier` admite el teléfono (identificador principal) o el correo. */
+  login(identifier: string, password: string): Observable<AuthUser> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { identifier, password }).pipe(
       tap(r => this.storeTokens(r.value)),
       map(r => r.value.user)
     );
@@ -143,6 +153,13 @@ export class AuthService {
   private loadUserFromStorage(): AuthUser | null {
     if (typeof localStorage === 'undefined') return null;
     const stored = localStorage.getItem('lll_user');
-    return stored ? JSON.parse(stored) : null;
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored) as AuthUser;
+    } catch {
+      // Sesión guardada con el modelo de usuario anterior: se descarta.
+      localStorage.removeItem('lll_user');
+      return null;
+    }
   }
 }

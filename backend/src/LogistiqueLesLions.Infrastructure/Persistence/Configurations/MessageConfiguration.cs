@@ -14,9 +14,9 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 
         builder.Property(m => m.Body).HasMaxLength(4000).IsRequired();
 
-        builder.HasOne(m => m.Conversation)
+        builder.HasOne(m => m.Negotiation)
             .WithMany(c => c.Messages)
-            .HasForeignKey(m => m.ConversationId)
+            .HasForeignKey(m => m.NegotiationId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(m => m.Sender)
@@ -24,7 +24,7 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
             .HasForeignKey(m => m.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(m => m.ConversationId);
+        builder.HasIndex(m => m.NegotiationId);
 
         builder.HasQueryFilter(m => m.DeletedAt == null);
     }

@@ -23,6 +23,148 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.AdminAction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AdminId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("admin_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("NewValue")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("new_value");
+
+                    b.Property<string>("OldValue")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("old_value");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("reason");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("target_id");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("target_type");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_admin_actions");
+
+                    b.HasIndex("AdminId")
+                        .HasDatabaseName("ix_admin_actions_admin_id");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("ix_admin_actions_created_at");
+
+                    b.HasIndex("TargetType", "TargetId", "CreatedAt")
+                        .HasDatabaseName("ix_admin_actions_target_type_target_id_created_at");
+
+                    b.ToTable("admin_actions", "users");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.AdminNote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AdminId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("admin_id");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("body");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("target_id");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("target_type");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_admin_notes");
+
+                    b.HasIndex("AdminId")
+                        .HasDatabaseName("ix_admin_notes_admin_id");
+
+                    b.HasIndex("TargetType", "TargetId", "CreatedAt")
+                        .HasDatabaseName("ix_admin_notes_target_type_target_id_created_at");
+
+                    b.ToTable("admin_notes", "users");
+                });
+
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.AuditLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -92,16 +234,27 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.ToTable("audit_logs", "vehicles");
                 });
 
-            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Conversation", b =>
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Communication", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("BuyerId")
+                    b.Property<Guid>("AdminId")
                         .HasColumnType("uuid")
-                        .HasColumnName("buyer_id");
+                        .HasColumnName("admin_id");
+
+                    b.Property<string>("Audience")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("audience");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)")
+                        .HasColumnName("body");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -119,21 +272,42 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("deleted_by");
 
-                    b.Property<bool>("IsArchivedByBuyer")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_archived_by_buyer");
+                    b.Property<int>("EmailsSent")
+                        .HasColumnType("integer")
+                        .HasColumnName("emails_sent");
 
-                    b.Property<bool>("IsArchivedBySeller")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_archived_by_seller");
+                    b.Property<int>("RecipientCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("recipient_count");
 
-                    b.Property<DateTimeOffset?>("LastMessageAt")
+                    b.Property<string>("Region")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("region");
+
+                    b.Property<DateTimeOffset>("SentAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_message_at");
+                        .HasColumnName("sent_at");
 
-                    b.Property<Guid>("SellerId")
+                    b.Property<bool>("SentByEmail")
+                        .HasColumnType("boolean")
+                        .HasColumnName("sent_by_email");
+
+                    b.Property<Guid?>("TargetUserId")
                         .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnName("target_user_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("type");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -143,24 +317,213 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
+                    b.HasKey("Id")
+                        .HasName("pk_communications");
+
+                    b.HasIndex("AdminId")
+                        .HasDatabaseName("ix_communications_admin_id");
+
+                    b.HasIndex("SentAt")
+                        .HasDatabaseName("ix_communications_sent_at");
+
+                    b.HasIndex("TargetUserId")
+                        .HasDatabaseName("ix_communications_target_user_id");
+
+                    b.ToTable("communications", "messaging");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Contract", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("AgreedPrice")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("agreed_price");
+
+                    b.Property<string>("BuyerAddress")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("buyer_address");
+
+                    b.Property<Guid>("BuyerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("buyer_id");
+
+                    b.Property<string>("BuyerIdDocument")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("buyer_id_document");
+
+                    b.Property<string>("BuyerLegalName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("buyer_legal_name");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("cancelled_at");
+
+                    b.Property<string>("ChangeRequestNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("change_request_notes");
+
+                    b.Property<DateTimeOffset?>("ChangeRequestedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("change_requested_at");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_user_id");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("NegotiationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("negotiation_id");
+
+                    b.Property<string>("PublicReference")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("public_reference");
+
+                    b.Property<string>("RegistrationPlate")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("registration_plate");
+
+                    b.Property<DateTimeOffset>("SaleDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sale_date");
+
+                    b.Property<string>("SellerAddress")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("seller_address");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
+
+                    b.Property<string>("SellerIdDocument")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("seller_id_document");
+
+                    b.Property<string>("SellerLegalName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("seller_legal_name");
+
+                    b.Property<DateTimeOffset?>("SentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<DateTimeOffset?>("ValidatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("validated_at");
+
                     b.Property<Guid>("VehicleId")
                         .HasColumnType("uuid")
                         .HasColumnName("vehicle_id");
 
-                    b.HasKey("Id")
-                        .HasName("pk_conversations");
+                    b.Property<string>("VehicleMake")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("vehicle_make");
 
-                    b.HasIndex("SellerId")
-                        .HasDatabaseName("ix_conversations_seller_id");
+                    b.Property<int?>("VehicleMileage")
+                        .HasColumnType("integer")
+                        .HasColumnName("vehicle_mileage");
+
+                    b.Property<string>("VehicleModel")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("vehicle_model");
+
+                    b.Property<string>("VehicleReference")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("vehicle_reference");
+
+                    b.Property<string>("VehicleVersion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("vehicle_version");
+
+                    b.Property<string>("VehicleVin")
+                        .HasMaxLength(17)
+                        .HasColumnType("character varying(17)")
+                        .HasColumnName("vehicle_vin");
+
+                    b.Property<int>("VehicleYear")
+                        .HasColumnType("integer")
+                        .HasColumnName("vehicle_year");
+
+                    b.Property<string>("VerificationCode")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("verification_code");
+
+                    b.HasKey("Id")
+                        .HasName("pk_contracts");
+
+                    b.HasIndex("NegotiationId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_contracts_negotiation_id")
+                        .HasFilter("status <> 'Annule'");
+
+                    b.HasIndex("PublicReference")
+                        .IsUnique()
+                        .HasDatabaseName("ix_contracts_public_reference");
 
                     b.HasIndex("VehicleId")
-                        .HasDatabaseName("ix_conversations_vehicle_id");
+                        .HasDatabaseName("ix_contracts_vehicle_id");
 
-                    b.HasIndex("BuyerId", "SellerId", "VehicleId")
+                    b.HasIndex("VerificationCode")
                         .IsUnique()
-                        .HasDatabaseName("ix_conversations_buyer_id_seller_id_vehicle_id");
+                        .HasDatabaseName("ix_contracts_verification_code");
 
-                    b.ToTable("conversations", "messaging");
+                    b.HasIndex("Status", "CreatedAt")
+                        .HasDatabaseName("ix_contracts_status_created_at");
+
+                    b.ToTable("contracts", "messaging");
                 });
 
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Country", b =>
@@ -258,7 +621,7 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000001"),
                             Code = "ES",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(991), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "EUR",
                             DisplayOrder = 1,
                             FlagEmoji = "🇪🇸",
@@ -268,13 +631,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "España",
                             SupportsExport = true,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1163), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000002"),
                             Code = "DE",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1320), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "EUR",
                             DisplayOrder = 2,
                             FlagEmoji = "🇩🇪",
@@ -284,13 +647,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Alemania",
                             SupportsExport = true,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1320), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000003"),
                             Code = "FR",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1327), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "EUR",
                             DisplayOrder = 3,
                             FlagEmoji = "🇫🇷",
@@ -300,13 +663,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Francia",
                             SupportsExport = true,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1327), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000004"),
                             Code = "IT",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1330), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "EUR",
                             DisplayOrder = 4,
                             FlagEmoji = "🇮🇹",
@@ -316,13 +679,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Italia",
                             SupportsExport = true,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1331), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000005"),
                             Code = "PT",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1334), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "EUR",
                             DisplayOrder = 5,
                             FlagEmoji = "🇵🇹",
@@ -332,13 +695,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Portugal",
                             SupportsExport = true,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1334), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000006"),
                             Code = "NL",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1357), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "EUR",
                             DisplayOrder = 6,
                             FlagEmoji = "🇳🇱",
@@ -348,13 +711,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Países Bajos",
                             SupportsExport = true,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1357), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000007"),
                             Code = "BE",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1361), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "EUR",
                             DisplayOrder = 7,
                             FlagEmoji = "🇧🇪",
@@ -364,13 +727,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Bélgica",
                             SupportsExport = true,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1361), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000008"),
                             Code = "GB",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1364), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "GBP",
                             DisplayOrder = 8,
                             FlagEmoji = "🇬🇧",
@@ -380,13 +743,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Reino Unido",
                             SupportsExport = true,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1364), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000009"),
                             Code = "US",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1372), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "USD",
                             DisplayOrder = 9,
                             FlagEmoji = "🇺🇸",
@@ -396,13 +759,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Estados Unidos",
                             SupportsExport = false,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1372), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000010"),
                             Code = "MA",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1375), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "MAD",
                             DisplayOrder = 10,
                             FlagEmoji = "🇲🇦",
@@ -412,13 +775,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Marruecos",
                             SupportsExport = true,
                             SupportsImport = false,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1376), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000011"),
                             Code = "JP",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1379), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "JPY",
                             DisplayOrder = 11,
                             FlagEmoji = "🇯🇵",
@@ -428,13 +791,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Japón",
                             SupportsExport = false,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1379), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000012"),
                             Code = "CH",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1382), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Currency = "CHF",
                             DisplayOrder = 12,
                             FlagEmoji = "🇨🇭",
@@ -444,7 +807,7 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                             NameEs = "Suiza",
                             SupportsExport = true,
                             SupportsImport = true,
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 12, 11, 52, 30, 146, DateTimeKind.Unspecified).AddTicks(1383), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });
 
@@ -834,6 +1197,457 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.ToTable("document_templates", "compliance");
                 });
 
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.FeatureFlag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_enabled");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("key");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("label");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_feature_flags");
+
+                    b.HasIndex("Key")
+                        .IsUnique()
+                        .HasDatabaseName("ix_feature_flags_key");
+
+                    b.ToTable("feature_flags", "users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("30000001-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Affiche « Bonne affaire / Prix correct / Prix élevé » sur les annonces.",
+                            IsEnabled = true,
+                            Key = "price_indicator",
+                            Label = "Indicateur de prix",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000001-0000-0000-0000-000000000002"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Estimation statistique de la valeur des véhicules de Mon Garage.",
+                            IsEnabled = true,
+                            Key = "vehicle_valuation",
+                            Label = "Valeur estimée",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000001-0000-0000-0000-000000000003"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Comparaison de plusieurs véhicules côte à côte.",
+                            IsEnabled = true,
+                            Key = "comparator",
+                            Label = "Comparateur",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000001-0000-0000-0000-000000000004"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Demandes d'importation gérées par l'équipe.",
+                            IsEnabled = true,
+                            Key = "vehicle_requests",
+                            Label = "Trouvez-moi cette voiture",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000001-0000-0000-0000-000000000005"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Fonctionnalités à venir et bouton « Ça m'intéresse ».",
+                            IsEnabled = true,
+                            Key = "upcoming_features",
+                            Label = "Prochainement",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.FeatureInterest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("FeatureId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("feature_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_feature_interests");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_feature_interests_user_id");
+
+                    b.HasIndex("FeatureId", "UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_feature_interests_feature_id_user_id")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.ToTable("feature_interests", "users");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.GarageDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("content_type");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<DateTimeOffset?>("DocumentDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("document_date");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("file_name");
+
+                    b.Property<Guid>("GarageVehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("garage_vehicle_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint")
+                        .HasColumnName("size_bytes");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("storage_key");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_garage_documents");
+
+                    b.HasIndex("GarageVehicleId", "DocumentDate")
+                        .HasDatabaseName("ix_garage_documents_garage_vehicle_id_document_date");
+
+                    b.ToTable("garage_documents", "garage");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.GarageVehicle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("BodyType")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("body_type");
+
+                    b.Property<string>("Color")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("color");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<int?>("EngineDisplacementCc")
+                        .HasColumnType("integer")
+                        .HasColumnName("engine_displacement_cc");
+
+                    b.Property<string>("FuelType")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("fuel_type");
+
+                    b.Property<Guid?>("ListedVehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listed_vehicle_id");
+
+                    b.Property<Guid>("MakeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("make_id");
+
+                    b.Property<int?>("Mileage")
+                        .HasColumnType("integer")
+                        .HasColumnName("mileage");
+
+                    b.Property<DateTimeOffset?>("MileageUpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("mileage_updated_at");
+
+                    b.Property<Guid?>("ModelId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("model_id");
+
+                    b.Property<int?>("PowerCv")
+                        .HasColumnType("integer")
+                        .HasColumnName("power_cv");
+
+                    b.Property<DateTimeOffset?>("PurchaseDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("purchase_date");
+
+                    b.Property<decimal?>("PurchasePrice")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("purchase_price");
+
+                    b.Property<string>("RegistrationPlate")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("registration_plate");
+
+                    b.Property<Guid?>("SourceContractId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("source_contract_id");
+
+                    b.Property<Guid?>("SourceVehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("source_vehicle_id");
+
+                    b.Property<string>("Transmission")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("transmission");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("Version")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("version");
+
+                    b.Property<string>("Vin")
+                        .HasMaxLength(17)
+                        .HasColumnType("character varying(17)")
+                        .HasColumnName("vin");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer")
+                        .HasColumnName("year");
+
+                    b.HasKey("Id")
+                        .HasName("pk_garage_vehicles");
+
+                    b.HasIndex("MakeId")
+                        .HasDatabaseName("ix_garage_vehicles_make_id");
+
+                    b.HasIndex("ModelId")
+                        .HasDatabaseName("ix_garage_vehicles_model_id");
+
+                    b.HasIndex("SourceContractId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_garage_vehicles_source_contract_id")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_garage_vehicles_user_id");
+
+                    b.ToTable("garage_vehicles", "garage");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.GarageVehicleImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("GarageVehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("garage_vehicle_id");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_primary");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.Property<string>("ThumbnailUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("thumbnail_url");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("url");
+
+                    b.HasKey("Id")
+                        .HasName("pk_garage_vehicle_images");
+
+                    b.HasIndex("GarageVehicleId")
+                        .HasDatabaseName("ix_garage_vehicle_images_garage_vehicle_id");
+
+                    b.ToTable("garage_vehicle_images", "garage");
+                });
+
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.HomologationRequirement", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1052,6 +1866,230 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.ToTable("import_export_processes", "compliance");
                 });
 
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.LoyaltyPointEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AdminId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("admin_id");
+
+                    b.Property<Guid?>("ContractId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("contract_id");
+
+                    b.Property<string>("ContractReference")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("contract_reference");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("note");
+
+                    b.Property<string>("Origin")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("origin");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("integer")
+                        .HasColumnName("points");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_loyalty_point_entries");
+
+                    b.HasIndex("AdminId")
+                        .HasDatabaseName("ix_loyalty_point_entries_admin_id");
+
+                    b.HasIndex("UserId", "CreatedAt")
+                        .HasDatabaseName("ix_loyalty_point_entries_user_id_created_at");
+
+                    b.ToTable("loyalty_point_entries", "users");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.MaintenanceRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal?>("Cost")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("cost");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("description");
+
+                    b.Property<Guid?>("DocumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("document_id");
+
+                    b.Property<Guid>("GarageVehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("garage_vehicle_id");
+
+                    b.Property<int?>("Mileage")
+                        .HasColumnType("integer")
+                        .HasColumnName("mileage");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<DateTimeOffset>("PerformedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("performed_at");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<string>("Workshop")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("workshop");
+
+                    b.HasKey("Id")
+                        .HasName("pk_maintenance_records");
+
+                    b.HasIndex("DocumentId")
+                        .HasDatabaseName("ix_maintenance_records_document_id");
+
+                    b.HasIndex("GarageVehicleId", "PerformedAt")
+                        .HasDatabaseName("ix_maintenance_records_garage_vehicle_id_performed_at");
+
+                    b.ToTable("maintenance_records", "garage");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.MaintenanceRecordImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("content_type");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("file_name");
+
+                    b.Property<Guid>("MaintenanceRecordId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("maintenance_record_id");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint")
+                        .HasColumnName("size_bytes");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("storage_key");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_maintenance_record_images");
+
+                    b.HasIndex("MaintenanceRecordId")
+                        .HasDatabaseName("ix_maintenance_record_images_maintenance_record_id");
+
+                    b.ToTable("maintenance_record_images", "garage");
+                });
+
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Message", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1064,10 +2102,6 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)")
                         .HasColumnName("body");
-
-                    b.Property<Guid>("ConversationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("conversation_id");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -1089,6 +2123,10 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_read");
 
+                    b.Property<Guid>("NegotiationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("negotiation_id");
+
                     b.Property<DateTimeOffset?>("ReadAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("read_at");
@@ -1108,13 +2146,166 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_messages");
 
-                    b.HasIndex("ConversationId")
-                        .HasDatabaseName("ix_messages_conversation_id");
+                    b.HasIndex("NegotiationId")
+                        .HasDatabaseName("ix_messages_negotiation_id");
 
                     b.HasIndex("SenderId")
                         .HasDatabaseName("ix_messages_sender_id");
 
                     b.ToTable("messages", "messaging");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Negotiation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("BuyerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("buyer_id");
+
+                    b.Property<DateTimeOffset?>("ClosedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("closed_at");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<bool>("IsArchivedByBuyer")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_archived_by_buyer");
+
+                    b.Property<bool>("IsArchivedBySeller")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_archived_by_seller");
+
+                    b.Property<DateTimeOffset?>("LastActivityAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_activity_at");
+
+                    b.Property<DateTimeOffset?>("LastMessageAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_message_at");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("vehicle_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_negotiations");
+
+                    b.HasIndex("SellerId")
+                        .HasDatabaseName("ix_negotiations_seller_id");
+
+                    b.HasIndex("VehicleId")
+                        .HasDatabaseName("ix_negotiations_vehicle_id");
+
+                    b.HasIndex("Status", "LastActivityAt")
+                        .HasDatabaseName("ix_negotiations_status_last_activity_at");
+
+                    b.HasIndex("BuyerId", "SellerId", "VehicleId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_negotiations_buyer_id_seller_id_vehicle_id");
+
+                    b.ToTable("negotiations", "messaging");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.NegotiationEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("ActorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("actor_id");
+
+                    b.Property<decimal?>("Amount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("NegotiationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("negotiation_id");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_negotiation_events");
+
+                    b.HasIndex("ActorId")
+                        .HasDatabaseName("ix_negotiation_events_actor_id");
+
+                    b.HasIndex("NegotiationId", "Sequence")
+                        .HasDatabaseName("ix_negotiation_events_negotiation_id_sequence");
+
+                    b.ToTable("negotiation_events", "messaging");
                 });
 
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.NewsletterSubscriber", b =>
@@ -1141,6 +2332,234 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasName("pk_newsletter_subscribers");
 
                     b.ToTable("newsletter_subscribers", "vehicles");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Offer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("FromUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("from_user_id");
+
+                    b.Property<decimal>("ListedPrice")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("listed_price");
+
+                    b.Property<string>("Message")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("message");
+
+                    b.Property<Guid>("NegotiationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("negotiation_id");
+
+                    b.Property<Guid?>("RepliesToOfferId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("replies_to_offer_id");
+
+                    b.Property<DateTimeOffset?>("RespondedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("responded_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_offers");
+
+                    b.HasIndex("FromUserId")
+                        .HasDatabaseName("ix_offers_from_user_id");
+
+                    b.HasIndex("NegotiationId", "CreatedAt")
+                        .HasDatabaseName("ix_offers_negotiation_id_created_at");
+
+                    b.HasIndex("NegotiationId", "Status")
+                        .HasDatabaseName("ix_offers_negotiation_id_status");
+
+                    b.ToTable("offers", "messaging");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.PlatformSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("ComparatorMaxVehicles")
+                        .HasColumnType("integer")
+                        .HasColumnName("comparator_max_vehicles");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<DateTimeOffset?>("LegalTermsUpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("legal_terms_updated_at");
+
+                    b.Property<string>("LegalTermsVersion")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("legal_terms_version");
+
+                    b.Property<int>("ListingFreshnessDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("listing_freshness_days");
+
+                    b.Property<int>("MaxImagesPerListing")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_images_per_listing");
+
+                    b.Property<int>("PointsPerVerifiedSale")
+                        .HasColumnType("integer")
+                        .HasColumnName("points_per_verified_sale");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_platform_settings");
+
+                    b.ToTable("platform_settings", "users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000003"),
+                            ComparatorMaxVehicles = 3,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            LegalTermsVersion = "1.0",
+                            ListingFreshnessDays = 60,
+                            MaxImagesPerListing = 20,
+                            PointsPerVerifiedSale = 100,
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.PriceIndicatorSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<decimal>("GoodDealMargin")
+                        .HasPrecision(4, 3)
+                        .HasColumnType("numeric(4,3)")
+                        .HasColumnName("good_deal_margin");
+
+                    b.Property<decimal>("HighPriceMargin")
+                        .HasPrecision(4, 3)
+                        .HasColumnType("numeric(4,3)")
+                        .HasColumnName("high_price_margin");
+
+                    b.Property<int>("MaxListingAgeDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_listing_age_days");
+
+                    b.Property<int>("MinComparables")
+                        .HasColumnType("integer")
+                        .HasColumnName("min_comparables");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<int>("YearBand")
+                        .HasColumnType("integer")
+                        .HasColumnName("year_band");
+
+                    b.HasKey("Id")
+                        .HasName("pk_price_indicator_settings");
+
+                    b.ToTable("price_indicator_settings", "vehicles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            GoodDealMargin = 0.10m,
+                            HighPriceMargin = 0.10m,
+                            MaxListingAgeDays = 180,
+                            MinComparables = 5,
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            YearBand = 2
+                        });
                 });
 
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.ProcessDocument", b =>
@@ -1337,6 +2756,186 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.ToTable("process_incidents", "compliance");
                 });
 
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Report", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Evidence")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("evidence");
+
+                    b.Property<Guid?>("HandledByAdminId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("handled_by_admin_id");
+
+                    b.Property<string>("PublicReference")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("public_reference");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("reason");
+
+                    b.Property<Guid?>("ReportedUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("reported_user_id");
+
+                    b.Property<Guid>("ReporterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("reporter_id");
+
+                    b.Property<string>("Resolution")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("resolution");
+
+                    b.Property<DateTimeOffset?>("ResolvedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("resolved_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("target_id");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("target_type");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_reports");
+
+                    b.HasIndex("HandledByAdminId")
+                        .HasDatabaseName("ix_reports_handled_by_admin_id");
+
+                    b.HasIndex("PublicReference")
+                        .IsUnique()
+                        .HasDatabaseName("ix_reports_public_reference");
+
+                    b.HasIndex("ReportedUserId")
+                        .HasDatabaseName("ix_reports_reported_user_id");
+
+                    b.HasIndex("ReporterId")
+                        .HasDatabaseName("ix_reports_reporter_id");
+
+                    b.HasIndex("Status", "CreatedAt")
+                        .HasDatabaseName("ix_reports_status_created_at");
+
+                    b.HasIndex("TargetType", "TargetId", "Status")
+                        .HasDatabaseName("ix_reports_target_type_target_id_status");
+
+                    b.ToTable("reports", "messaging");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.SavedSearch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("AlertEnabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("alert_enabled");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("FiltersJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("filters_json");
+
+                    b.Property<DateTimeOffset?>("LastNotifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_notified_at");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_saved_searches");
+
+                    b.HasIndex("AlertEnabled")
+                        .HasDatabaseName("ix_saved_searches_alert_enabled")
+                        .HasFilter("alert_enabled");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_saved_searches_user_id");
+
+                    b.ToTable("saved_searches", "vehicles");
+                });
+
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.SavedVehicle", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1358,6 +2957,20 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uuid")
                         .HasColumnName("deleted_by");
+
+                    b.Property<decimal?>("LastAlertedPrice")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("last_alerted_price");
+
+                    b.Property<bool>("PriceAlertEnabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("price_alert_enabled");
+
+                    b.Property<decimal>("PriceWhenSaved")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("price_when_saved");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -1506,6 +3119,183 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.ToTable("service_partners", "marketplace");
                 });
 
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.SharedMaintenanceRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("MaintenanceRecordId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("maintenance_record_id");
+
+                    b.Property<bool>("ShareInvoice")
+                        .HasColumnType("boolean")
+                        .HasColumnName("share_invoice");
+
+                    b.Property<Guid>("TransparencyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("transparency_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_shared_maintenance_records");
+
+                    b.HasIndex("MaintenanceRecordId")
+                        .HasDatabaseName("ix_shared_maintenance_records_maintenance_record_id");
+
+                    b.HasIndex("TransparencyId", "MaintenanceRecordId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_shared_maintenance_records_transparency_id_maintenance_reco");
+
+                    b.ToTable("shared_maintenance_records", "garage");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.UpcomingFeature", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("display_order");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_upcoming_features");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_upcoming_features_code");
+
+                    b.ToTable("upcoming_features", "users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("30000002-0000-0000-0000-000000000001"),
+                            Code = "STOCK",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Gérer un parc de véhicules et publier plusieurs annonces d'un coup.",
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            Name = "Gestion de stock",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000002-0000-0000-0000-000000000002"),
+                            Code = "WHATSAPP",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Recevoir les messages des acheteurs directement sur WhatsApp.",
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            Name = "WhatsApp Business",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000002-0000-0000-0000-000000000003"),
+                            Code = "CRM",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Suivre ses contacts, ses relances et ses ventes.",
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            Name = "CRM",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000002-0000-0000-0000-000000000004"),
+                            Code = "TENDANCES",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Voir l'évolution des prix et de la demande par modèle.",
+                            DisplayOrder = 4,
+                            IsActive = true,
+                            Name = "Tendances du marché",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000002-0000-0000-0000-000000000005"),
+                            Code = "OUTILS",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Aide à la fixation du prix et à la rédaction des annonces.",
+                            DisplayOrder = 5,
+                            IsActive = true,
+                            Name = "Outils intelligents",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
+                });
+
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.UserNotification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1590,6 +3380,16 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("AccountType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("account_type");
+
+                    b.Property<bool>("AllowWhatsAppContact")
+                        .HasColumnType("boolean")
+                        .HasColumnName("allow_whats_app_contact");
+
                     b.Property<string>("AvatarUrl")
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)")
@@ -1605,21 +3405,6 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("city");
 
-                    b.Property<string>("CompanyName")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("company_name");
-
-                    b.Property<string>("CompanyVat")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("company_vat");
-
-                    b.Property<string>("CountryCode")
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)")
-                        .HasColumnName("country_code");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -1636,35 +3421,32 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("deleted_by");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("DisplayName")
                         .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("display_name");
+
+                    b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)")
                         .HasColumnName("email");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("first_name");
-
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("FavoriteAlertsAllEnabled")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_active");
+                        .HasColumnName("favorite_alerts_all_enabled");
 
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_verified");
+                    b.Property<DateTimeOffset?>("LastActivityAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_activity_at");
 
                     b.Property<DateTimeOffset?>("LastLoginAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_login_at");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("last_name");
+                    b.Property<int>("LoyaltyPoints")
+                        .HasColumnType("integer")
+                        .HasColumnName("loyalty_points");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -1673,9 +3455,17 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnName("password_hash");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("phone");
+
+                    b.Property<bool>("PhoneVerified")
+                        .HasColumnType("boolean")
+                        .HasColumnName("phone_verified");
+
+                    b.Property<DateTimeOffset?>("PhoneVerifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("phone_verified_at");
 
                     b.Property<string>("RefreshToken")
                         .HasMaxLength(256)
@@ -1686,11 +3476,26 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("refresh_token_expires_at");
 
+                    b.Property<string>("Region")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("region");
+
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("role");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset?>("SuspendedUntil")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("suspended_until");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -1700,12 +3505,20 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
+                    b.Property<int>("VerifiedSalesCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("verified_sales_count");
+
                     b.HasKey("Id")
                         .HasName("pk_user_profiles");
 
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasDatabaseName("ix_user_profiles_email");
+
+                    b.HasIndex("Phone")
+                        .IsUnique()
+                        .HasDatabaseName("ix_user_profiles_phone");
 
                     b.ToTable("user_profiles", "users");
                 });
@@ -1716,8 +3529,17 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<DateTimeOffset?>("AdminFlaggedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("admin_flagged_at");
+
+                    b.Property<DateTimeOffset?>("AdminHiddenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("admin_hidden_at");
+
                     b.Property<string>("BodyType")
-                        .HasColumnType("text")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("body_type");
 
                     b.Property<string>("City")
@@ -1732,7 +3554,8 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
 
                     b.Property<string>("Condition")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("condition");
 
                     b.Property<int>("ContactsCount")
@@ -1741,8 +3564,10 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
 
                     b.Property<string>("CountryOrigin")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(2)
                         .HasColumnType("character varying(2)")
+                        .HasDefaultValue("SN")
                         .HasColumnName("country_origin");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -1758,8 +3583,13 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(3)
                         .HasColumnType("character varying(3)")
-                        .HasDefaultValue("EUR")
+                        .HasDefaultValue("XOF")
                         .HasColumnName("currency");
+
+                    b.Property<string>("CustomsStatus")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("customs_status");
 
                     b.Property<Guid?>("DealerId")
                         .HasColumnType("uuid")
@@ -1773,15 +3603,33 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("deleted_by");
 
-                    b.Property<string>("DescriptionEn")
+                    b.Property<string>("Description")
                         .HasMaxLength(5000)
                         .HasColumnType("character varying(5000)")
-                        .HasColumnName("description_en");
+                        .HasColumnName("description");
 
-                    b.Property<string>("DescriptionEs")
-                        .HasMaxLength(5000)
-                        .HasColumnType("character varying(5000)")
-                        .HasColumnName("description_es");
+                    b.Property<string>("District")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("district");
+
+                    b.Property<int?>("Doors")
+                        .HasColumnType("integer")
+                        .HasColumnName("doors");
+
+                    b.Property<string>("Drivetrain")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("drivetrain");
+
+                    b.Property<int?>("EngineDisplacementCc")
+                        .HasColumnType("integer")
+                        .HasColumnName("engine_displacement_cc");
+
+                    b.Property<string>("EngineName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("engine_name");
 
                     b.Property<DateTimeOffset?>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
@@ -1791,12 +3639,9 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("favorites_count");
 
-                    b.Property<string>("Features")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("features");
-
                     b.Property<string>("FuelType")
-                        .HasColumnType("text")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
                         .HasColumnName("fuel_type");
 
                     b.Property<bool>("IsExportReady")
@@ -1824,6 +3669,10 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("postal_code");
 
+                    b.Property<int?>("PowerCv")
+                        .HasColumnType("integer")
+                        .HasColumnName("power_cv");
+
                     b.Property<decimal>("Price")
                         .HasPrecision(12, 2)
                         .HasColumnType("numeric(12,2)")
@@ -1832,6 +3681,29 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.Property<bool>("PriceNegotiable")
                         .HasColumnType("boolean")
                         .HasColumnName("price_negotiable");
+
+                    b.Property<string>("PublicReference")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("public_reference");
+
+                    b.Property<DateTimeOffset?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("published_at");
+
+                    b.Property<string>("Region")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("region");
+
+                    b.Property<DateTimeOffset?>("ReservedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reserved_at");
+
+                    b.Property<int?>("Seats")
+                        .HasColumnType("integer")
+                        .HasColumnName("seats");
 
                     b.Property<Guid>("SellerId")
                         .HasColumnType("uuid")
@@ -1847,13 +3719,10 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("sold_at");
 
-                    b.Property<string>("Specs")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("specs");
-
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("status");
 
                     b.Property<string>("Title")
@@ -1863,7 +3732,8 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasColumnName("title");
 
                     b.Property<string>("Transmission")
-                        .HasColumnType("text")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("transmission");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
@@ -1873,6 +3743,11 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
+
+                    b.Property<string>("Version")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("version");
 
                     b.Property<int>("ViewsCount")
                         .HasColumnType("integer")
@@ -1896,11 +3771,18 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.HasIndex("CreatedAt")
                         .HasDatabaseName("ix_vehicles_created_at");
 
+                    b.HasIndex("CustomsStatus")
+                        .HasDatabaseName("ix_vehicles_customs_status");
+
                     b.HasIndex("MakeId")
                         .HasDatabaseName("ix_vehicles_make_id");
 
                     b.HasIndex("ModelId")
                         .HasDatabaseName("ix_vehicles_model_id");
+
+                    b.HasIndex("PublicReference")
+                        .IsUnique()
+                        .HasDatabaseName("ix_vehicles_public_reference");
 
                     b.HasIndex("SellerId")
                         .HasDatabaseName("ix_vehicles_seller_id");
@@ -1914,6 +3796,9 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
 
                     b.HasIndex("Price", "Currency")
                         .HasDatabaseName("ix_vehicles_price_currency");
+
+                    b.HasIndex("Region", "City")
+                        .HasDatabaseName("ix_vehicles_region_city");
 
                     b.HasIndex("Status", "IsFeatured", "DeletedAt")
                         .HasDatabaseName("ix_vehicles_active_featured")
@@ -1993,6 +3878,247 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasDatabaseName("ix_vehicle_documents_vehicle_id_type");
 
                     b.ToTable("vehicle_documents", "vehicles");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleEquipment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("display_order");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_equipments");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_vehicle_equipments_code");
+
+                    b.ToTable("vehicle_equipments", "vehicles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000001"),
+                            Code = "CLIMATISATION",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            Name = "Climatisation",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000002"),
+                            Code = "BLUETOOTH",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            Name = "Bluetooth",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000003"),
+                            Code = "GPS",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            Name = "Navigation / GPS",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000004"),
+                            Code = "CAMERA_RECUL",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 4,
+                            IsActive = true,
+                            Name = "Caméra de recul",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000005"),
+                            Code = "RADAR_STATION",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 5,
+                            IsActive = true,
+                            Name = "Radar de stationnement",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000006"),
+                            Code = "TOIT_OUVRANT",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 6,
+                            IsActive = true,
+                            Name = "Toit ouvrant",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000007"),
+                            Code = "INTERIEUR_CUIR",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 7,
+                            IsActive = true,
+                            Name = "Intérieur cuir",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000008"),
+                            Code = "ISOFIX",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 8,
+                            IsActive = true,
+                            Name = "ISOFIX",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000009"),
+                            Code = "PHARES_LED",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 9,
+                            IsActive = true,
+                            Name = "Phares LED",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000010"),
+                            Code = "REGULATEUR",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 10,
+                            IsActive = true,
+                            Name = "Régulateur de vitesse",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000011"),
+                            Code = "JANTES_ALLIAGE",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 11,
+                            IsActive = true,
+                            Name = "Jantes alliage",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000012"),
+                            Code = "VITRES_ELEC",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 12,
+                            IsActive = true,
+                            Name = "Vitres électriques",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000013"),
+                            Code = "VERROUILLAGE",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 13,
+                            IsActive = true,
+                            Name = "Verrouillage centralisé",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000014"),
+                            Code = "ABS",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 14,
+                            IsActive = true,
+                            Name = "ABS",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000015"),
+                            Code = "AIRBAGS",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 15,
+                            IsActive = true,
+                            Name = "Airbags",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000016"),
+                            Code = "DIRECTION_ASSIST",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayOrder = 16,
+                            IsActive = true,
+                            Name = "Direction assistée",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleEquipmentLink", b =>
+                {
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("vehicle_id");
+
+                    b.Property<Guid>("EquipmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("equipment_id");
+
+                    b.HasKey("VehicleId", "EquipmentId")
+                        .HasName("pk_vehicle_equipment_links");
+
+                    b.HasIndex("EquipmentId")
+                        .HasDatabaseName("ix_vehicle_equipment_links_equipment_id");
+
+                    b.ToTable("vehicle_equipment_links", "vehicles");
                 });
 
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleHistory", b =>
@@ -2160,6 +4286,127 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.ToTable("vehicle_images", "vehicles");
                 });
 
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleInspection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("NegotiationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("negotiation_id");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)")
+                        .HasColumnName("notes");
+
+                    b.Property<int?>("ObservedMileage")
+                        .HasColumnType("integer")
+                        .HasColumnName("observed_mileage");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<DateTimeOffset?>("VisitedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("visited_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_inspections");
+
+                    b.HasIndex("NegotiationId", "UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_vehicle_inspections_negotiation_id_user_id");
+
+                    b.ToTable("vehicle_inspections", "messaging");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleInspectionItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("InspectionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("inspection_id");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<string>("Result")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("result");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_inspection_items");
+
+                    b.HasIndex("InspectionId", "Type")
+                        .IsUnique()
+                        .HasDatabaseName("ix_vehicle_inspection_items_inspection_id_type");
+
+                    b.ToTable("vehicle_inspection_items", "messaging");
+                });
+
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleMake", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2280,34 +4527,780 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.ToTable("vehicle_models", "vehicles");
                 });
 
-            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Conversation", b =>
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehiclePriceHistory", b =>
                 {
-                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Buyer")
-                        .WithMany()
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_conversations_user_profiles_buyer_id");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
-                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Seller")
+                    b.Property<DateTimeOffset>("ChangedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("changed_at");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("price");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("vehicle_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_price_history");
+
+                    b.HasIndex("VehicleId", "ChangedAt")
+                        .HasDatabaseName("ix_vehicle_price_history_vehicle_id_changed_at");
+
+                    b.ToTable("vehicle_price_history", "vehicles");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleReminder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<DateTimeOffset?>("DueDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("due_date");
+
+                    b.Property<int?>("DueMileage")
+                        .HasColumnType("integer")
+                        .HasColumnName("due_mileage");
+
+                    b.Property<Guid>("GarageVehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("garage_vehicle_id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<DateTimeOffset?>("NotifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("notified_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_reminders");
+
+                    b.HasIndex("GarageVehicleId", "Status")
+                        .HasDatabaseName("ix_vehicle_reminders_garage_vehicle_id_status");
+
+                    b.HasIndex("Status", "DueDate")
+                        .HasDatabaseName("ix_vehicle_reminders_status_due_date");
+
+                    b.ToTable("vehicle_reminders", "garage");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AssignedAdminId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assigned_admin_id");
+
+                    b.Property<string>("BodyType")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("body_type");
+
+                    b.Property<DateTimeOffset?>("ClosedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("closed_at");
+
+                    b.Property<string>("Color")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("color");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("FuelType")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("fuel_type");
+
+                    b.Property<string>("ImportantEquipment")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("important_equipment");
+
+                    b.Property<Guid?>("MakeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("make_id");
+
+                    b.Property<string>("MakeName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("make_name");
+
+                    b.Property<decimal?>("MaxBudget")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("max_budget");
+
+                    b.Property<int?>("MaxMileage")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_mileage");
+
+                    b.Property<string>("ModelName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("model_name");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("notes");
+
+                    b.Property<string>("Origin")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("origin");
+
+                    b.Property<string>("PublicReference")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("public_reference");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Transmission")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("transmission");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("Version")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("version");
+
+                    b.Property<int?>("YearFrom")
+                        .HasColumnType("integer")
+                        .HasColumnName("year_from");
+
+                    b.Property<int?>("YearTo")
+                        .HasColumnType("integer")
+                        .HasColumnName("year_to");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_requests");
+
+                    b.HasIndex("AssignedAdminId")
+                        .HasDatabaseName("ix_vehicle_requests_assigned_admin_id");
+
+                    b.HasIndex("MakeId")
+                        .HasDatabaseName("ix_vehicle_requests_make_id");
+
+                    b.HasIndex("PublicReference")
+                        .IsUnique()
+                        .HasDatabaseName("ix_vehicle_requests_public_reference");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_vehicle_requests_user_id");
+
+                    b.HasIndex("Status", "CreatedAt")
+                        .HasDatabaseName("ix_vehicle_requests_status_created_at");
+
+                    b.ToTable("vehicle_requests", "vehicles");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleRequestMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)")
+                        .HasColumnName("body");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<bool>("IsFromAdmin")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_from_admin");
+
+                    b.Property<bool>("IsInternalNote")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_internal_note");
+
+                    b.Property<Guid>("RequestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("request_id");
+
+                    b.Property<Guid?>("SenderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sender_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_request_messages");
+
+                    b.HasIndex("SenderId")
+                        .HasDatabaseName("ix_vehicle_request_messages_sender_id");
+
+                    b.HasIndex("RequestId", "CreatedAt")
+                        .HasDatabaseName("ix_vehicle_request_messages_request_id_created_at");
+
+                    b.ToTable("vehicle_request_messages", "vehicles");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleRequestProposal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal?>("AdditionalCosts")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("additional_costs");
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("comments");
+
+                    b.Property<string>("CountryOfOrigin")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("country_of_origin");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<decimal?>("EstimatedPrice")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("estimated_price");
+
+                    b.Property<string>("ExternalUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("external_url");
+
+                    b.Property<string>("FuelType")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("fuel_type");
+
+                    b.Property<bool>("IsSeenByUser")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_seen_by_user");
+
+                    b.Property<string>("MakeModel")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("make_model");
+
+                    b.Property<int?>("Mileage")
+                        .HasColumnType("integer")
+                        .HasColumnName("mileage");
+
+                    b.Property<string>("PhotoUrls")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("photo_urls");
+
+                    b.Property<Guid>("RequestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("request_id");
+
+                    b.Property<string>("Transmission")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("transmission");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid?>("VehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("vehicle_id");
+
+                    b.Property<string>("Version")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("version");
+
+                    b.Property<int?>("Year")
+                        .HasColumnType("integer")
+                        .HasColumnName("year");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_request_proposals");
+
+                    b.HasIndex("RequestId")
+                        .HasDatabaseName("ix_vehicle_request_proposals_request_id");
+
+                    b.HasIndex("VehicleId")
+                        .HasDatabaseName("ix_vehicle_request_proposals_vehicle_id");
+
+                    b.ToTable("vehicle_request_proposals", "vehicles");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleTransparency", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<Guid>("GarageVehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("garage_vehicle_id");
+
+                    b.Property<bool>("ShowMaintenanceDetails")
+                        .HasColumnType("boolean")
+                        .HasColumnName("show_maintenance_details");
+
+                    b.Property<bool>("ShowMaintenanceHistory")
+                        .HasColumnType("boolean")
+                        .HasColumnName("show_maintenance_history");
+
+                    b.Property<bool>("ShowMileageEvolution")
+                        .HasColumnType("boolean")
+                        .HasColumnName("show_mileage_evolution");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("vehicle_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_transparency");
+
+                    b.HasIndex("GarageVehicleId")
+                        .HasDatabaseName("ix_vehicle_transparency_garage_vehicle_id");
+
+                    b.HasIndex("VehicleId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_vehicle_transparency_vehicle_id");
+
+                    b.ToTable("vehicle_transparency", "garage");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleValuationSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<int>("MaxListingAgeDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_listing_age_days");
+
+                    b.Property<int>("MileageBandKm")
+                        .HasColumnType("integer")
+                        .HasColumnName("mileage_band_km");
+
+                    b.Property<int>("MinComparables")
+                        .HasColumnType("integer")
+                        .HasColumnName("min_comparables");
+
+                    b.Property<decimal>("RangeSpread")
+                        .HasPrecision(4, 3)
+                        .HasColumnType("numeric(4,3)")
+                        .HasColumnName("range_spread");
+
+                    b.Property<int>("SnapshotIntervalDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("snapshot_interval_days");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<int>("YearBand")
+                        .HasColumnType("integer")
+                        .HasColumnName("year_band");
+
+                    b.HasKey("Id")
+                        .HasName("pk_valuation_settings");
+
+                    b.ToTable("valuation_settings", "vehicles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000002"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            MaxListingAgeDays = 365,
+                            MileageBandKm = 30000,
+                            MinComparables = 5,
+                            RangeSpread = 0.05m,
+                            SnapshotIntervalDays = 30,
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            YearBand = 2
+                        });
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleValuationSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CapturedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("captured_at");
+
+                    b.Property<int>("ComparableCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("comparable_count");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<decimal>("EstimatedValue")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("estimated_value");
+
+                    b.Property<Guid>("GarageVehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("garage_vehicle_id");
+
+                    b.Property<decimal>("HighValue")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("high_value");
+
+                    b.Property<decimal>("LowValue")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("low_value");
+
+                    b.Property<int?>("Mileage")
+                        .HasColumnType("integer")
+                        .HasColumnName("mileage");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_valuation_snapshots");
+
+                    b.HasIndex("GarageVehicleId", "CapturedAt")
+                        .HasDatabaseName("ix_valuation_snapshots_garage_vehicle_id_captured_at");
+
+                    b.ToTable("valuation_snapshots", "garage");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.AdminAction", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Admin")
                         .WithMany()
-                        .HasForeignKey("SellerId")
+                        .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_conversations_user_profiles_seller_id");
+                        .HasConstraintName("fk_admin_actions_user_profiles_admin_id");
+
+                    b.Navigation("Admin");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.AdminNote", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_admin_notes_user_profiles_admin_id");
+
+                    b.Navigation("Admin");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Communication", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_communications_user_profiles_admin_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_communications_user_profiles_target_user_id");
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("TargetUser");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Contract", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Negotiation", "Negotiation")
+                        .WithMany()
+                        .HasForeignKey("NegotiationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_contracts_negotiations_negotiation_id");
 
                     b.HasOne("LogistiqueLesLions.Domain.Entities.Vehicle", "Vehicle")
                         .WithMany()
                         .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_conversations_vehicles_vehicle_id");
+                        .HasConstraintName("fk_contracts_vehicles_vehicle_id");
 
-                    b.Navigation("Buyer");
-
-                    b.Navigation("Seller");
+                    b.Navigation("Negotiation");
 
                     b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.FeatureInterest", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UpcomingFeature", "Feature")
+                        .WithMany("Interests")
+                        .HasForeignKey("FeatureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_feature_interests_upcoming_features_feature_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_feature_interests_user_profiles_user_id");
+
+                    b.Navigation("Feature");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.GarageDocument", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.GarageVehicle", "GarageVehicle")
+                        .WithMany("Documents")
+                        .HasForeignKey("GarageVehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_garage_documents_garage_vehicles_garage_vehicle_id");
+
+                    b.Navigation("GarageVehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.GarageVehicle", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.VehicleMake", "Make")
+                        .WithMany()
+                        .HasForeignKey("MakeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_garage_vehicles_vehicle_makes_make_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.VehicleModel", "Model")
+                        .WithMany()
+                        .HasForeignKey("ModelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_garage_vehicles_vehicle_models_model_id");
+
+                    b.Navigation("Make");
+
+                    b.Navigation("Model");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.GarageVehicleImage", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.GarageVehicle", "GarageVehicle")
+                        .WithMany("Images")
+                        .HasForeignKey("GarageVehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_garage_vehicle_images_garage_vehicles_garage_vehicle_id");
+
+                    b.Navigation("GarageVehicle");
                 });
 
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.ImportExportProcess", b =>
@@ -2322,14 +5315,66 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Message", b =>
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.LoyaltyPointEntry", b =>
                 {
-                    b.HasOne("LogistiqueLesLions.Domain.Entities.Conversation", "Conversation")
-                        .WithMany("Messages")
-                        .HasForeignKey("ConversationId")
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_loyalty_point_entries_user_profiles_admin_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_loyalty_point_entries_user_profiles_user_id");
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.MaintenanceRecord", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.GarageDocument", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_maintenance_records_garage_documents_document_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.GarageVehicle", "GarageVehicle")
+                        .WithMany("MaintenanceRecords")
+                        .HasForeignKey("GarageVehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_messages_conversations_conversation_id");
+                        .HasConstraintName("fk_maintenance_records_garage_vehicles_garage_vehicle_id");
+
+                    b.Navigation("Document");
+
+                    b.Navigation("GarageVehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.MaintenanceRecordImage", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.MaintenanceRecord", "MaintenanceRecord")
+                        .WithMany("Images")
+                        .HasForeignKey("MaintenanceRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_maintenance_record_images_maintenance_records_maintenance_r");
+
+                    b.Navigation("MaintenanceRecord");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Message", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Negotiation", "Negotiation")
+                        .WithMany("Messages")
+                        .HasForeignKey("NegotiationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_messages_negotiations_negotiation_id");
 
                     b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Sender")
                         .WithMany()
@@ -2338,9 +5383,80 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_messages_user_profiles_sender_id");
 
-                    b.Navigation("Conversation");
+                    b.Navigation("Negotiation");
 
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Negotiation", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Buyer")
+                        .WithMany()
+                        .HasForeignKey("BuyerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_negotiations_user_profiles_buyer_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Seller")
+                        .WithMany()
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_negotiations_user_profiles_seller_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_negotiations_vehicles_vehicle_id");
+
+                    b.Navigation("Buyer");
+
+                    b.Navigation("Seller");
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.NegotiationEvent", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Actor")
+                        .WithMany()
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_negotiation_events_user_profiles_actor_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Negotiation", "Negotiation")
+                        .WithMany("Events")
+                        .HasForeignKey("NegotiationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_negotiation_events_negotiations_negotiation_id");
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("Negotiation");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Offer", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "From")
+                        .WithMany()
+                        .HasForeignKey("FromUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_offers_user_profiles_from_user_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Negotiation", "Negotiation")
+                        .WithMany("Offers")
+                        .HasForeignKey("NegotiationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_offers_negotiations_negotiation_id");
+
+                    b.Navigation("From");
+
+                    b.Navigation("Negotiation");
                 });
 
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.ProcessDocument", b =>
@@ -2367,6 +5483,34 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.Navigation("Process");
                 });
 
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Report", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "HandledByAdmin")
+                        .WithMany()
+                        .HasForeignKey("HandledByAdminId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_reports_user_profiles_handled_by_admin_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "ReportedUser")
+                        .WithMany()
+                        .HasForeignKey("ReportedUserId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_reports_user_profiles_reported_user_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Reporter")
+                        .WithMany()
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_reports_user_profiles_reporter_id");
+
+                    b.Navigation("HandledByAdmin");
+
+                    b.Navigation("ReportedUser");
+
+                    b.Navigation("Reporter");
+                });
+
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.SavedVehicle", b =>
                 {
                     b.HasOne("LogistiqueLesLions.Domain.Entities.Vehicle", "Vehicle")
@@ -2377,6 +5521,27 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                         .HasConstraintName("fk_saved_vehicles_vehicles_vehicle_id");
 
                     b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.SharedMaintenanceRecord", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.MaintenanceRecord", "MaintenanceRecord")
+                        .WithMany()
+                        .HasForeignKey("MaintenanceRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_shared_maintenance_records_maintenance_records_maintenance_");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.VehicleTransparency", "Transparency")
+                        .WithMany("SharedRecords")
+                        .HasForeignKey("TransparencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_shared_maintenance_records_vehicle_transparencies_transpare");
+
+                    b.Navigation("MaintenanceRecord");
+
+                    b.Navigation("Transparency");
                 });
 
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Vehicle", b =>
@@ -2420,6 +5585,27 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleEquipmentLink", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.VehicleEquipment", "Equipment")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_equipment_links_vehicle_equipments_equipment_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Vehicle", "Vehicle")
+                        .WithMany("Equipments")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_equipment_links_vehicles_vehicle_id");
+
+                    b.Navigation("Equipment");
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleHistory", b =>
                 {
                     b.HasOne("LogistiqueLesLions.Domain.Entities.Vehicle", "Vehicle")
@@ -2444,6 +5630,30 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleInspection", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Negotiation", "Negotiation")
+                        .WithMany()
+                        .HasForeignKey("NegotiationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_inspections_negotiations_negotiation_id");
+
+                    b.Navigation("Negotiation");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleInspectionItem", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.VehicleInspection", "Inspection")
+                        .WithMany("Items")
+                        .HasForeignKey("InspectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_inspection_items_vehicle_inspections_inspection_id");
+
+                    b.Navigation("Inspection");
+                });
+
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleModel", b =>
                 {
                     b.HasOne("LogistiqueLesLions.Domain.Entities.VehicleMake", "Make")
@@ -2456,9 +5666,142 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.Navigation("Make");
                 });
 
-            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Conversation", b =>
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehiclePriceHistory", b =>
                 {
-                    b.Navigation("Messages");
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Vehicle", "Vehicle")
+                        .WithMany("PriceHistory")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_price_history_vehicles_vehicle_id");
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleReminder", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.GarageVehicle", "GarageVehicle")
+                        .WithMany("Reminders")
+                        .HasForeignKey("GarageVehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_reminders_garage_vehicles_garage_vehicle_id");
+
+                    b.Navigation("GarageVehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleRequest", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "AssignedAdmin")
+                        .WithMany()
+                        .HasForeignKey("AssignedAdminId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_vehicle_requests_user_profiles_assigned_admin_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.VehicleMake", "Make")
+                        .WithMany()
+                        .HasForeignKey("MakeId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_vehicle_requests_vehicle_makes_make_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_requests_user_profiles_user_id");
+
+                    b.Navigation("AssignedAdmin");
+
+                    b.Navigation("Make");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleRequestMessage", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.VehicleRequest", "Request")
+                        .WithMany("Messages")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_request_messages_vehicle_requests_request_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.UserProfile", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_vehicle_request_messages_user_profiles_sender_id");
+
+                    b.Navigation("Request");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleRequestProposal", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.VehicleRequest", "Request")
+                        .WithMany("Proposals")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_request_proposals_vehicle_requests_request_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_vehicle_request_proposals_vehicles_vehicle_id");
+
+                    b.Navigation("Request");
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleTransparency", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.GarageVehicle", "GarageVehicle")
+                        .WithMany()
+                        .HasForeignKey("GarageVehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_transparency_garage_vehicles_garage_vehicle_id");
+
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicle_transparency_vehicles_vehicle_id");
+
+                    b.Navigation("GarageVehicle");
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleValuationSnapshot", b =>
+                {
+                    b.HasOne("LogistiqueLesLions.Domain.Entities.GarageVehicle", "GarageVehicle")
+                        .WithMany("ValuationSnapshots")
+                        .HasForeignKey("GarageVehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_valuation_snapshots_garage_vehicles_garage_vehicle_id");
+
+                    b.Navigation("GarageVehicle");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.GarageVehicle", b =>
+                {
+                    b.Navigation("Documents");
+
+                    b.Navigation("Images");
+
+                    b.Navigation("MaintenanceRecords");
+
+                    b.Navigation("Reminders");
+
+                    b.Navigation("ValuationSnapshots");
                 });
 
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.ImportExportProcess", b =>
@@ -2466,9 +5809,42 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
                     b.Navigation("Documents");
                 });
 
-            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Vehicle", b =>
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.MaintenanceRecord", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Negotiation", b =>
+                {
+                    b.Navigation("Events");
+
+                    b.Navigation("Messages");
+
+                    b.Navigation("Offers");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.UpcomingFeature", b =>
+                {
+                    b.Navigation("Interests");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.Vehicle", b =>
+                {
+                    b.Navigation("Equipments");
+
+                    b.Navigation("Images");
+
+                    b.Navigation("PriceHistory");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleEquipment", b =>
+                {
+                    b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleInspection", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleMake", b =>
@@ -2481,6 +5857,18 @@ namespace LogistiqueLesLions.Infrastructure.Migrations
             modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleModel", b =>
                 {
                     b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleRequest", b =>
+                {
+                    b.Navigation("Messages");
+
+                    b.Navigation("Proposals");
+                });
+
+            modelBuilder.Entity("LogistiqueLesLions.Domain.Entities.VehicleTransparency", b =>
+                {
+                    b.Navigation("SharedRecords");
                 });
 #pragma warning restore 612, 618
         }

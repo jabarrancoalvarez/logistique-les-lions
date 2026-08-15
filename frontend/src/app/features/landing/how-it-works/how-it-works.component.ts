@@ -1,9 +1,15 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
 
 type UserType = 'buyer' | 'seller';
 
+/**
+ * «Comment ça marche», visto desde cada lado.
+ *
+ * Cada paso corresponde a algo que la aplicación hace hoy. ❌ Nada de escrow, de
+ * transporte ni de traducción automática: eso era el producto anterior y no existe.
+ */
 @Component({
   selector: 'lll-how-it-works',
   standalone: true,
@@ -18,38 +24,44 @@ export class HowItWorksComponent {
     {
       step: '01',
       icon: '🔍',
-      title: 'Busca y compara',
-      description: 'Explora miles de vehículos verificados de toda Europa y más allá. Filtra por marca, país, precio y tipo de combustible.'
+      title: 'Cherchez et comparez',
+      description: 'Filtrez par marque, région, budget, carburant et statut douanier. ' +
+                   'Comparez plusieurs voitures côte à côte.'
     },
     {
       step: '02',
-      icon: '📋',
-      title: 'Calcula el coste total',
-      description: 'Nuestra calculadora te muestra el precio final real: aranceles, IVA, homologación, transporte y tasas de matriculación.'
+      icon: '🔔',
+      title: 'Enregistrez votre recherche',
+      description: 'Recevez une alerte dès qu\'une voiture correspondant à vos ' +
+                   'critères est publiée, et quand un favori baisse de prix.'
     },
     {
       step: '03',
-      icon: '📄',
-      title: 'Gestión documental automática',
-      description: 'La plataforma genera el checklist completo de documentos necesarios para importar el vehículo a tu país.'
+      icon: '💬',
+      title: 'Contactez le vendeur',
+      description: 'Ouvrez une négociation, posez vos questions et suivez toute ' +
+                   'la discussion au même endroit.'
     },
     {
       step: '04',
-      icon: '🔒',
-      title: 'Pago seguro con escrow',
-      description: 'Tu dinero queda protegido hasta confirmar la recepción del vehículo y la documentación en regla.'
+      icon: '💰',
+      title: 'Faites une offre',
+      description: 'Proposez votre prix, recevez une contre-offre et mettez-vous ' +
+                   'd\'accord. Chaque étape reste inscrite dans la chronologie.'
     },
     {
       step: '05',
-      icon: '🚛',
-      title: 'Transporte y entrega',
-      description: 'Coordinamos el transporte desde origen hasta tu puerta. Seguimiento en tiempo real incluido.'
+      icon: '📝',
+      title: 'Vérifiez avant d\'acheter',
+      description: 'Remplissez votre checklist d\'inspection. Elle est privée : ' +
+                   'le vendeur ne la voit pas.'
     },
     {
       step: '06',
       icon: '✅',
-      title: 'Matriculación y disfrute',
-      description: 'Con todos los documentos homologados y validados, registra el vehículo y a disfrutar.'
+      title: 'Signez le contrat',
+      description: 'Le contrat est validé par les deux parties, avec PDF et code QR. ' +
+                   'La voiture entre automatiquement dans votre Mon Garage.'
     }
   ];
 
@@ -57,42 +69,47 @@ export class HowItWorksComponent {
     {
       step: '01',
       icon: '📸',
-      title: 'Publica tu anuncio',
-      description: 'Describe tu vehículo con hasta 40 fotos. Nuestro asistente IA sugiere el precio óptimo de mercado internacional.'
+      title: 'Publiez votre annonce',
+      description: 'Photos, fiche technique, prix en FCFA et statut douanier. ' +
+                   'Gratuit et sans limite d\'annonces.'
     },
     {
       step: '02',
-      icon: '✔️',
-      title: 'Verificación del vehículo',
-      description: 'Sube la documentación del vehículo. Nuestros verificadores comprueban la autenticidad y el historial.'
+      icon: '📊',
+      title: 'Situez votre prix',
+      description: 'L\'indicateur compare votre prix à celui des voitures ' +
+                   'semblables. Un calcul statistique, sans intelligence artificielle.'
     },
     {
       step: '03',
-      icon: '🌍',
-      title: 'Visibilidad internacional',
-      description: 'Tu anuncio llega a compradores en España, Alemania, Francia, Marruecos y 8 países más simultáneamente.'
+      icon: '⭐',
+      title: 'Soignez la qualité de l\'annonce',
+      description: 'Un score vous indique ce qu\'il manque : photos, description, ' +
+                   'équipements. Une annonce complète est plus consultée.'
     },
     {
       step: '04',
       icon: '💬',
-      title: 'Comunícate con compradores',
-      description: 'Chat con traducción automática integrada. Gestiona ofertas y responde preguntas en tu idioma.'
+      title: 'Répondez aux acheteurs',
+      description: 'Toutes les négociations réunies, avec des réponses types pour ' +
+                   'les questions qui reviennent.'
     },
     {
       step: '05',
-      icon: '📦',
-      title: 'Documentación de exportación',
-      description: 'La plataforma genera automáticamente todos los documentos de exportación requeridos por el país destino.'
+      icon: '🤝',
+      title: 'Acceptez une offre',
+      description: 'Comparez les offres reçues, contre-proposez et concluez. ' +
+                   'Vous restez maître de votre prix.'
     },
     {
       step: '06',
-      icon: '💰',
-      title: 'Recibe el pago',
-      description: 'Una vez el comprador confirma la recepción, el pago se libera del escrow a tu cuenta en 24-48h.'
+      icon: '🏅',
+      title: 'Vente vérifiée',
+      description: 'Le contrat validé ajoute une vente vérifiée à votre profil. ' +
+                   'C\'est la réputation qui rassure le prochain acheteur.'
     }
   ];
 
-  get activeSteps() {
-    return this.activeTab() === 'buyer' ? this.buyerSteps : this.sellerSteps;
-  }
+  readonly activeSteps = computed(() =>
+    this.activeTab() === 'buyer' ? this.buyerSteps : this.sellerSteps);
 }

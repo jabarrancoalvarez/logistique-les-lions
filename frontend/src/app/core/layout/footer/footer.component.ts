@@ -13,28 +13,28 @@ export class FooterComponent {
   readonly currentYear = new Date().getFullYear();
 
   readonly platformLinks = [
-    { label: 'Buscar vehículos', path: '/vehiculos' },
-    { label: 'Publicar anuncio', path: '/vehiculos/nuevo' },
-    { label: 'Precios de mercado', path: '/precios' },
-    { label: 'Calculadora de costes', path: '/calculadora' },
-    { label: 'Inspectores certificados', path: '/inspectores' },
+    { label: 'Voir les annonces',   path: '/vehiculos' },
+    { label: 'Publier une annonce', path: '/vehiculos/nuevo' },
+    { label: 'Trouvez-moi une voiture', path: '/mis-pedidos' },
+    { label: 'Comparateur',         path: '/comparateur' },
+    { label: 'Prochainement',       path: '/prochainement' }
   ];
 
+  // Los cuatro espacios personales del documento. Exigen cuenta: el guard redirige a
+  // login, que es el comportamiento correcto para quien llega desde el pie.
   readonly serviceLinks = [
-    { label: 'Tramitación documental', path: '/tramitacion' },
-    { label: 'Guía de importación', path: '/guias/importacion' },
-    { label: 'Guía de exportación', path: '/guias/exportacion' },
-    { label: 'Homologaciones UE', path: '/guias/homologacion' },
-    { label: 'Transporte internacional', path: '/logistica' },
-    { label: 'Financiación', path: '/financiacion' },
+    { label: 'Mes recherches',   path: '/mis-busquedas' },
+    { label: 'Mes négociations', path: '/mis-negociaciones' },
+    { label: 'Mon Garage',       path: '/mi-garaje' },
+    { label: 'Mes annonces',     path: '/mis-vehiculos' }
   ];
 
   readonly legalLinks = [
-    { label: 'Aviso legal', path: '/legal/aviso-legal' },
-    { label: 'Política de privacidad', path: '/legal/privacidad' },
-    { label: 'Política de cookies', path: '/legal/cookies' },
-    { label: 'Términos y condiciones', path: '/legal/terminos' },
-    { label: 'Protección de datos', path: '/legal/rgpd' },
+    { label: 'Mentions légales',        path: '/legal/aviso-legal' },
+    { label: 'Politique de confidentialité', path: '/legal/privacidad' },
+    { label: 'Politique de cookies',    path: '/legal/cookies' },
+    { label: 'Conditions générales',    path: '/legal/terminos' },
+    { label: 'Protection des données',  path: '/legal/rgpd' },
   ];
 
   readonly socials = [

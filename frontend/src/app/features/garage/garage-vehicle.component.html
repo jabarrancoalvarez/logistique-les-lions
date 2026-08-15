@@ -1,0 +1,1024 @@
+<section class="bg-frost min-h-[70vh] py-8">
+  <div class="max-w-3xl mx-auto px-4">
+
+    <p class="mb-4">
+      <a routerLink="/mi-garaje" class="text-sm text-azure-dark hover:underline">
+        ← Mon Garage
+      </a>
+    </p>
+
+    @if (loading()) {
+      <p class="text-sm text-navy/50 py-10 text-center">Chargement…</p>
+    }
+
+    @if (notFound()) {
+      <p class="text-sm text-red-600 py-10 text-center" role="alert">
+        Véhicule introuvable.
+      </p>
+    }
+
+    @if (!loading() && !notFound()) {
+
+      <!-- ─── En-tête ───────────────────────────────────────────────────── -->
+      <div class="flex flex-wrap items-start justify-between gap-3 mb-5">
+        <div>
+          <h1 class="font-heading font-bold text-navy text-2xl">
+            {{ isNew() ? 'Ajouter un véhicule' : vehicle()?.title }}
+          </h1>
+          @if (vehicle(); as v) {
+            <p class="text-sm text-navy/60 mt-0.5">
+              {{ v.year }}
+              @if (v.mileage !== null) { · {{ v.mileage }} km }
+            </p>
+            @if (v.boughtOnYoonUAuto) {
+              <span class="inline-block mt-2 text-[11px] font-medium px-2 py-0.5 rounded-full
+                           bg-green-100 text-green-800">
+                Acheté sur Yoon u Auto
+              </span>
+            }
+          }
+        </div>
+
+        @if (vehicle() && !editing()) {
+          <button type="button" (click)="startEditing()" class="btn-outline text-sm">
+            Mettre à jour
+          </button>
+        }
+      </div>
+
+      <!-- ─── Fiche ─────────────────────────────────────────────────────── -->
+      @if (vehicle(); as v) {
+        @if (!editing()) {
+          <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+            <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+              <div>
+                <dt class="text-xs text-navy/50">Marque et modèle</dt>
+                <dd class="text-navy font-medium">
+                  {{ v.makeName }} {{ v.modelName }} {{ v.version }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-navy/50">Année</dt>
+                <dd class="text-navy">{{ v.year }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-navy/50">Kilométrage</dt>
+                <dd class="text-navy">{{ v.mileage !== null ? v.mileage + ' km' : '—' }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-navy/50">Carburant</dt>
+                <dd class="text-navy">{{ v.fuelType ? fuelLabel(v.fuelType) : '—' }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-navy/50">Boîte</dt>
+                <dd class="text-navy">
+                  {{ v.transmission ? transmissionLabel(v.transmission) : '—' }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-navy/50">Carrosserie</dt>
+                <dd class="text-navy">{{ v.bodyType ? bodyLabel(v.bodyType) : '—' }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-navy/50">Puissance</dt>
+                <dd class="text-navy">{{ v.powerCv !== null ? v.powerCv + ' ch' : '—' }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-navy/50">Cylindrée</dt>
+                <dd class="text-navy">
+                  {{ v.engineDisplacementCc !== null ? v.engineDisplacementCc + ' cm³' : '—' }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-navy/50">Couleur</dt>
+                <dd class="text-navy">{{ v.color ?? '—' }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-navy/50">Immatriculation</dt>
+                <dd class="text-navy font-mono">{{ v.registrationPlate ?? '—' }}</dd>
+              </div>
+              <div class="sm:col-span-2">
+                <dt class="text-xs text-navy/50">Numéro de châssis (VIN)</dt>
+                <dd class="text-navy font-mono text-xs">{{ v.vin ?? '—' }}</dd>
+              </div>
+              <div class="sm:col-span-2 border-t border-navy/10 pt-3">
+                <dt class="text-xs text-navy/50">Acquisition</dt>
+                <dd class="text-navy">
+                  @if (v.purchaseDate) { {{ v.purchaseDate | date:'dd/MM/yyyy' }} } @else { — }
+                  @if (v.purchasePrice !== null) {
+                    <span class="text-navy/60"> · {{ v.purchasePrice | fcfa }}</span>
+                  }
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- ─── Photographies ───────────────────────────────────────────── -->
+          <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <h2 class="font-heading font-semibold text-navy">Photographies</h2>
+              <label class="btn-outline text-sm cursor-pointer">
+                {{ uploading() ? 'Envoi…' : 'Ajouter une photo' }}
+                <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
+                  (change)="onFileSelected($event)" [disabled]="uploading()" />
+              </label>
+            </div>
+
+            @if (images().length === 0) {
+              <p class="text-sm text-navy/50 py-3">Aucune photo pour le moment.</p>
+            } @else {
+              <ul class="grid grid-cols-2 sm:grid-cols-3 gap-3" role="list">
+                @for (img of images(); track img.id) {
+                  <li class="relative rounded-lg overflow-hidden border border-navy/10">
+                    <img [src]="img.thumbnailUrl ?? img.url" alt=""
+                      class="w-full h-28 object-cover" loading="lazy" />
+                    @if (img.isPrimary) {
+                      <span class="absolute top-1 left-1 text-[10px] font-medium px-1.5 py-0.5
+                                   rounded bg-navy text-white">
+                        Principale
+                      </span>
+                    }
+                    <button type="button" (click)="deleteImage(img)" [disabled]="uploading()"
+                      class="absolute top-1 right-1 w-6 h-6 rounded-full bg-white/90 text-red-600
+                             text-sm leading-none" aria-label="Supprimer la photo">
+                      ×
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+
+          <!-- ─── Vendre ce véhicule ──────────────────────────────────────── -->
+          <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+            <h2 class="font-heading font-semibold text-navy mb-1">Vendre ce véhicule</h2>
+
+            @if (!isListed()) {
+              <p class="text-sm text-navy/60 mb-4">
+                Yoon u Auto crée un <strong>brouillon d'annonce</strong> avec les
+                informations de votre garage. Rien n'est publié automatiquement&nbsp;:
+                vous devrez vérifier le prix, le kilométrage, les photos, l'état,
+                la description, le statut douanier et la localisation avant de publier.
+              </p>
+              <button type="button" (click)="sell()" class="btn-primary text-sm"
+                [disabled]="selling()">
+                {{ selling() ? 'Création…' : 'Vendre ce véhicule' }}
+              </button>
+            } @else {
+              @let listing = vehicle()!;
+              <p class="text-sm text-navy/60 mb-3">
+                Ce véhicule est lié à une annonce
+                <span class="font-mono text-navy">#{{ sellResult()?.publicReference ?? '' }}</span>
+                @if (listing.listedVehicleStatus === 'Brouillon') {
+                  au statut <strong>brouillon</strong>&nbsp;: elle n'est pas encore visible.
+                }
+              </p>
+              <a [routerLink]="['/vehiculos', listing.listedVehicleSlug]"
+                class="btn-outline text-sm inline-block">
+                Voir l'annonce
+              </a>
+            }
+
+            @if (sellResult(); as r) {
+              <div class="bg-frost rounded-lg px-4 py-3 mt-4 text-sm">
+                <p class="text-navy font-medium">Brouillon créé&nbsp;: #{{ r.publicReference }}</p>
+                <ul class="text-xs text-navy/60 mt-2 space-y-1" role="list">
+                  <li>{{ r.copiedImages }} photo(s) reprise(s) de votre garage.</li>
+                  @if (r.suggestedPrice !== null) {
+                    <li>
+                      À titre indicatif, la valeur estimée de ce véhicule est de
+                      <strong>{{ r.suggestedPrice | fcfa }}</strong>. Le prix de vente
+                      reste à définir&nbsp;: l'annonce a été créée sans prix.
+                    </li>
+                  } @else {
+                    <li>Le prix de vente reste à définir.</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (sellError()) {
+              <p class="text-xs text-red-600 mt-3" role="alert">{{ sellError() }}</p>
+            }
+          </div>
+
+          <!-- ─── Transparence du véhicule ────────────────────────────────── -->
+          @if (transparency(); as t) {
+            <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+              <h2 class="font-heading font-semibold text-navy mb-1">Transparence du véhicule</h2>
+              <p class="text-xs text-navy/50 mb-4">
+                Choisissez ce que vous souhaitez montrer dans l'annonce. Vos documents
+                restent privés&nbsp;: <strong>rien n'est publié sans votre accord
+                explicite</strong>.
+              </p>
+
+              <div class="space-y-2 mb-4">
+                <label class="flex items-start gap-2 text-sm text-navy cursor-pointer">
+                  <input type="checkbox" [checked]="t.showMaintenanceHistory"
+                    (change)="toggleTransparency('showMaintenanceHistory')" class="mt-0.5" />
+                  <span>Montrer l'historique d'entretien</span>
+                </label>
+                <label class="flex items-start gap-2 text-sm text-navy cursor-pointer"
+                  [class.opacity-40]="!t.showMaintenanceHistory">
+                  <input type="checkbox" [checked]="t.showMaintenanceDetails"
+                    [disabled]="!t.showMaintenanceHistory"
+                    (change)="toggleTransparency('showMaintenanceDetails')" class="mt-0.5" />
+                  <span>Montrer les dates et le kilométrage des entretiens</span>
+                </label>
+                <label class="flex items-start gap-2 text-sm text-navy cursor-pointer"
+                  [class.opacity-40]="!t.showMaintenanceHistory">
+                  <input type="checkbox" [checked]="t.showMileageEvolution"
+                    [disabled]="!t.showMaintenanceHistory"
+                    (change)="toggleTransparency('showMileageEvolution')" class="mt-0.5" />
+                  <span>Montrer l'évolution enregistrée du kilométrage</span>
+                </label>
+              </div>
+
+              @if (t.records.length > 0) {
+                <p class="text-sm font-medium text-navy border-t border-navy/10 pt-3 mb-2">
+                  Interventions à montrer
+                </p>
+                <ul class="space-y-2" role="list">
+                  @for (r of t.records; track r.maintenanceRecordId) {
+                    <li class="text-sm">
+                      <label class="flex items-start gap-2 text-navy cursor-pointer">
+                        <input type="checkbox" [checked]="r.shared"
+                          (change)="toggleRecord(r)" class="mt-0.5" />
+                        <span>
+                          {{ r.description }}
+                          <span class="text-xs text-navy/50">
+                            · {{ r.performedAt | date:'dd/MM/yyyy' }}
+                            @if (km(r.mileage); as m) { · {{ m }} }
+                          </span>
+                        </span>
+                      </label>
+                      @if (r.hasInvoice) {
+                        <label class="flex items-start gap-2 text-xs text-navy/70 ml-6 mt-1
+                                      cursor-pointer"
+                          [class.opacity-40]="!r.shared">
+                          <input type="checkbox" [checked]="r.shareInvoice"
+                            [disabled]="!r.shared"
+                            (change)="toggleRecordInvoice(r)" class="mt-0.5" />
+                          <span>Montrer aussi la facture</span>
+                        </label>
+                      }
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="text-sm text-navy/50 border-t border-navy/10 pt-3">
+                  Aucun entretien enregistré à partager pour le moment.
+                </p>
+              }
+
+              <div class="flex items-center gap-3 mt-4">
+                <button type="button" (click)="saveTransparency()" class="btn-primary text-sm"
+                  [disabled]="transparencyBusy()">
+                  Enregistrer
+                </button>
+                @if (transparencySaved()) {
+                  <span class="text-sm text-green-700">Enregistré ✓</span>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- ─── Complétude du dossier ───────────────────────────────────── -->
+          @if (completeness(); as c) {
+            <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+              <div class="flex items-baseline justify-between gap-3 mb-1">
+                <h2 class="font-heading font-semibold text-navy">Complétude du dossier</h2>
+                <p class="font-heading font-bold text-navy text-lg">
+                  {{ c.score }} %
+                  <span class="text-sm font-normal text-navy/60">
+                    — {{ completenessLevelLabel(c) }}
+                  </span>
+                </p>
+              </div>
+
+              <div class="h-2 rounded-full bg-frost-dark overflow-hidden mb-4">
+                <div class="h-full bg-azure-dark rounded-full transition-all"
+                  [style.width.%]="c.score"></div>
+              </div>
+
+              <ul class="space-y-1.5 text-sm" role="list">
+                @for (item of c.items; track item.check) {
+                  <li class="flex items-start gap-2"
+                    [class]="item.status === 'Complete' ? 'text-navy/70' : 'text-amber-800'">
+                    <span aria-hidden="true">{{ completenessIcon(item) }}</span>
+                    <span>{{ completenessText(item) }}</span>
+                  </li>
+                }
+              </ul>
+
+              <p class="text-xs text-navy/40 border-t border-navy/10 mt-4 pt-3">
+                Cet indicateur mesure uniquement à quel point le dossier numérique du
+                véhicule est complet et à jour.
+                <strong>Il ne s'agit ni d'un diagnostic mécanique ni d'une certification
+                de l'état du véhicule.</strong>
+              </p>
+            </div>
+          }
+
+          <!-- ─── Valeur estimée ──────────────────────────────────────────── -->
+          @if (valuation(); as val) {
+            <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+              <h2 class="font-heading font-semibold text-navy mb-3">Valeur estimée</h2>
+
+              @if (!val.hasEstimate) {
+                <p class="text-sm text-navy/60">
+                  Pas assez de données pour estimer la valeur de ce véhicule.
+                </p>
+                <p class="text-xs text-navy/40 mt-2">
+                  L'estimation apparaîtra dès que des véhicules comparables seront publiés
+                  sur Yoon u Auto.
+                </p>
+              } @else {
+                <p class="font-heading font-bold text-navy text-xl">
+                  {{ val.lowValue | fcfa }} – {{ val.highValue | fcfa }}
+                </p>
+                <p class="text-xs text-navy/50 mt-1">
+                  Basée sur {{ val.comparableCount }}
+                  {{ val.comparableCount === 1 ? 'annonce comparable' : 'annonces comparables' }}
+                  ({{ valuationBasis(val.criteria) }}).
+                </p>
+
+                <!-- Évolution -->
+                @if (val.evolution; as ev) {
+                  <div class="border-t border-navy/10 mt-4 pt-4">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+                      <p class="text-sm font-medium text-navy">Évolution de la valeur</p>
+                      @if (ev.changeAmount !== null) {
+                        <p class="text-sm"
+                          [class]="ev.changeAmount < 0 ? 'text-red-600' : 'text-green-700'">
+                          {{ ev.monthsCovered }} derniers mois&nbsp;:
+                          {{ ev.changeAmount < 0 ? '↓' : '↑' }}
+                          {{ (ev.changeAmount < 0 ? -ev.changeAmount : ev.changeAmount) | fcfa }}
+                          @if (ev.changePercent !== null) { ({{ ev.changePercent }} %) }
+                        </p>
+                      }
+                    </div>
+
+                    @if (evolutionPath(); as path) {
+                      <svg viewBox="0 0 100 40" preserveAspectRatio="none" role="img"
+                        aria-label="Courbe d'évolution de la valeur estimée"
+                        class="w-full h-20 mb-2">
+                        <polyline [attr.points]="path" fill="none" stroke="#157FA8"
+                          stroke-width="1.5" vector-effect="non-scaling-stroke" />
+                      </svg>
+                    }
+
+                    <ul class="text-xs text-navy/60 space-y-1" role="list">
+                      @for (p of ev.points; track p.capturedAt) {
+                        <li class="flex justify-between gap-3">
+                          <span>{{ p.capturedAt | date:'MMMM yyyy' }}</span>
+                          <span class="text-navy">{{ p.estimatedValue | fcfa }}</span>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+
+                <p class="text-xs text-navy/40 border-t border-navy/10 mt-4 pt-3">
+                  Estimation basée sur les données disponibles sur Yoon u Auto.
+                  Il ne s'agit pas d'une offre d'achat.
+                </p>
+              }
+            </div>
+          }
+
+          <!-- ─── Rappels ─────────────────────────────────────────────────── -->
+          <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+            <div class="flex items-center justify-between gap-3 mb-1">
+              <h2 class="font-heading font-semibold text-navy">Rappels</h2>
+              @if (!reminderFormOpen()) {
+                <button type="button" (click)="openReminderForm()" class="btn-outline text-sm">
+                  Ajouter un rappel
+                </button>
+              }
+            </div>
+            <p class="text-xs text-navy/50 mb-4">
+              Par date, par kilométrage ou les deux. Pour les rappels au kilométrage,
+              pensez à mettre à jour régulièrement le compteur&nbsp;: Yoon u Auto ne
+              devine jamais la distance parcourue.
+            </p>
+
+            <!-- Formulaire -->
+            @if (reminderFormOpen()) {
+              <div class="border border-navy/10 rounded-lg p-4 mb-4 space-y-3">
+                <div class="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="r-type" class="block text-sm font-medium text-navy mb-1">Type</label>
+                    <select id="r-type" [(ngModel)]="reminderForm.type"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                      @for (t of reminderTypes; track t) {
+                        <option [ngValue]="t">{{ reminderLabel(t) }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label for="r-label" class="block text-sm font-medium text-navy mb-1">
+                      Libellé
+                    </label>
+                    <input id="r-label" type="text" [(ngModel)]="reminderForm.label"
+                      placeholder="Prochaine vidange"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label for="r-date" class="block text-sm font-medium text-navy mb-1">
+                      Date d'échéance
+                    </label>
+                    <input id="r-date" type="date" [(ngModel)]="reminderForm.dueDate"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label for="r-km" class="block text-sm font-medium text-navy mb-1">
+                      Kilométrage d'échéance
+                    </label>
+                    <input id="r-km" type="number" min="1" [(ngModel)]="reminderForm.dueMileage"
+                      placeholder="150000"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label for="r-notes" class="block text-sm font-medium text-navy mb-1">
+                      Observations
+                    </label>
+                    <textarea id="r-notes" rows="2" [(ngModel)]="reminderForm.notes"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm"></textarea>
+                  </div>
+                </div>
+
+                <p class="text-xs text-navy/40">
+                  Avec les deux conditions, le rappel se déclenche à la première atteinte.
+                </p>
+
+                <div class="flex gap-2">
+                  <button type="button" (click)="saveReminder()" class="btn-primary text-sm"
+                    [disabled]="reminderBusy()">
+                    {{ editingReminder ? 'Enregistrer' : 'Ajouter' }}
+                  </button>
+                  <button type="button" (click)="closeReminderForm()" class="btn-outline text-sm">
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- Liste -->
+            @if (reminders().length === 0) {
+              <p class="text-sm text-navy/50 py-3">Aucun rappel pour le moment.</p>
+            } @else {
+              <ul class="divide-y divide-navy/10" role="list">
+                @for (r of reminders(); track r.id) {
+                  <li class="py-3 flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="text-sm font-medium text-navy">
+                        {{ r.label }}
+                        <span class="ml-2 text-[11px] font-medium px-2 py-0.5 rounded-full
+                                     align-middle"
+                          [class]="reminderStatusClass(r.status)">
+                          {{ reminderStatusLabel(r.status) }}
+                        </span>
+                      </p>
+                      <p class="text-xs text-navy/50 mt-0.5">
+                        {{ reminderLabel(r.type) }}
+                        @if (r.dueDate) { · {{ r.dueDate | date:'dd/MM/yyyy' }} }
+                        @if (r.dueMileage !== null) { · {{ km(r.dueMileage) }} }
+                      </p>
+                      @if (reminderCountdown(r); as countdown) {
+                        <p class="text-xs mt-0.5"
+                          [class]="r.status === 'AFaire' ? 'text-amber-700' : 'text-navy/60'">
+                          {{ countdown }}
+                        </p>
+                      }
+                      @if (r.notes) {
+                        <p class="text-xs text-navy/60 mt-1">{{ r.notes }}</p>
+                      }
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                      @if (r.status === 'AVenir' || r.status === 'AFaire') {
+                        <button type="button" (click)="setReminderStatus(r, 'Termine')"
+                          [disabled]="reminderBusy()"
+                          class="text-sm text-green-700 hover:underline">
+                          Terminé
+                        </button>
+                      } @else {
+                        <button type="button" (click)="setReminderStatus(r, 'AVenir')"
+                          [disabled]="reminderBusy()"
+                          class="text-sm text-navy/60 hover:underline">
+                          Rouvrir
+                        </button>
+                      }
+                      <button type="button" (click)="openReminderForm(r)" [disabled]="reminderBusy()"
+                        class="text-sm text-navy/60 hover:underline">
+                        Modifier
+                      </button>
+                      <button type="button" (click)="deleteReminder(r)" [disabled]="reminderBusy()"
+                        class="text-sm text-red-600 hover:underline">
+                        Supprimer
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (reminderError()) {
+              <p class="text-xs text-red-600 mt-3" role="alert">{{ reminderError() }}</p>
+            }
+          </div>
+
+          <!-- ─── Entretien ───────────────────────────────────────────────── -->
+          <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+            <div class="flex items-center justify-between gap-3 mb-1">
+              <h2 class="font-heading font-semibold text-navy">Entretien</h2>
+              @if (!maintenanceFormOpen()) {
+                <button type="button" (click)="openMaintenanceForm()" class="btn-outline text-sm">
+                  Ajouter une intervention
+                </button>
+              }
+            </div>
+
+            @if (maintenance(); as h) {
+              @if (h.recordCount > 0) {
+                <p class="text-xs text-navy/50 mb-4">
+                  {{ h.recordCount }}
+                  {{ h.recordCount === 1 ? 'intervention enregistrée' : 'interventions enregistrées' }}
+                  @if (h.totalCost > 0) { · {{ h.totalCost | fcfa }} au total }
+                  @if (km(h.lastMileage); as last) { · dernière à {{ last }} }
+                </p>
+              } @else {
+                <p class="text-xs text-navy/50 mb-4">
+                  Enregistrez chaque intervention&nbsp;: avec le temps, vous construirez
+                  l'historique réel du véhicule.
+                </p>
+              }
+            }
+
+            <!-- Formulaire -->
+            @if (maintenanceFormOpen()) {
+              <div class="border border-navy/10 rounded-lg p-4 mb-4 space-y-3">
+                <div class="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="m-type" class="block text-sm font-medium text-navy mb-1">
+                      Type d'intervention
+                    </label>
+                    <select id="m-type" [(ngModel)]="maintenanceForm.type"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                      @for (t of maintenanceTypes; track t) {
+                        <option [ngValue]="t">{{ maintenanceLabel(t) }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label for="m-date" class="block text-sm font-medium text-navy mb-1">Date</label>
+                    <input id="m-date" type="date" [(ngModel)]="maintenanceForm.performedAt"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label for="m-desc" class="block text-sm font-medium text-navy mb-1">
+                      Description
+                    </label>
+                    <input id="m-desc" type="text" [(ngModel)]="maintenanceForm.description"
+                      placeholder="Vidange + filtre à huile"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label for="m-km" class="block text-sm font-medium text-navy mb-1">
+                      Kilométrage
+                    </label>
+                    <input id="m-km" type="number" min="0" [(ngModel)]="maintenanceForm.mileage"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label for="m-cost" class="block text-sm font-medium text-navy mb-1">
+                      Coût (FCFA)
+                    </label>
+                    <input id="m-cost" type="number" min="0" [(ngModel)]="maintenanceForm.cost"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label for="m-workshop" class="block text-sm font-medium text-navy mb-1">
+                      Garage
+                    </label>
+                    <input id="m-workshop" type="text" [(ngModel)]="maintenanceForm.workshop"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label for="m-invoice" class="block text-sm font-medium text-navy mb-1">
+                      Facture
+                    </label>
+                    <select id="m-invoice" [(ngModel)]="maintenanceForm.documentId"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                      <option [ngValue]="null">Aucune</option>
+                      @for (d of documents(); track d.id) {
+                        <option [ngValue]="d.id">{{ d.name }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label for="m-notes" class="block text-sm font-medium text-navy mb-1">
+                      Observations
+                    </label>
+                    <textarea id="m-notes" rows="2" [(ngModel)]="maintenanceForm.notes"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm"></textarea>
+                  </div>
+                </div>
+
+                <p class="text-xs text-navy/40">
+                  La facture doit d'abord être ajoutée dans <strong>Documents</strong>&nbsp;;
+                  vous pourrez ensuite la rattacher ici.
+                </p>
+
+                <!-- Photos : seulement une fois l'intervention créée -->
+                @if (editingRecord; as record) {
+                  <div class="border-t border-navy/10 pt-3">
+                    <div class="flex items-center justify-between gap-3 mb-2">
+                      <p class="text-sm font-medium text-navy">Photographies</p>
+                      <label class="text-sm text-azure-dark hover:underline cursor-pointer">
+                        Ajouter une photo
+                        <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
+                          (change)="onPhotoSelected($event)" [disabled]="maintenanceBusy()" />
+                      </label>
+                    </div>
+
+                    @if (record.images.length === 0) {
+                      <p class="text-xs text-navy/40">Aucune photo.</p>
+                    } @else {
+                      <ul class="grid grid-cols-3 sm:grid-cols-4 gap-2" role="list">
+                        @for (img of record.images; track img.id) {
+                          <li class="relative rounded-lg overflow-hidden border border-navy/10">
+                            @if (photoUrls()[img.id]; as url) {
+                              <img [src]="url" [alt]="img.fileName"
+                                class="w-full h-20 object-cover" />
+                            } @else {
+                              <div class="w-full h-20 bg-frost-dark"></div>
+                            }
+                            <button type="button" (click)="deletePhoto(img.id)"
+                              [disabled]="maintenanceBusy()"
+                              class="absolute top-1 right-1 w-5 h-5 rounded-full bg-white/90
+                                     text-red-600 text-xs leading-none"
+                              aria-label="Supprimer la photo">
+                              ×
+                            </button>
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                }
+
+                <div class="flex gap-2">
+                  <button type="button" (click)="saveMaintenance()" class="btn-primary text-sm"
+                    [disabled]="maintenanceBusy()">
+                    {{ editingRecord ? 'Enregistrer' : 'Ajouter' }}
+                  </button>
+                  <button type="button" (click)="closeMaintenanceForm()" class="btn-outline text-sm">
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- Historique par année -->
+            @if (maintenance(); as h) {
+              @if (h.years.length === 0) {
+                <p class="text-sm text-navy/50 py-3">Aucune intervention enregistrée.</p>
+              } @else {
+                @for (y of h.years; track y.year) {
+                  <div class="mb-4 last:mb-0">
+                    <p class="text-sm font-heading font-semibold text-navy/70 border-b
+                              border-navy/10 pb-1 mb-2">
+                      {{ y.year }}
+                    </p>
+                    <ul class="space-y-3" role="list">
+                      @for (r of y.records; track r.id) {
+                        <li class="flex items-start justify-between gap-3">
+                          <div class="min-w-0">
+                            <p class="text-sm font-medium text-navy">{{ r.description }}</p>
+                            <p class="text-xs text-navy/50 mt-0.5">
+                              {{ maintenanceLabel(r.type) }} ·
+                              {{ r.performedAt | date:'dd/MM/yyyy' }}
+                              @if (km(r.mileage); as m) { · {{ m }} }
+                              @if (r.workshop) { · {{ r.workshop }} }
+                            </p>
+                            @if (r.cost !== null) {
+                              <p class="text-sm text-navy mt-0.5">{{ r.cost | fcfa }}</p>
+                            }
+                            @if (invoiceName(r); as invoice) {
+                              <p class="text-xs text-green-700 mt-0.5">
+                                Facture disponible ✓ <span class="text-navy/50">{{ invoice }}</span>
+                              </p>
+                            }
+                            @if (r.notes) {
+                              <p class="text-xs text-navy/60 mt-1">{{ r.notes }}</p>
+                            }
+                          </div>
+                          <div class="flex items-center gap-3 shrink-0">
+                            <button type="button" (click)="openMaintenanceForm(r)"
+                              [disabled]="maintenanceBusy()"
+                              class="text-sm text-navy/60 hover:underline">
+                              Modifier
+                            </button>
+                            <button type="button" (click)="deleteMaintenance(r)"
+                              [disabled]="maintenanceBusy()"
+                              class="text-sm text-red-600 hover:underline">
+                              Supprimer
+                            </button>
+                          </div>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              }
+            }
+
+            @if (maintenanceError()) {
+              <p class="text-xs text-red-600 mt-3" role="alert">{{ maintenanceError() }}</p>
+            }
+          </div>
+
+          <!-- ─── Documents ───────────────────────────────────────────────── -->
+          <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+            <div class="flex items-center justify-between gap-3 mb-1">
+              <h2 class="font-heading font-semibold text-navy">Documents</h2>
+              @if (!documentFormOpen()) {
+                <button type="button" (click)="openDocumentForm()" class="btn-outline text-sm">
+                  Ajouter un document
+                </button>
+              }
+            </div>
+            <p class="text-xs text-navy/50 mb-4">
+              Vos documents sont <strong>strictement privés</strong>&nbsp;: personne d'autre
+              n'y a accès.
+            </p>
+
+            <!-- Formulaire -->
+            @if (documentFormOpen()) {
+              <div class="border border-navy/10 rounded-lg p-4 mb-4 space-y-3">
+                @if (!editingDocument) {
+                  <div>
+                    <label for="doc-file" class="block text-sm font-medium text-navy mb-1">
+                      Fichier
+                    </label>
+                    <input id="doc-file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp"
+                      (change)="onDocumentFileSelected($event)"
+                      class="w-full text-sm text-navy/70" />
+                    <p class="text-xs text-navy/40 mt-1">PDF, JPEG, PNG ou WebP · 10 Mo maximum</p>
+                  </div>
+                }
+
+                <div class="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="doc-type" class="block text-sm font-medium text-navy mb-1">Type</label>
+                    <select id="doc-type" [(ngModel)]="documentForm.type"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                      @for (t of documentTypes; track t) {
+                        <option [ngValue]="t">{{ documentTypeLabel(t) }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label for="doc-date" class="block text-sm font-medium text-navy mb-1">
+                      Date du document
+                    </label>
+                    <input id="doc-date" type="date" [(ngModel)]="documentForm.documentDate"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label for="doc-name" class="block text-sm font-medium text-navy mb-1">Nom</label>
+                    <input id="doc-name" type="text" [(ngModel)]="documentForm.name"
+                      placeholder="Carte grise 2024"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label for="doc-notes" class="block text-sm font-medium text-navy mb-1">
+                      Observations
+                    </label>
+                    <textarea id="doc-notes" rows="2" [(ngModel)]="documentForm.notes"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm"></textarea>
+                  </div>
+                </div>
+
+                <div class="flex gap-2">
+                  <button type="button" (click)="saveDocument()" class="btn-primary text-sm"
+                    [disabled]="documentBusy()">
+                    {{ editingDocument ? 'Enregistrer' : 'Ajouter' }}
+                  </button>
+                  <button type="button" (click)="closeDocumentForm()" class="btn-outline text-sm">
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- Liste chronologique -->
+            @if (documents().length === 0) {
+              <p class="text-sm text-navy/50 py-3">Aucun document pour le moment.</p>
+            } @else {
+              <ul class="divide-y divide-navy/10" role="list">
+                @for (d of documents(); track d.id) {
+                  <li class="py-3 flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="text-sm font-medium text-navy truncate">{{ d.name }}</p>
+                      <p class="text-xs text-navy/50 mt-0.5">
+                        {{ documentTypeLabel(d.type) }} ·
+                        @if (d.documentDate) {
+                          {{ d.documentDate | date:'dd/MM/yyyy' }}
+                        } @else {
+                          ajouté le {{ d.uploadedAt | date:'dd/MM/yyyy' }}
+                        }
+                        · {{ fileSize(d.sizeBytes) }}
+                      </p>
+                      @if (d.notes) {
+                        <p class="text-xs text-navy/60 mt-1">{{ d.notes }}</p>
+                      }
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                      <button type="button" (click)="downloadDocument(d)" [disabled]="documentBusy()"
+                        class="text-sm text-azure-dark hover:underline">
+                        Ouvrir
+                      </button>
+                      <button type="button" (click)="openDocumentForm(d)" [disabled]="documentBusy()"
+                        class="text-sm text-navy/60 hover:underline">
+                        Modifier
+                      </button>
+                      <button type="button" (click)="deleteDocument(d)" [disabled]="documentBusy()"
+                        class="text-sm text-red-600 hover:underline">
+                        Supprimer
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (documentError()) {
+              <p class="text-xs text-red-600 mt-3" role="alert">{{ documentError() }}</p>
+            }
+          </div>
+
+          <button type="button" (click)="remove()" [disabled]="saving()"
+            class="text-sm text-red-600 hover:underline">
+            Retirer ce véhicule de Mon Garage
+          </button>
+        }
+      }
+
+      <!-- ─── Formulaire ────────────────────────────────────────────────── -->
+      @if (editing()) {
+        <div class="bg-white rounded-xl border border-navy/10 p-5 space-y-5">
+          @if (isNew()) {
+            <p class="text-xs text-navy/50">
+              Seules la marque et l'année sont obligatoires&nbsp;: vous pourrez compléter
+              la fiche plus tard.
+            </p>
+          }
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="make" class="block text-sm font-medium text-navy mb-1">Marque</label>
+              <select id="make" [(ngModel)]="form.makeId" (change)="onMakeChange()"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                <option value="">—</option>
+                @for (m of makes(); track m.id) {
+                  <option [value]="m.id">{{ m.name }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="model" class="block text-sm font-medium text-navy mb-1">Modèle</label>
+              <select id="model" [(ngModel)]="form.modelId"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                <option [ngValue]="null">—</option>
+                @for (m of models(); track m.id) {
+                  <option [ngValue]="m.id">{{ m.name }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="version" class="block text-sm font-medium text-navy mb-1">Version</label>
+              <input id="version" type="text" [(ngModel)]="form.version"
+                placeholder="2.0 D-4D Executive"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label for="year" class="block text-sm font-medium text-navy mb-1">Année</label>
+              <input id="year" type="number" [(ngModel)]="form.year"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label for="mileage" class="block text-sm font-medium text-navy mb-1">
+                Kilométrage actuel
+              </label>
+              <input id="mileage" type="number" min="0" [(ngModel)]="form.mileage"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label for="color" class="block text-sm font-medium text-navy mb-1">Couleur</label>
+              <input id="color" type="text" [(ngModel)]="form.color"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label for="fuel" class="block text-sm font-medium text-navy mb-1">Carburant</label>
+              <select id="fuel" [(ngModel)]="form.fuelType"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                <option [ngValue]="null">—</option>
+                @for (f of fuelTypes; track f) {
+                  <option [ngValue]="f">{{ fuelLabel(f) }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="transmission" class="block text-sm font-medium text-navy mb-1">Boîte</label>
+              <select id="transmission" [(ngModel)]="form.transmission"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                <option [ngValue]="null">—</option>
+                @for (t of transmissions; track t) {
+                  <option [ngValue]="t">{{ transmissionLabel(t) }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="body" class="block text-sm font-medium text-navy mb-1">Carrosserie</label>
+              <select id="body" [(ngModel)]="form.bodyType"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                <option [ngValue]="null">—</option>
+                @for (b of bodyTypes; track b) {
+                  <option [ngValue]="b">{{ bodyLabel(b) }}</option>
+                }
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="power" class="block text-sm font-medium text-navy mb-1">Puissance (ch)</label>
+                <input id="power" type="number" min="0" [(ngModel)]="form.powerCv"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="cc" class="block text-sm font-medium text-navy mb-1">Cylindrée (cm³)</label>
+                <input id="cc" type="number" min="0" [(ngModel)]="form.engineDisplacementCc"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+            </div>
+          </div>
+
+          <fieldset class="border-t border-navy/10 pt-4">
+            <legend class="text-sm font-medium text-navy mb-2">Identification</legend>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label for="plate" class="block text-xs text-navy/60 mb-1">Immatriculation</label>
+                <input id="plate" type="text" [(ngModel)]="form.registrationPlate"
+                  placeholder="DK-1234-AB"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="vin" class="block text-xs text-navy/60 mb-1">Numéro de châssis (VIN)</label>
+                <input id="vin" type="text" maxlength="17" [(ngModel)]="form.vin"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm font-mono" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="border-t border-navy/10 pt-4">
+            <legend class="text-sm font-medium text-navy mb-2">Acquisition</legend>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label for="purchase-date" class="block text-xs text-navy/60 mb-1">Date d'achat</label>
+                <input id="purchase-date" type="date" [(ngModel)]="form.purchaseDate"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="purchase-price" class="block text-xs text-navy/60 mb-1">
+                  Prix payé (FCFA)
+                </label>
+                <input id="purchase-price" type="number" min="0" [(ngModel)]="form.purchasePrice"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+            </div>
+          </fieldset>
+
+          @if (isNew()) {
+            <p class="text-xs text-navy/50 border-t border-navy/10 pt-4">
+              Vous pourrez ajouter les photographies une fois le véhicule créé.
+            </p>
+          }
+
+          <div class="flex gap-2">
+            <button type="button" (click)="save()" class="btn-primary text-sm" [disabled]="saving()">
+              {{ isNew() ? 'Ajouter le véhicule' : 'Enregistrer' }}
+            </button>
+            <button type="button" (click)="cancelEditing()" class="btn-outline text-sm">
+              Annuler
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (error()) {
+        <p class="text-xs text-red-600 mt-3" role="alert">{{ error() }}</p>
+      }
+    }
+  </div>
+</section>

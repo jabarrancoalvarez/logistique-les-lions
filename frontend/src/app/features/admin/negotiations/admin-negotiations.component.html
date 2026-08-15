@@ -1,0 +1,450 @@
+<section class="p-6 lg:p-8 max-w-6xl">
+
+  <header class="mb-5">
+    @if (tab() === 'negotiations') {
+      <h1 class="font-heading text-2xl font-bold text-navy">Négociations</h1>
+      <p class="text-sm text-navy/60 mt-1">
+        Qui négocie avec qui, sur quelle annonce et où en est l'opération.
+        <strong>Le contenu des conversations n'apparaît pas ici.</strong>
+      </p>
+    } @else {
+      <h1 class="font-heading text-2xl font-bold text-navy">Contrats &amp; ventes</h1>
+      <p class="text-sm text-navy/60 mt-1">
+        Suivi du flux contractuel. La validation appartient aux parties&nbsp;: elle ne
+        peut pas être faite depuis l'administration.
+      </p>
+    }
+  </header>
+
+  <!-- ─── Filtres ───────────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-xl border border-navy/10 p-4 mb-5">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="lg:col-span-2">
+        <label for="n-search" class="block text-xs text-navy/60 mb-1">
+          {{ tab() === 'contracts' ? 'Référence ou nom des parties' : 'Référence ou titre de l\'annonce' }}
+        </label>
+        <input id="n-search" type="text" [(ngModel)]="filters['search']" (keyup.enter)="search()"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label for="n-status" class="block text-xs text-navy/60 mb-1">Statut</label>
+        <select id="n-status" [(ngModel)]="filters['status']"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+          <option [ngValue]="undefined">Tous</option>
+          @if (tab() === 'contracts') {
+            @for (s of contractStatuses; track s) {
+              <option [ngValue]="s">{{ contractStatusLabel(s) }}</option>
+            }
+          } @else {
+            @for (s of negotiationStatuses; track s) {
+              <option [ngValue]="s">{{ negotiationStatusLabel(s) }}</option>
+            }
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4 mt-3">
+      <button type="button" (click)="search()" class="btn-primary text-sm">Rechercher</button>
+      <button type="button" (click)="resetFilters()" class="text-sm text-navy/60 hover:underline">
+        Réinitialiser
+      </button>
+      @if (tab() === 'contracts') {
+        <label class="flex items-center gap-2 text-sm text-navy/70 cursor-pointer">
+          <input type="checkbox" [(ngModel)]="filters['verifiedSalesOnly']" (change)="search()" />
+          Ventes vérifiées uniquement
+        </label>
+      } @else {
+        <label class="flex items-center gap-2 text-sm text-navy/70 cursor-pointer">
+          <input type="checkbox" [(ngModel)]="filters['withContract']" (change)="search()" />
+          Avec contrat
+        </label>
+      }
+    </div>
+  </div>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 mb-4" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="text-sm text-navy/50 py-10">Chargement…</p>
+  }
+
+  <!-- ─── Négociations ──────────────────────────────────────────────────── -->
+  @if (tab() === 'negotiations' && negotiations(); as d) {
+    <p class="text-xs text-navy/50 mb-2">
+      {{ d.totalCount }} {{ d.totalCount === 1 ? 'négociation' : 'négociations' }}
+    </p>
+
+    <div class="bg-white rounded-xl border border-navy/10 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-frost text-navy/60 text-xs uppercase">
+            <tr>
+              <th class="px-4 py-3 text-left">Annonce</th>
+              <th class="px-4 py-3 text-left">Parties</th>
+              <th class="px-4 py-3 text-right">Offres</th>
+              <th class="px-4 py-3 text-right">Messages</th>
+              <th class="px-4 py-3 text-left">Contrat</th>
+              <th class="px-4 py-3 text-left">Statut</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-navy/10">
+            @for (n of d.items; track n.id) {
+              <tr class="hover:bg-frost/60 cursor-pointer" (click)="openNegotiation(n)">
+                <td class="px-4 py-3">
+                  <p class="text-navy font-medium">{{ n.vehicleTitle }}</p>
+                  <p class="text-xs text-navy/50 font-mono">#{{ n.vehicleReference }}</p>
+                </td>
+                <td class="px-4 py-3 text-navy/70">
+                  <p>{{ n.buyerName }}</p>
+                  <p class="text-xs text-navy/40">↔ {{ n.sellerName }}</p>
+                </td>
+                <td class="px-4 py-3 text-right text-navy/70">{{ n.offersCount }}</td>
+                <td class="px-4 py-3 text-right text-navy/70">{{ n.messagesCount }}</td>
+                <td class="px-4 py-3">
+                  @if (n.contractReference) {
+                    <span class="text-xs font-mono text-navy/70">#{{ n.contractReference }}</span>
+                    @if (n.contractStatus) {
+                      <span class="block text-xs text-navy/40">
+                        {{ contractStatusLabel(n.contractStatus) }}
+                      </span>
+                    }
+                  } @else { <span class="text-navy/30">—</span> }
+                </td>
+                <td class="px-4 py-3 text-navy/70">
+                  {{ negotiationStatusLabel(n.status) }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (d.items.length === 0) {
+        <p class="text-sm text-navy/50 p-6 text-center">Aucune négociation.</p>
+      }
+    </div>
+  }
+
+  <!-- ─── Contrats ──────────────────────────────────────────────────────── -->
+  @if (tab() === 'contracts' && contracts(); as d) {
+    <p class="text-xs text-navy/50 mb-2">
+      {{ d.totalCount }} {{ d.totalCount === 1 ? 'contrat' : 'contrats' }}
+    </p>
+
+    <div class="bg-white rounded-xl border border-navy/10 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-frost text-navy/60 text-xs uppercase">
+            <tr>
+              <th class="px-4 py-3 text-left">Contrat</th>
+              <th class="px-4 py-3 text-left">Véhicule</th>
+              <th class="px-4 py-3 text-left">Parties</th>
+              <th class="px-4 py-3 text-right">Prix</th>
+              <th class="px-4 py-3 text-left">Statut</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-navy/10">
+            @for (c of d.items; track c.id) {
+              <tr class="hover:bg-frost/60 cursor-pointer" (click)="openContract(c)">
+                <td class="px-4 py-3">
+                  <p class="text-navy font-mono">#{{ c.publicReference }}</p>
+                  <p class="text-xs text-navy/50">{{ c.saleDate | date:'dd/MM/yyyy' }}</p>
+                </td>
+                <td class="px-4 py-3 text-navy/70">
+                  {{ c.vehicleLabel }}
+                  <span class="block text-xs text-navy/40 font-mono">#{{ c.vehicleReference }}</span>
+                </td>
+                <td class="px-4 py-3 text-navy/70">
+                  <p>{{ c.sellerName }}</p>
+                  <p class="text-xs text-navy/40">→ {{ c.buyerName }}</p>
+                </td>
+                <td class="px-4 py-3 text-right text-navy/70">{{ c.agreedPrice | fcfa }}</td>
+                <td class="px-4 py-3">
+                  <span class="text-navy/70">{{ contractStatusLabel(c.status) }}</span>
+                  @if (c.isVerifiedSale) {
+                    <span class="block text-xs text-green-700">Vente vérifiée ✓</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (d.items.length === 0) {
+        <p class="text-sm text-navy/50 p-6 text-center">Aucun contrat.</p>
+      }
+    </div>
+  }
+
+  @if (detailLoading()) {
+    <p class="text-sm text-navy/50 mt-6">Chargement de la fiche…</p>
+  }
+
+  <!-- ─── Fiche négociation ─────────────────────────────────────────────── -->
+  @if (detail(); as d) {
+    <div class="bg-white rounded-xl border-2 border-azure/40 p-5 mt-6">
+      <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+          <h2 class="font-heading font-semibold text-navy text-lg">
+            {{ d.negotiation.vehicleTitle }}
+          </h2>
+          <p class="text-xs text-navy/50 mt-0.5">
+            {{ d.negotiation.buyerName }} ↔ {{ d.negotiation.sellerName }}
+          </p>
+        </div>
+        <button type="button" (click)="closeDetail()" class="text-sm text-navy/50 hover:underline">
+          Fermer
+        </button>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-5">
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Offres</h3>
+          @if (d.offers.length === 0) {
+            <p class="text-sm text-navy/50">Aucune offre.</p>
+          } @else {
+            <ul class="text-sm space-y-1" role="list">
+              @for (o of d.offers; track o.id) {
+                <li class="flex justify-between gap-3">
+                  <span class="text-navy/60">
+                    {{ o.fromBuyer ? 'Acheteur' : 'Vendeur' }} ·
+                    {{ o.createdAt | date:'dd/MM/yyyy' }}
+                  </span>
+                  <span class="text-navy">{{ o.amount | fcfa }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Chronologie</h3>
+          @if (d.timeline.length === 0) {
+            <p class="text-sm text-navy/50">Aucun événement.</p>
+          } @else {
+            <ol class="text-sm space-y-1" role="list">
+              @for (e of d.timeline; track e.createdAt + e.type) {
+                <li class="flex justify-between gap-3">
+                  <span class="text-navy/70">{{ e.type }}</span>
+                  <span class="text-xs text-navy/40">{{ e.createdAt | date:'dd/MM/yyyy' }}</span>
+                </li>
+              }
+            </ol>
+          }
+        </div>
+      </div>
+
+      <!-- Accès au contenu -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-1">Lire la conversation</h3>
+        <p class="text-xs text-navy/50 mb-3">
+          Les conversations entre utilisateurs sont privées. L'accès est réservé aux
+          situations justifiées et <strong>reste enregistré</strong> avec votre nom.
+        </p>
+
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div>
+            <label for="c-reason" class="block text-xs text-navy/60 mb-1">Motif</label>
+            <select id="c-reason" [(ngModel)]="accessReason"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+              @for (r of accessReasons; track r) {
+                <option [ngValue]="r">{{ accessReasonLabel(r) }}</option>
+              }
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label for="c-details" class="block text-xs text-navy/60 mb-1">
+              Pourquoi cette conversation <span class="text-red-600">*</span>
+            </label>
+            <input id="c-details" type="text" [(ngModel)]="accessDetails"
+              placeholder="Signalement reçu le…"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          </div>
+        </div>
+
+        <button type="button" (click)="readContent()" class="btn-outline text-sm mt-3"
+          [disabled]="busy()">
+          Accéder au contenu
+        </button>
+
+        @if (messages(); as list) {
+          <div class="bg-frost rounded-lg p-3 mt-4">
+            @if (list.length === 0) {
+              <p class="text-sm text-navy/50">Aucun message.</p>
+            } @else {
+              <ul class="space-y-2 text-sm" role="list">
+                @for (m of list; track m.id) {
+                  <li>
+                    <p class="text-xs text-navy/40">
+                      {{ m.fromBuyer ? d.negotiation.buyerName : d.negotiation.sellerName }} ·
+                      {{ m.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                    </p>
+                    <p class="text-navy">{{ m.body }}</p>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Historique des accès -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-2">Accès enregistrés</h3>
+        @if (d.actions.length === 0) {
+          <p class="text-sm text-navy/50">Personne n'a lu cette conversation.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (a of d.actions; track a.id) {
+              <li class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-navy">{{ actionLabel(a) }}</p>
+                  @if (a.reason) { <p class="text-xs text-navy/60">{{ a.reason }}</p> }
+                </div>
+                <p class="text-xs text-navy/40 whitespace-nowrap">
+                  {{ a.adminName }} · {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ─── Fiche contrat ─────────────────────────────────────────────────── -->
+  @if (contractDetail(); as d) {
+    <div class="bg-white rounded-xl border-2 border-azure/40 p-5 mt-6">
+      <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+          <h2 class="font-heading font-semibold text-navy text-lg">
+            Contrat #{{ d.contract.publicReference }}
+          </h2>
+          <p class="text-xs text-navy/50 mt-0.5">
+            {{ contractStatusLabel(d.contract.status) }}
+            @if (d.contract.isVerifiedSale) {
+              <span class="text-green-700"> · Vente vérifiée ✓</span>
+            }
+          </p>
+        </div>
+        <button type="button" (click)="closeDetail()" class="text-sm text-navy/50 hover:underline">
+          Fermer
+        </button>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-5">
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Véhicule et prix</h3>
+          <dl class="text-sm space-y-1.5">
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Véhicule</dt>
+              <dd class="text-navy">{{ d.contract.vehicleLabel }}</dd>
+            </div>
+            @if (d.vehicleVin) {
+              <div class="flex justify-between gap-3">
+                <dt class="text-navy/60">VIN</dt>
+                <dd class="text-navy font-mono text-xs">{{ d.vehicleVin }}</dd>
+              </div>
+            }
+            @if (d.registrationPlate) {
+              <div class="flex justify-between gap-3">
+                <dt class="text-navy/60">Immatriculation</dt>
+                <dd class="text-navy">{{ d.registrationPlate }}</dd>
+              </div>
+            }
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Prix convenu</dt>
+              <dd class="text-navy font-medium">{{ d.contract.agreedPrice | fcfa }}</dd>
+            </div>
+            @if (d.verificationCode) {
+              <div class="flex justify-between gap-3">
+                <dt class="text-navy/60">Code de vérification</dt>
+                <dd class="text-navy font-mono text-xs">{{ d.verificationCode }}</dd>
+              </div>
+            }
+          </dl>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Parties et dates</h3>
+          <dl class="text-sm space-y-1.5">
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Vendeur</dt>
+              <dd class="text-navy">{{ d.contract.sellerName }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Acheteur</dt>
+              <dd class="text-navy">{{ d.contract.buyerName }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Créé le</dt>
+              <dd class="text-navy">{{ d.contract.createdAt | date:'dd/MM/yyyy' }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Envoyé le</dt>
+              <dd class="text-navy">
+                {{ d.contract.sentAt ? (d.contract.sentAt | date:'dd/MM/yyyy') : '—' }}
+              </dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Validé le</dt>
+              <dd class="text-navy">
+                {{ d.contract.validatedAt ? (d.contract.validatedAt | date:'dd/MM/yyyy') : '—' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Invalidation -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-1">Invalider le contrat</h3>
+        <p class="text-xs text-navy/50 mb-3">
+          Mesure exceptionnelle. Une vente vérifiée invalidée cesse de compter dans la
+          réputation du vendeur. <strong>La validation, elle, appartient aux parties&nbsp;:
+          elle ne peut pas être faite ici.</strong>
+        </p>
+
+        @if (d.contract.status === 'Annule') {
+          <p class="text-sm text-navy/50">Ce contrat est déjà annulé.</p>
+        } @else {
+          <div class="flex flex-wrap gap-2">
+            <input type="text" [(ngModel)]="invalidateReason"
+              placeholder="Motif de l'invalidation"
+              class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            <button type="button" (click)="invalidate()" class="btn-outline text-sm"
+              [disabled]="busy()">
+              Invalider
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Traçabilité -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-2">Traçabilité</h3>
+        @if (d.actions.length === 0) {
+          <p class="text-sm text-navy/50">Aucune action administrative.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (a of d.actions; track a.id) {
+              <li class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-navy">{{ actionLabel(a) }}</p>
+                  @if (a.reason) { <p class="text-xs text-navy/60">{{ a.reason }}</p> }
+                </div>
+                <p class="text-xs text-navy/40 whitespace-nowrap">
+                  {{ a.adminName }} · {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+</section>

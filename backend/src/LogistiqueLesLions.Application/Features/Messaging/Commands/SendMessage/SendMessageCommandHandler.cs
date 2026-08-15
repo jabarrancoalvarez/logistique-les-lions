@@ -1,6 +1,7 @@
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Common.Models;
 using LogistiqueLesLions.Domain.Entities;
+using LogistiqueLesLions.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,42 +12,67 @@ public class SendMessageCommandHandler(IApplicationDbContext db)
 {
     public async Task<Result<Guid>> Handle(SendMessageCommand request, CancellationToken ct)
     {
-        // Check vehicle exists
         var vehicle = await db.Vehicles.FindAsync([request.VehicleId], ct);
         if (vehicle is null) return Result<Guid>.Failure("Vehicle.NotFound");
 
-        // Determine buyer/seller
+        // Un anuncio vendido deja de admitir nuevos contactos, según la especificación.
+        if (!vehicle.AcceptsNegotiation)
+            return Result<Guid>.Failure("Vehicle.NotOpenForNegotiation");
+
+        // Quien publica siempre es el vendedor del anuncio; el otro es el interesado.
         var isSenderSeller = vehicle.SellerId == request.SenderId;
         var buyerId  = isSenderSeller ? request.RecipientId : request.SenderId;
         var sellerId = isSenderSeller ? request.SenderId : request.RecipientId;
 
-        // Find or create conversation
-        var conversation = await db.Conversations
-            .FirstOrDefaultAsync(c =>
-                c.BuyerId == buyerId &&
-                c.SellerId == sellerId &&
-                c.VehicleId == request.VehicleId, ct);
+        if (sellerId != vehicle.SellerId)
+            return Result<Guid>.Failure("Negotiation.InvalidParticipants");
 
-        if (conversation is null)
+        var now = DateTimeOffset.UtcNow;
+
+        var negotiation = await db.Negotiations
+            .FirstOrDefaultAsync(n =>
+                n.BuyerId == buyerId &&
+                n.SellerId == sellerId &&
+                n.VehicleId == request.VehicleId, ct);
+
+        if (negotiation is null)
         {
-            conversation = new Conversation
+            // La negociación nace del primer mensaje: es la primera muestra de interés
+            // real sobre el vehículo.
+            negotiation = new Negotiation
             {
                 BuyerId   = buyerId,
                 SellerId  = sellerId,
-                VehicleId = request.VehicleId
+                VehicleId = request.VehicleId,
+                Status    = NegotiationStatus.EnCours
             };
-            db.Conversations.Add(conversation);
+            db.Negotiations.Add(negotiation);
+
+            db.NegotiationEvents.Add(new NegotiationEvent
+            {
+                NegotiationId = negotiation.Id,
+                // Primer hito de la cronología.
+                Sequence      = 1,
+                Type          = NegotiationEventType.ConversationStarted,
+                ActorId       = request.SenderId
+            });
         }
 
         var message = new Message
         {
-            ConversationId = conversation.Id,
-            SenderId       = request.SenderId,
-            Body           = request.Body.Trim()
+            NegotiationId = negotiation.Id,
+            SenderId      = request.SenderId,
+            Body          = request.Body.Trim()
         };
         db.Messages.Add(message);
 
-        conversation.LastMessageAt = DateTimeOffset.UtcNow;
+        negotiation.LastMessageAt  = now;
+        negotiation.LastActivityAt = now;
+
+        // Un mensaje reabre la conversación: deja de estar a la espera.
+        if (negotiation.Status == NegotiationStatus.EnAttente)
+            negotiation.Status = NegotiationStatus.EnCours;
+
         await db.SaveChangesAsync(ct);
 
         return Result<Guid>.Success(message.Id);

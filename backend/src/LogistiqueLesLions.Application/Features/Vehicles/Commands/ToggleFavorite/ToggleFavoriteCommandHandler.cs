@@ -34,7 +34,9 @@ public class ToggleFavoriteCommandHandler(IApplicationDbContext context)
             context.SavedVehicles.Add(new SavedVehicle
             {
                 UserId    = request.UserId,
-                VehicleId = request.VehicleId
+                VehicleId = request.VehicleId,
+                // Referencia para poder mostrar después cuánto ha bajado el precio.
+                PriceWhenSaved = vehicle.Price
             });
             vehicle.FavoritesCount++;
             isNowSaved = true;

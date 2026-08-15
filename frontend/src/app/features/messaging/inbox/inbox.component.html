@@ -25,9 +25,9 @@
     <div class="space-y-2">
       @for (conv of conversations(); track conv.id) {
         <a [routerLink]="['/mensajes', conv.id]"
-           class="flex items-center gap-3 bg-white rounded-xl border border-navy/10 p-4 hover:border-gold/40 hover:shadow-sm transition-all">
+           class="flex items-center gap-3 bg-white rounded-xl border border-navy/10 p-4 hover:border-azure/40 hover:shadow-sm transition-all">
           <!-- Avatar -->
-          <div class="w-12 h-12 rounded-full bg-gold flex items-center justify-center text-navy font-bold text-lg shrink-0">
+          <div class="w-12 h-12 rounded-full bg-azure flex items-center justify-center text-navy font-bold text-lg shrink-0">
             {{ conv.otherUserName[0] }}
           </div>
           <!-- Content -->
@@ -43,7 +43,7 @@
           </div>
           <!-- Unread badge -->
           @if (conv.unreadCount > 0) {
-            <span class="w-5 h-5 bg-gold rounded-full flex items-center justify-center text-navy text-xs font-bold shrink-0">
+            <span class="w-5 h-5 bg-azure rounded-full flex items-center justify-center text-navy text-xs font-bold shrink-0">
               {{ conv.unreadCount }}
             </span>
           }

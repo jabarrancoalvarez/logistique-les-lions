@@ -6,6 +6,14 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { VehicleService, VehicleMake, VehicleAiContext, AiDocumentExtraction } from '@core/services/vehicle.service';
 import { AuthService } from '@core/auth/auth.service';
+import { YOON_CURRENCY_CODE } from '@shared/pipes/fcfa.pipe';
+import { SENEGAL_REGIONS, citiesOfRegion } from '@shared/data/senegal-geo';
+
+const CUSTOMS_STATUSES = [
+  { value: 'Dedouane',    label: 'Dédouané' },
+  { value: 'NonDedouane', label: 'Non dédouané' },
+  { value: 'Passavant',   label: 'Passavant' }
+] as const;
 
 type WizardStep = 1 | 2 | 3 | 4;
 
@@ -31,9 +39,6 @@ export class VehicleFormComponent {
   readonly isExtractingDoc = signal(false);
   readonly extractError = signal<string | null>(null);
   readonly extractInfo = signal<string | null>(null);
-  readonly isGeneratingDesc = signal(false);
-  readonly aiError = signal<string | null>(null);
-  readonly aiDescriptionEn = signal<string>('');
 
   // ─── Fotos del anuncio (Step 4) ───────────────────────────────────────
   readonly selectedImages = signal<{ file: File; preview: string }[]>([]);
@@ -67,17 +72,29 @@ export class VehicleFormComponent {
   // Step 3: Price & Location
   readonly step3 = this.fb.group({
     price:          ['', [Validators.required, Validators.min(1)]],
-    currency:       ['EUR', Validators.required],
+    // Yoon u Auto opera únicamente en FCFA: el campo queda fijo y sin selector.
+    currency:       [YOON_CURRENCY_CODE, Validators.required],
     priceNegotiable:[''],
-    countryOrigin:  ['', Validators.required],
+    // Bloque obligatorio de la ficha en Senegal.
+    customsStatus:  ['', Validators.required],
+    region:         [''],
     city:           [''],
-    isExportReady:  [''],
   });
+
+  readonly customsStatuses = CUSTOMS_STATUSES;
+  readonly regions = SENEGAL_REGIONS;
+  private readonly selectedRegion = signal<string>('');
+  readonly cities = computed(() => citiesOfRegion(this.selectedRegion()));
+
+  onRegionChange(event: Event): void {
+    this.selectedRegion.set((event.target as HTMLSelectElement).value);
+    this.step3.patchValue({ city: '' });
+  }
 
   // Step 4: Images & Description
   readonly step4 = this.fb.group({
     title:         ['', [Validators.required, Validators.maxLength(200)]],
-    descriptionEs: ['', Validators.maxLength(5000)],
+    description:   ['', Validators.maxLength(5000)],
   });
 
   readonly currentForm = computed<FormGroup>(() => {
@@ -128,10 +145,10 @@ export class VehicleFormComponent {
 
     const payload = {
       title:          s4.title,
-      descriptionEs:  nz(s4.descriptionEs),
-      descriptionEn:  null,
+      description:    nz(s4.description),
       makeId:         s1.makeId,
       modelId:        nz(s1.modelId),
+      version:        null,
       year:           +s1.year!,
       mileage:        s2.mileage ? +s2.mileage : null,
       condition:      s1.condition,
@@ -139,18 +156,24 @@ export class VehicleFormComponent {
       fuelType:       nz(s2.fuelType),
       transmission:   nz(s2.transmission),
       color:          nz(s2.color),
+      doors:          null,
+      seats:          null,
       vin:            nz(s1.vin),
+      powerCv:              null,
+      engineDisplacementCc: null,
+      drivetrain:           null,
+      engineName:           null,
+      customsStatus:  s3.customsStatus,
       price:          +s3.price!,
-      currency:       s3.currency,
       priceNegotiable: !!s3.priceNegotiable,
-      countryOrigin:  s3.countryOrigin,
+      region:         nz(s3.region),
       city:           nz(s3.city),
-      postalCode:     null,
-      isExportReady:  !!s3.isExportReady,
+      district:       null,
+      equipmentIds:   [],
+      publish:        true,
+      // El backend lo sustituye por el usuario del token; se envía solo para
+      // cumplir el contrato del comando.
       sellerId:       this.auth.user()?.id,
-      dealerId:       null,
-      specs:          null,
-      features:       null,
     };
 
     this.vehicleService.createVehicle(payload).subscribe({
@@ -214,28 +237,27 @@ export class VehicleFormComponent {
     this.selectedImages.update(imgs => imgs.filter((_, i) => i !== index));
   }
 
-  readonly currencies = ['EUR', 'USD', 'GBP', 'MAD', 'JPY'];
   readonly fuelTypes = [
-    { value: 'Gasoline', label: 'Gasolina' },
+    { value: 'Essence', label: 'Gasolina' },
     { value: 'Diesel', label: 'Diésel' },
-    { value: 'Electric', label: 'Eléctrico' },
-    { value: 'Hybrid', label: 'Híbrido' },
-    { value: 'PluginHybrid', label: 'Híbrido enchufable' },
+    { value: 'Electrique', label: 'Eléctrico' },
+    { value: 'Hybride', label: 'Híbrido' },
+    { value: 'HybrideRechargeable', label: 'Híbrido enchufable' },
     { value: 'Lpg', label: 'GLP' },
   ];
   readonly transmissions = [
-    { value: 'Manual', label: 'Manual' },
-    { value: 'Automatic', label: 'Automático' },
-    { value: 'SemiAutomatic', label: 'Semiautomático' },
+    { value: 'Manuel', label: 'Manuel' },
+    { value: 'Automatique', label: 'Automático' },
+    { value: 'Automatique', label: 'Semiautomático' },
   ];
   readonly bodyTypes = [
-    { value: 'Sedan', label: 'Sedán' },
-    { value: 'Hatchback', label: 'Hatchback' },
+    { value: 'Berline', label: 'Sedán' },
+    { value: 'Citadine', label: 'Citadine' },
     { value: 'Suv', label: 'SUV' },
     { value: 'Coupe', label: 'Coupé' },
-    { value: 'Convertible', label: 'Descapotable' },
-    { value: 'Wagon', label: 'Familiar' },
-    { value: 'Van', label: 'Furgoneta' },
+    { value: 'Cabriolet', label: 'Descapotable' },
+    { value: 'Break', label: 'Familiar' },
+    { value: 'Utilitaire', label: 'Furgoneta' },
   ];
   readonly countries = [
     { code: 'ES', name: 'España' }, { code: 'DE', name: 'Alemania' },
@@ -294,48 +316,4 @@ export class VehicleFormComponent {
     );
   }
 
-  // ─── IA: generar descripción (Step 4) ─────────────────────────────────
-  generateDescription(): void {
-    const makeId = this.step1.value.makeId;
-    const make   = this.makes().find(m => m.id === makeId)?.name;
-    const year   = this.step1.value.year ? +this.step1.value.year : null;
-    const price  = this.step3.value.price ? +this.step3.value.price : null;
-
-    if (!make || !year || !price || !this.step3.value.countryOrigin) {
-      this.aiError.set('Completa los pasos anteriores (marca, año, precio, país) antes de generar la descripción.');
-      return;
-    }
-
-    const context: VehicleAiContext = {
-      make,
-      model:        null,
-      year,
-      mileage:      this.step2.value.mileage ? +this.step2.value.mileage : null,
-      fuelType:     this.step2.value.fuelType || null,
-      transmission: this.step2.value.transmission || null,
-      bodyType:     this.step2.value.bodyType || null,
-      color:        this.step2.value.color || null,
-      condition:    this.step1.value.condition || 'Used',
-      price,
-      currency:     this.step3.value.currency || 'EUR',
-      countryOrigin: this.step3.value.countryOrigin || '',
-      isExportReady: !!this.step3.value.isExportReady
-    };
-
-    this.isGeneratingDesc.set(true);
-    this.aiError.set(null);
-    this.aiDescriptionEn.set('');
-
-    this.vehicleService.previewAiDescription(context).subscribe({
-      next: (res) => {
-        this.isGeneratingDesc.set(false);
-        this.step4.patchValue({ descriptionEs: res.descriptionEs });
-        this.aiDescriptionEn.set(res.descriptionEn);
-      },
-      error: () => {
-        this.isGeneratingDesc.set(false);
-        this.aiError.set('No se pudo generar la descripción. Inténtalo de nuevo.');
-      }
-    });
-  }
 }

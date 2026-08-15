@@ -111,7 +111,7 @@ public class GetTrackingByCodeQueryHandlerTests : IDisposable
             Id = vehicleId, Slug = "bmw-tracking-test", Title = "BMW 320d Tracking Test",
             MakeId = make.Id, Year = 2022, Price = 25000, Currency = "EUR",
             CountryOrigin = "DE", Condition = VehicleCondition.Used,
-            Status = VehicleStatus.Active,
+            Status = VehicleStatus.Actif,
             CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
         });
 

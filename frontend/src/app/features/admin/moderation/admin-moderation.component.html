@@ -1,0 +1,320 @@
+<section class="p-6 lg:p-8 max-w-6xl">
+
+  <header class="mb-5">
+    <h1 class="font-heading text-2xl font-bold text-navy">Modération</h1>
+    <p class="text-sm text-navy/60 mt-1">
+      Les signalements des utilisateurs, qu'ils portent sur une annonce, une personne ou
+      une conversation. Toute décision reste enregistrée.
+    </p>
+  </header>
+
+  <!-- ─── Onglets par statut ────────────────────────────────────────────── -->
+  <div class="flex gap-1 mb-5 border-b border-navy/10 overflow-x-auto" role="tablist">
+    <button type="button" (click)="filterByStatus(null)" role="tab"
+      class="px-3 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors"
+      [class]="!filters['status']
+        ? 'border-azure text-navy' : 'border-transparent text-navy/50 hover:text-navy'">
+      Tous
+    </button>
+    @for (s of statuses; track s) {
+      <button type="button" (click)="filterByStatus(s)" role="tab"
+        class="px-3 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors"
+        [class]="filters['status'] === s
+          ? 'border-azure text-navy' : 'border-transparent text-navy/50 hover:text-navy'">
+        {{ statusLabel(s) }} ({{ countFor(s) }})
+      </button>
+    }
+  </div>
+
+  <!-- ─── Filtres ───────────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-xl border border-navy/10 p-4 mb-5">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="lg:col-span-2">
+        <label for="m-search" class="block text-xs text-navy/60 mb-1">
+          Référence ou description
+        </label>
+        <input id="m-search" type="text" [(ngModel)]="filters['search']" (keyup.enter)="search()"
+          placeholder="SG00042" class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label for="m-reason" class="block text-xs text-navy/60 mb-1">Motif</label>
+        <select id="m-reason" [(ngModel)]="filters['reason']"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+          <option [ngValue]="undefined">Tous</option>
+          @for (r of reasons; track r) {
+            <option [ngValue]="r">{{ reasonLabel(r) }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label for="m-target" class="block text-xs text-navy/60 mb-1">Type</label>
+        <select id="m-target" [(ngModel)]="filters['targetType']"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+          <option [ngValue]="undefined">Tous</option>
+          @for (t of targetTypes; track t) {
+            <option [ngValue]="t">{{ targetLabel(t) }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3 mt-3">
+      <button type="button" (click)="search()" class="btn-primary text-sm">Rechercher</button>
+      <button type="button" (click)="resetFilters()" class="text-sm text-navy/60 hover:underline">
+        Réinitialiser
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 mb-4" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="text-sm text-navy/50 py-10">Chargement…</p>
+  }
+
+  <!-- ─── Liste ─────────────────────────────────────────────────────────── -->
+  @if (data(); as d) {
+    <div class="bg-white rounded-xl border border-navy/10 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-frost text-navy/60 text-xs uppercase">
+            <tr>
+              <th class="px-4 py-3 text-left">Signalement</th>
+              <th class="px-4 py-3 text-left">Objet</th>
+              <th class="px-4 py-3 text-left">Motif</th>
+              <th class="px-4 py-3 text-left">Signalé par</th>
+              <th class="px-4 py-3 text-left">Statut</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-navy/10">
+            @for (r of d.items; track r.id) {
+              <tr class="hover:bg-frost/60 cursor-pointer" (click)="openDetail(r)">
+                <td class="px-4 py-3">
+                  <p class="text-navy font-mono">#{{ r.publicReference }}</p>
+                  <p class="text-xs text-navy/50">{{ r.createdAt | date:'dd/MM/yyyy' }}</p>
+                </td>
+                <td class="px-4 py-3">
+                  <p class="text-navy/70 truncate max-w-[16rem]">{{ r.targetLabel }}</p>
+                  <p class="text-xs text-navy/40">{{ targetLabel(r.targetType) }}</p>
+                </td>
+                <td class="px-4 py-3 text-navy/70">{{ reasonLabel(r.reason) }}</td>
+                <td class="px-4 py-3">
+                  <p class="text-navy/70">{{ r.reporterName }}</p>
+                  @if (r.reportedUserName) {
+                    <p class="text-xs text-navy/40">contre {{ r.reportedUserName }}</p>
+                  }
+                </td>
+                <td class="px-4 py-3">
+                  <span class="text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap"
+                    [class]="statusClass(r.status)">
+                    {{ statusLabel(r.status) }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (d.items.length === 0) {
+        <p class="text-sm text-navy/50 p-6 text-center">Aucun signalement.</p>
+      }
+    </div>
+  }
+
+  @if (detailLoading()) {
+    <p class="text-sm text-navy/50 mt-6">Chargement de la fiche…</p>
+  }
+
+  <!-- ─── Fiche ─────────────────────────────────────────────────────────── -->
+  @if (detail(); as d) {
+    <div class="bg-white rounded-xl border-2 border-azure/40 p-5 mt-6">
+      <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+          <h2 class="font-heading font-semibold text-navy text-lg">
+            Signalement #{{ d.report.publicReference }}
+          </h2>
+          <p class="text-xs text-navy/50 mt-0.5">
+            {{ reasonLabel(d.report.reason) }} · {{ targetLabel(d.report.targetType) }} ·
+            {{ d.report.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+        </div>
+        <button type="button" (click)="closeDetail()" class="text-sm text-navy/50 hover:underline">
+          Fermer
+        </button>
+      </div>
+
+      @if (d.otherOpenReports > 0) {
+        <p class="text-sm bg-amber-50 text-amber-900 rounded-lg px-3 py-2 mb-4">
+          {{ d.otherOpenReports }}
+          {{ d.otherOpenReports === 1 ? 'autre signalement ouvert' : 'autres signalements ouverts' }}
+          sur le même objet.
+        </p>
+      }
+
+      <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm mb-4">
+        <div class="sm:col-span-2">
+          <dt class="text-xs text-navy/50">Objet</dt>
+          <dd class="text-navy">{{ d.report.targetLabel }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-navy/50">Signalé par</dt>
+          <dd class="text-navy">{{ d.report.reporterName }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-navy/50">Personne mise en cause</dt>
+          <dd class="text-navy">{{ d.report.reportedUserName ?? '—' }}</dd>
+        </div>
+        @if (d.report.description) {
+          <div class="sm:col-span-2">
+            <dt class="text-xs text-navy/50">Description</dt>
+            <dd class="text-navy">{{ d.report.description }}</dd>
+          </div>
+        }
+        @if (d.evidence.length > 0) {
+          <div class="sm:col-span-2">
+            <dt class="text-xs text-navy/50">Preuves</dt>
+            <dd>
+              <ul class="space-y-0.5" role="list">
+                @for (e of d.evidence; track e) {
+                  <li>
+                    <a [href]="e" target="_blank" rel="noopener"
+                      class="text-azure-dark hover:underline text-xs break-all">{{ e }}</a>
+                  </li>
+                }
+              </ul>
+            </dd>
+          </div>
+        }
+        @if (d.resolution) {
+          <div class="sm:col-span-2 border-t border-navy/10 pt-3">
+            <dt class="text-xs text-navy/50">Décision</dt>
+            <dd class="text-navy">{{ d.resolution }}</dd>
+            <dd class="text-xs text-navy/40 mt-0.5">
+              {{ d.handledByAdminName }} · {{ d.resolvedAt | date:'dd/MM/yyyy' }}
+            </dd>
+          </div>
+        }
+      </dl>
+
+      <!-- Traitement -->
+      <div class="border-t border-navy/10 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-2">Traiter le signalement</h3>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div>
+            <label for="s-status" class="block text-xs text-navy/60 mb-1">Statut</label>
+            <select id="s-status" [(ngModel)]="newStatus"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+              @for (s of statuses; track s) {
+                <option [ngValue]="s">{{ statusLabel(s) }}</option>
+              }
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label for="s-resolution" class="block text-xs text-navy/60 mb-1">
+              Décision @if (needsResolution) { <span class="text-red-600">*</span> }
+            </label>
+            <input id="s-resolution" type="text" [(ngModel)]="resolution"
+              placeholder="Ce qui a été décidé et pourquoi"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          </div>
+        </div>
+        <button type="button" (click)="applyStatus()" class="btn-primary text-sm mt-3"
+          [disabled]="busy()">
+          Appliquer
+        </button>
+      </div>
+
+      <!-- Avertir -->
+      @if (d.report.reportedUserId) {
+        <div class="border-t border-navy/10 mt-5 pt-4">
+          <h3 class="text-sm font-medium text-navy mb-1">Avertir {{ d.report.reportedUserName }}</h3>
+          <p class="text-xs text-navy/50 mb-3">
+            Pour suspendre ou bloquer le compte, passez par
+            <strong>Utilisateurs</strong>&nbsp;; ici on avertit.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <input type="text" [(ngModel)]="warningMessage" (keyup.enter)="warn()"
+              placeholder="Message d'avertissement…"
+              class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            <button type="button" (click)="warn()" class="btn-outline text-sm" [disabled]="busy()">
+              Avertir
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Solicitar información -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-1">
+          Demander un complément à {{ d.report.reporterName }}
+        </h3>
+        <div class="flex flex-wrap gap-2 mt-2">
+          <input type="text" [(ngModel)]="infoMessage" (keyup.enter)="requestInfo()"
+            placeholder="Ce qu'il manque pour décider…"
+            class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          <button type="button" (click)="requestInfo()" class="btn-outline text-sm"
+            [disabled]="busy()">
+            Demander
+          </button>
+        </div>
+      </div>
+
+      <!-- Historique -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-2">Historique</h3>
+        @if (d.actions.length === 0) {
+          <p class="text-sm text-navy/50">Aucune action enregistrée.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (a of d.actions; track a.id) {
+              <li class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-navy">{{ actionLabel(a) }}</p>
+                  @if (a.reason) { <p class="text-xs text-navy/60">{{ a.reason }}</p> }
+                </div>
+                <p class="text-xs text-navy/40 whitespace-nowrap">
+                  {{ a.adminName }} · {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Notes internes -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-3">Notes internes</h3>
+        <div class="flex flex-wrap gap-2 mb-3">
+          <input type="text" [(ngModel)]="noteBody" (keyup.enter)="addNote()"
+            placeholder="Ajouter une note…"
+            class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          <button type="button" (click)="addNote()" class="btn-outline text-sm" [disabled]="busy()">
+            Ajouter
+          </button>
+        </div>
+
+        @if (d.notes.length === 0) {
+          <p class="text-sm text-navy/50">Aucune note.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (n of d.notes; track n.id) {
+              <li class="flex items-start justify-between gap-3">
+                <p class="text-navy">{{ n.body }}</p>
+                <div class="flex items-center gap-3 shrink-0">
+                  <span class="text-xs text-navy/40 whitespace-nowrap">
+                    {{ n.adminName }} · {{ n.createdAt | date:'dd/MM/yyyy' }}
+                  </span>
+                  <button type="button" (click)="deleteNote(n.id)" [disabled]="busy()"
+                    class="text-xs text-red-600 hover:underline">Retirer</button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+</section>

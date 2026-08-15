@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   apiUrl: 'https://logistique-les-lions-api.onrender.com/api',
-  appName: 'Logistique Les Lions',
+  appName: 'Yoon U Auto',
   version: '1.0.0',
   defaultLanguage: 'es',
   supportedLanguages: ['es', 'en', 'fr', 'de', 'pt'],

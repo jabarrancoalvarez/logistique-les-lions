@@ -4,6 +4,7 @@ using LogistiqueLesLions.Application.Features.Auth.Commands.RefreshToken;
 using LogistiqueLesLions.Application.Features.Auth.Commands.Register;
 using LogistiqueLesLions.Application.Features.Auth.Commands.UpdateProfile;
 using LogistiqueLesLions.Application.Features.Auth.Queries.GetProfile;
+using LogistiqueLesLions.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,9 +67,8 @@ public static class AuthEndpoints
 
             var command = new UpdateProfileCommand(
                 currentUser.UserId.Value,
-                req.FirstName, req.LastName, req.Phone,
-                req.CountryCode, req.City, req.CompanyName,
-                req.CompanyVat, req.Bio, req.AvatarUrl);
+                req.DisplayName, req.AccountType, req.Region, req.City,
+                req.Email, req.Bio, req.AvatarUrl, req.AllowWhatsAppContact);
 
             var result = await sender.Send(command, ct);
             return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result);
@@ -99,13 +99,12 @@ public static class AuthEndpoints
 }
 
 public record UpdateProfileRequest(
-    string FirstName,
-    string LastName,
-    string? Phone,
-    string? CountryCode,
+    string DisplayName,
+    AccountType AccountType,
+    string? Region,
     string? City,
-    string? CompanyName,
-    string? CompanyVat,
+    string? Email,
     string? Bio,
-    string? AvatarUrl
+    string? AvatarUrl,
+    bool AllowWhatsAppContact
 );

@@ -14,13 +14,13 @@
         </div>
         <p id="cookie-desc" class="text-xs text-navy/60 leading-relaxed">
           Usamos cookies para mejorar tu experiencia y mostrarte contenido relevante.
-          <a routerLink="/legal/cookies" class="text-gold hover:underline">Saber más</a>
+          <a routerLink="/legal/cookies" class="text-azure hover:underline">Saber más</a>
         </p>
       </div>
 
       <!-- Detalles (desplegable) -->
       @if (showDetails()) {
-        <div class="px-5 py-3 space-y-3 border-b border-navy/8 bg-ivory/50">
+        <div class="px-5 py-3 space-y-3 border-b border-navy/8 bg-frost/50">
           @for (pref of cookiePrefs; track pref.key) {
             <div class="flex items-start justify-between gap-3">
               <div>
@@ -30,7 +30,7 @@
               <button
                 (click)="togglePref(pref.key)"
                 class="relative w-10 h-6 rounded-full transition-colors duration-200 flex-shrink-0 mt-0.5"
-                [ngClass]="isPrefEnabled(pref.key) ? 'bg-gold' : 'bg-navy/20'"
+                [ngClass]="isPrefEnabled(pref.key) ? 'bg-azure' : 'bg-navy/20'"
                 [disabled]="pref.alwaysOn"
                 [attr.aria-checked]="isPrefEnabled(pref.key)"
                 [attr.aria-label]="'Cookies ' + pref.label"
@@ -48,7 +48,7 @@
 
       <!-- Acciones -->
       <div class="px-5 py-4 flex flex-col gap-2">
-        <button (click)="acceptAll()" class="btn-gold w-full py-2.5 text-sm">
+        <button (click)="acceptAll()" class="btn-azure w-full py-2.5 text-sm">
           Aceptar todas
         </button>
         <div class="flex gap-2">

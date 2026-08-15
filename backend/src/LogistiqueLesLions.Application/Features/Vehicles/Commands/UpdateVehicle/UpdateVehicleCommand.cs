@@ -1,4 +1,3 @@
-using System.Text.Json;
 using LogistiqueLesLions.Application.Common.Models;
 using LogistiqueLesLions.Domain.Enums;
 using MediatR;
@@ -8,10 +7,11 @@ namespace LogistiqueLesLions.Application.Features.Vehicles.Commands.UpdateVehicl
 public record UpdateVehicleCommand(
     Guid Id,
     string Title,
-    string? DescriptionEs,
-    string? DescriptionEn,
+    string? Description,
+
     Guid MakeId,
     Guid? ModelId,
+    string? Version,
     int Year,
     int? Mileage,
     VehicleCondition Condition,
@@ -19,14 +19,29 @@ public record UpdateVehicleCommand(
     FuelType? FuelType,
     TransmissionType? Transmission,
     string? Color,
+    int? Doors,
+    int? Seats,
     string? Vin,
+
+    int? PowerCv,
+    int? EngineDisplacementCc,
+    Drivetrain? Drivetrain,
+    string? EngineName,
+
+    CustomsStatus CustomsStatus,
+
     decimal Price,
-    string Currency,
     bool PriceNegotiable,
-    string CountryOrigin,
+
+    string? Region,
     string? City,
-    string? PostalCode,
-    bool IsExportReady,
-    JsonDocument? Specs,
-    JsonDocument? Features
+    string? District,
+
+    IReadOnlyList<Guid> EquipmentIds,
+
+    /// <summary>
+    /// Usuario que solicita la edición. Lo fija el endpoint a partir del JWT: nunca se
+    /// acepta del cuerpo de la petición.
+    /// </summary>
+    Guid RequesterId = default
 ) : IRequest<Result>;

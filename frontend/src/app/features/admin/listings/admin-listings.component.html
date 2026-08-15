@@ -1,0 +1,342 @@
+<section class="p-6 lg:p-8 max-w-6xl">
+
+  <header class="mb-5">
+    <h1 class="font-heading text-2xl font-bold text-navy">Annonces</h1>
+    <p class="text-sm text-navy/60 mt-1">
+      Modération des annonces. Les informations commerciales appartiennent à qui publie&nbsp;:
+      en cas d'erreur, demandez la correction.
+    </p>
+  </header>
+
+  <!-- ─── Filtres ───────────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-xl border border-navy/10 p-4 mb-5">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="lg:col-span-2">
+        <label for="l-search" class="block text-xs text-navy/60 mb-1">
+          Référence Yoon ou titre
+        </label>
+        <input id="l-search" type="text" [(ngModel)]="filters.search" (keyup.enter)="search()"
+          placeholder="YU10001" class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label for="l-city" class="block text-xs text-navy/60 mb-1">Ville</label>
+        <input id="l-city" type="text" [(ngModel)]="filters.city" (keyup.enter)="search()"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label for="l-status" class="block text-xs text-navy/60 mb-1">Statut</label>
+        <select id="l-status" [(ngModel)]="filters.status"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+          <option [ngValue]="undefined">Tous</option>
+          @for (s of statuses; track s) {
+            <option [ngValue]="s">{{ statusLabel(s) }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label for="l-type" class="block text-xs text-navy/60 mb-1">Vendeur</label>
+        <select id="l-type" [(ngModel)]="filters.sellerAccountType"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+          <option [ngValue]="undefined">Tous</option>
+          @for (t of accountTypes; track t) {
+            <option [ngValue]="t">{{ t }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4 mt-3">
+      <button type="button" (click)="search()" class="btn-primary text-sm">Rechercher</button>
+      <button type="button" (click)="resetFilters()" class="text-sm text-navy/60 hover:underline">
+        Réinitialiser
+      </button>
+      <label class="flex items-center gap-2 text-sm text-navy/70 cursor-pointer">
+        <input type="checkbox" [(ngModel)]="filters.hidden" (change)="search()" />
+        Masquées
+      </label>
+      <label class="flex items-center gap-2 text-sm text-navy/70 cursor-pointer">
+        <input type="checkbox" [(ngModel)]="filters.flagged" (change)="search()" />
+        À réviser
+      </label>
+    </div>
+  </div>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 mb-4" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="text-sm text-navy/50 py-10">Chargement…</p>
+  }
+
+  <!-- ─── Liste ─────────────────────────────────────────────────────────── -->
+  @if (data(); as d) {
+    <p class="text-xs text-navy/50 mb-2">
+      {{ d.totalCount }} {{ d.totalCount === 1 ? 'annonce' : 'annonces' }}
+    </p>
+
+    <div class="bg-white rounded-xl border border-navy/10 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-frost text-navy/60 text-xs uppercase">
+            <tr>
+              <th class="px-4 py-3 text-left">Annonce</th>
+              <th class="px-4 py-3 text-left">Vendeur</th>
+              <th class="px-4 py-3 text-right">Prix</th>
+              <th class="px-4 py-3 text-right">Vues</th>
+              <th class="px-4 py-3 text-right">Qualité</th>
+              <th class="px-4 py-3 text-left">Statut</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-navy/10">
+            @for (l of d.items; track l.id) {
+              <tr class="hover:bg-frost/60 cursor-pointer" (click)="openDetail(l)">
+                <td class="px-4 py-3">
+                  <p class="text-navy font-medium">{{ l.title }}</p>
+                  <p class="text-xs text-navy/50 font-mono">#{{ l.publicReference }}</p>
+                </td>
+                <td class="px-4 py-3">
+                  <p class="text-navy/70">{{ l.sellerName }}</p>
+                  <p class="text-xs text-navy/40">{{ l.city ?? '—' }}</p>
+                </td>
+                <td class="px-4 py-3 text-right text-navy/70">
+                  @if (l.price > 0) { {{ l.price | fcfa }} } @else { — }
+                </td>
+                <td class="px-4 py-3 text-right text-navy/70">{{ l.viewsCount }}</td>
+                <td class="px-4 py-3 text-right"
+                  [class]="l.qualityScore >= 80 ? 'text-green-700' : 'text-amber-700'">
+                  {{ l.qualityScore }} %
+                </td>
+                <td class="px-4 py-3">
+                  <span class="text-xs font-medium px-2 py-0.5 rounded-full"
+                    [class]="statusClass(l.status)">
+                    {{ statusLabel(l.status) }}
+                  </span>
+                  @if (l.hiddenByAdmin) {
+                    <span class="block text-xs text-red-600 mt-0.5">masquée</span>
+                  }
+                  @if (l.flaggedForReview) {
+                    <span class="block text-xs text-amber-700 mt-0.5">à réviser</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (d.items.length === 0) {
+        <p class="text-sm text-navy/50 p-6 text-center">Aucune annonce.</p>
+      }
+    </div>
+
+    @if (lastPage > 1) {
+      <div class="flex items-center justify-center gap-4 mt-4 text-sm">
+        <button type="button" (click)="changePage(-1)" [disabled]="d.page <= 1"
+          class="text-navy/60 hover:underline disabled:opacity-30">← Précédent</button>
+        <span class="text-navy/50">{{ d.page }} / {{ lastPage }}</span>
+        <button type="button" (click)="changePage(1)" [disabled]="d.page >= lastPage"
+          class="text-navy/60 hover:underline disabled:opacity-30">Suivant →</button>
+      </div>
+    }
+  }
+
+  <!-- ─── Fiche ─────────────────────────────────────────────────────────── -->
+  @if (detailLoading()) {
+    <p class="text-sm text-navy/50 mt-6">Chargement de la fiche…</p>
+  }
+
+  @if (detail(); as d) {
+    <div class="bg-white rounded-xl border-2 border-azure/40 p-5 mt-6">
+      <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+          <h2 class="font-heading font-semibold text-navy text-lg">{{ d.listing.title }}</h2>
+          <p class="text-xs text-navy/50 font-mono mt-0.5">
+            #{{ d.listing.publicReference }} · {{ d.listing.id }}
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <a [routerLink]="['/vehiculos', d.listing.slug]" target="_blank"
+            class="text-sm text-azure-dark hover:underline">Voir l'annonce ↗</a>
+          <button type="button" (click)="closeDetail()" class="text-sm text-navy/50 hover:underline">
+            Fermer
+          </button>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-5">
+        <!-- Métriques -->
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Activité</h3>
+          <dl class="text-sm space-y-1.5">
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Vues</dt>
+              <dd class="text-navy">{{ d.listing.viewsCount }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Favoris</dt>
+              <dd class="text-navy">{{ d.listing.favoritesCount }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Contacts</dt>
+              <dd class="text-navy">{{ d.contactsCount }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Négociations</dt>
+              <dd class="text-navy">{{ d.negotiationsCount }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Offres reçues</dt>
+              <dd class="text-navy">{{ d.offersReceived }}</dd>
+            </div>
+            <div class="flex justify-between gap-3 border-t border-navy/10 pt-1.5">
+              <dt class="text-navy/60">Propriétaire</dt>
+              <dd class="text-navy">
+                {{ d.listing.sellerName }}
+                <span class="block text-xs text-navy/50 font-mono">{{ d.sellerPhone }}</span>
+              </dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Créée / modifiée</dt>
+              <dd class="text-navy text-xs">
+                {{ d.listing.createdAt | date:'dd/MM/yyyy' }} ·
+                {{ d.updatedAt | date:'dd/MM/yyyy' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Historique des prix -->
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Historique des prix</h3>
+          @if (d.priceHistory.length === 0) {
+            <p class="text-sm text-navy/50">Aucun changement enregistré.</p>
+          } @else {
+            <ul class="text-sm space-y-1" role="list">
+              @for (p of d.priceHistory; track p.changedAt) {
+                <li class="flex justify-between gap-3">
+                  <span class="text-navy/60">{{ p.changedAt | date:'dd/MM/yyyy' }}</span>
+                  <span class="text-navy">{{ p.price | fcfa }}</span>
+                </li>
+              }
+            </ul>
+          }
+
+          <h3 class="text-sm font-medium text-navy mt-4 mb-2">
+            Qualité de l'annonce&nbsp;: {{ d.quality.score }} %
+          </h3>
+        </div>
+      </div>
+
+      <!-- Modération -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-2">Modération</h3>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div>
+            <label for="a-action" class="block text-xs text-navy/60 mb-1">Mesure</label>
+            <select id="a-action" [(ngModel)]="selectedAction"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+              @for (a of actions; track a.action) {
+                <option [ngValue]="a.action">{{ a.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label for="a-reason" class="block text-xs text-navy/60 mb-1">
+              Motif @if (actionNeedsReason) { <span class="text-red-600">*</span> }
+            </label>
+            <input id="a-reason" type="text" [(ngModel)]="actionReason"
+              placeholder="Restera dans l'historique"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          </div>
+        </div>
+        <button type="button" (click)="applyAction()" class="btn-primary text-sm mt-3"
+          [disabled]="busy()">
+          Appliquer
+        </button>
+        <p class="text-xs text-navy/40 mt-2">
+          Masquer retire l'annonce du Marketplace sans changer le statut choisi par le
+          vendeur&nbsp;; lui seul ne peut pas lever la mesure.
+        </p>
+      </div>
+
+      <!-- Demander une correction -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-1">Demander une correction</h3>
+        <p class="text-xs text-navy/50 mb-3">
+          Les informations commerciales — marque, kilométrage, prix… — appartiennent au
+          vendeur. En cas d'erreur, demandez-lui de la corriger.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <input type="text" [(ngModel)]="correctionMessage" (keyup.enter)="requestCorrection()"
+            placeholder="Ce qui doit être corrigé…"
+            class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          <button type="button" (click)="requestCorrection()" class="btn-outline text-sm"
+            [disabled]="busy()">
+            Envoyer
+          </button>
+        </div>
+      </div>
+
+      <!-- Historique administratif -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-2">Historique administratif</h3>
+        @if (d.actions.length === 0) {
+          <p class="text-sm text-navy/50">Aucune action enregistrée.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (a of d.actions; track a.id) {
+              <li class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-navy">{{ actionLabel(a) }}</p>
+                  @if (a.reason) {
+                    <p class="text-xs text-navy/60">{{ a.reason }}</p>
+                  }
+                </div>
+                <p class="text-xs text-navy/40 whitespace-nowrap">
+                  {{ a.adminName }} · {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Notes internes -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-1">Notes internes</h3>
+        <p class="text-xs text-navy/50 mb-3">Jamais visibles par le vendeur.</p>
+
+        <div class="flex flex-wrap gap-2 mb-3">
+          <input type="text" [(ngModel)]="noteBody" (keyup.enter)="addNote()"
+            placeholder="Ajouter une note…"
+            class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          <button type="button" (click)="addNote()" class="btn-outline text-sm" [disabled]="busy()">
+            Ajouter
+          </button>
+        </div>
+
+        @if (d.notes.length === 0) {
+          <p class="text-sm text-navy/50">Aucune note.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (n of d.notes; track n.id) {
+              <li class="flex items-start justify-between gap-3">
+                <p class="text-navy">{{ n.body }}</p>
+                <div class="flex items-center gap-3 shrink-0">
+                  <span class="text-xs text-navy/40 whitespace-nowrap">
+                    {{ n.adminName }} · {{ n.createdAt | date:'dd/MM/yyyy' }}
+                  </span>
+                  <button type="button" (click)="deleteNote(n.id)" [disabled]="busy()"
+                    class="text-xs text-red-600 hover:underline">
+                    Retirer
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+</section>

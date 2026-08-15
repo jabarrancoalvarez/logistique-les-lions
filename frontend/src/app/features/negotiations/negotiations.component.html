@@ -1,0 +1,109 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+
+  <div class="mb-6">
+    <h1 class="font-heading text-2xl font-bold text-navy">Mes négociations</h1>
+    <p class="text-navy/60 text-sm mt-1">
+      Tout ce qui se passe autour d'un véhicule&nbsp;: conversation, offres et contrat.
+    </p>
+  </div>
+
+  <!-- ─── Onglets ───────────────────────────────────────────────────────── -->
+  <div class="flex gap-1 mb-5 border-b border-navy/10 overflow-x-auto" role="tablist">
+    @for (tab of tabs; track tab.label) {
+      <button type="button" (click)="selectTab(tab.value)" role="tab"
+        class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors"
+        [class]="activeTab() === tab.value
+          ? 'border-azure text-navy'
+          : 'border-transparent text-navy/50 hover:text-navy'"
+        [attr.aria-selected]="activeTab() === tab.value">
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="space-y-3">
+      @for (i of [1,2,3]; track i) {
+        <div class="animate-pulse bg-white rounded-xl border border-navy/10 p-4 flex gap-4">
+          <div class="w-20 h-14 bg-navy/10 rounded-lg"></div>
+          <div class="flex-1 space-y-2 py-1">
+            <div class="h-4 bg-navy/10 rounded w-1/2"></div>
+            <div class="h-3 bg-navy/5 rounded w-1/3"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (hasError()) {
+    <div class="text-center py-16 bg-white rounded-2xl border border-red-200">
+      <p class="text-red-600">Impossible de charger vos négociations. Veuillez réessayer.</p>
+    </div>
+  } @else if (negotiations().length === 0) {
+    <div class="text-center py-16 bg-white rounded-2xl border border-navy/10">
+      <svg class="w-16 h-16 mx-auto mb-4 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+      </svg>
+      <p class="text-lg font-medium text-navy mb-2">Aucune négociation</p>
+      <p class="text-navy/50 text-sm mb-6 max-w-md mx-auto">
+        Une négociation démarre dès que vous contactez un vendeur ou faites une offre
+        sur un véhicule.
+      </p>
+      <a routerLink="/vehiculos" class="btn-azure">Explorer les véhicules</a>
+    </div>
+  } @else {
+    <div class="space-y-3">
+      @for (n of negotiations(); track n.id) {
+        <a [routerLink]="['/mis-negociaciones', n.id]"
+           class="block bg-white rounded-xl border border-navy/10 p-4 hover:border-azure/40 transition-colors">
+
+          <div class="flex items-start gap-4">
+            <!-- Photo du véhicule -->
+            <div class="w-20 h-14 rounded-lg overflow-hidden bg-navy/5 shrink-0">
+              @if (n.vehicleThumbnailUrl) {
+                <img [src]="n.vehicleThumbnailUrl" [alt]="n.vehicleTitle" class="w-full h-full object-cover">
+              } @else {
+                <div class="w-full h-full flex items-center justify-center">
+                  <svg class="w-6 h-6 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+              }
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <p class="font-semibold text-navy truncate">
+                {{ n.vehicleTitle }}
+                @if (vehicleNotice(n); as notice) {
+                  <span class="ml-1.5 badge bg-navy text-white text-xs align-middle">{{ notice }}</span>
+                }
+              </p>
+              <p class="text-sm text-navy/60 mt-0.5">{{ parties(n) }}</p>
+              @if (n.lastMessage) {
+                <p class="text-sm text-navy/50 mt-1 line-clamp-1">{{ n.lastMessage }}</p>
+              }
+            </div>
+
+            <div class="text-right shrink-0">
+              <p class="font-bold text-navy">{{ n.vehiclePrice | fcfa }}</p>
+              <span class="badge text-xs mt-1" [class]="statusClass(n)">{{ statusLabel(n) }}</span>
+              @if (n.unreadCount > 0) {
+                <p class="mt-1">
+                  <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-azure text-white text-xs font-bold">
+                    {{ n.unreadCount }}
+                  </span>
+                </p>
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-x-3 mt-3 pt-3 border-t border-navy/10 text-xs text-navy/50">
+            <span>Réf. #{{ n.vehiclePublicReference }}</span>
+            @if (n.lastActivityAt) {
+              <span aria-hidden="true">·</span>
+              <span>{{ timeAgo(n.lastActivityAt) }}</span>
+            }
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

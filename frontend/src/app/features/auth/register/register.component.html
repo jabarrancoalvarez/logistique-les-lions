@@ -2,125 +2,143 @@
   <div class="w-full max-w-lg">
 
     <div class="text-center mb-8">
-      <a routerLink="/">
-        <img src="assets/logo.jpeg" alt="Logistique Les Lions" class="h-16 mx-auto mb-4">
+      <a routerLink="/" class="inline-block logo-chip px-5 py-3 mb-5">
+        <img src="assets/logo.png" alt="Yoon u Auto" class="h-12 w-auto" loading="eager">
       </a>
-      <h1 class="font-heading text-2xl font-bold text-ivory">Crea tu cuenta</h1>
-      <p class="text-ivory/60 mt-1 text-sm">Únete a la plataforma de importación de vehículos</p>
+      <h1 class="font-heading text-2xl font-bold text-frost">Créer votre compte</h1>
+      <p class="text-frost/60 mt-1 text-sm">Gratuit. Achetez, vendez et gérez vos véhicules.</p>
     </div>
 
     <div class="bg-white rounded-2xl p-8 shadow-2xl">
 
       @if (error()) {
-        <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm" role="alert">
           {{ error() }}
         </div>
       }
 
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
 
-        <!-- Tipo de cuenta -->
+        <!-- Type de compte -->
         <div class="mb-5">
-          <label class="block text-sm font-medium text-navy mb-2">Tipo de cuenta</label>
-          <div class="grid grid-cols-3 gap-2">
-            @for (r of roles; track r.value) {
+          <label class="block text-sm font-medium text-navy mb-2">Type de compte</label>
+          <div class="grid grid-cols-2 gap-2">
+            @for (t of accountTypes; track t.value) {
               <label class="relative cursor-pointer">
-                <input type="radio" formControlName="role" [value]="r.value" class="sr-only">
-                <div class="border-2 rounded-lg p-2.5 text-center text-xs font-medium transition-all"
-                     [ngClass]="form.value.role == r.value
-                       ? 'border-gold bg-gold/5 text-navy'
-                       : 'border-navy/20 text-navy/60'">
-                  {{ r.label }}
+                <input type="radio" formControlName="accountType" [value]="t.value" class="sr-only">
+                <div class="border-2 rounded-lg p-3 h-full transition-all"
+                     [ngClass]="form.value.accountType === t.value
+                       ? 'border-azure bg-azure/5'
+                       : 'border-navy/20'">
+                  <p class="text-sm font-semibold"
+                     [ngClass]="form.value.accountType === t.value ? 'text-navy' : 'text-navy/70'">
+                    {{ t.label }}
+                  </p>
+                  <p class="text-xs mt-0.5 text-navy/50">{{ t.hint }}</p>
                 </div>
               </label>
             }
           </div>
         </div>
 
-        <!-- Nombre y apellido -->
-        <div class="grid grid-cols-2 gap-3 mb-4">
-          <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Nombre</label>
-            <input type="text" formControlName="firstName"
-              class="w-full px-3 py-2.5 rounded-lg border border-navy/20 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none text-navy text-sm">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Apellido</label>
-            <input type="text" formControlName="lastName"
-              class="w-full px-3 py-2.5 rounded-lg border border-navy/20 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none text-navy text-sm">
-          </div>
-        </div>
-
-        <!-- Email -->
+        <!-- Téléphone : identifiant du compte -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-navy mb-1.5">Correo electrónico</label>
-          <input type="email" formControlName="email" autocomplete="email"
-            class="w-full px-4 py-3 rounded-lg border border-navy/20 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none text-navy placeholder-navy/40"
-            placeholder="tu@correo.com">
-          @if (form.get('email')?.invalid && form.get('email')?.touched) {
-            <p class="text-red-500 text-xs mt-1">Introduce un email válido.</p>
+          <label for="phone" class="block text-sm font-medium text-navy mb-1.5">
+            Numéro de téléphone <span class="text-red-500">*</span>
+          </label>
+          <input id="phone" type="tel" formControlName="phone" autocomplete="tel"
+            class="w-full px-4 py-3 rounded-lg border border-navy/20 focus:border-azure focus:ring-2 focus:ring-azure/20 outline-none text-navy placeholder-navy/40"
+            placeholder="+221 77 123 45 67">
+          @if (form.get('phone')?.invalid && form.get('phone')?.touched) {
+            <p class="text-red-500 text-xs mt-1">Saisissez un numéro sénégalais valide.</p>
+          } @else {
+            <p class="text-navy/50 text-xs mt-1">C'est avec ce numéro que vous vous connecterez.</p>
           }
         </div>
 
-        <!-- Contraseña -->
+        <!-- Nom -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-navy mb-1.5">Contraseña</label>
-          <input type="password" formControlName="password" autocomplete="new-password"
-            class="w-full px-4 py-3 rounded-lg border border-navy/20 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none text-navy placeholder-navy/40"
-            placeholder="Mínimo 8 caracteres">
+          <label for="displayName" class="block text-sm font-medium text-navy mb-1.5">
+            Nom affiché <span class="text-red-500">*</span>
+          </label>
+          <input id="displayName" type="text" formControlName="displayName" autocomplete="name"
+            class="w-full px-4 py-3 rounded-lg border border-navy/20 focus:border-azure focus:ring-2 focus:ring-azure/20 outline-none text-navy placeholder-navy/40"
+            placeholder="Mamadou Diop ou Auto Dakar Services">
+          @if (form.get('displayName')?.invalid && form.get('displayName')?.touched) {
+            <p class="text-red-500 text-xs mt-1">Le nom est obligatoire.</p>
+          }
+        </div>
+
+        <!-- Région et ville -->
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <label for="region" class="block text-sm font-medium text-navy mb-1.5">Région</label>
+            <select id="region" formControlName="region" (change)="onRegionChange($event)"
+              class="w-full px-3 py-2.5 rounded-lg border border-navy/20 focus:border-azure focus:ring-2 focus:ring-azure/20 outline-none text-navy text-sm bg-white">
+              <option value="">Choisir…</option>
+              @for (r of regions; track r.code) {
+                <option [value]="r.code">{{ r.name }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label for="city" class="block text-sm font-medium text-navy mb-1.5">Ville</label>
+            <select id="city" formControlName="city" [disabled]="cities().length === 0"
+              class="w-full px-3 py-2.5 rounded-lg border border-navy/20 focus:border-azure focus:ring-2 focus:ring-azure/20 outline-none text-navy text-sm bg-white disabled:bg-navy/5 disabled:text-navy/40">
+              <option value="">Choisir…</option>
+              @for (c of cities(); track c) {
+                <option [value]="c">{{ c }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="mb-4">
+          <label for="password" class="block text-sm font-medium text-navy mb-1.5">
+            Mot de passe <span class="text-red-500">*</span>
+          </label>
+          <input id="password" type="password" formControlName="password" autocomplete="new-password"
+            class="w-full px-4 py-3 rounded-lg border border-navy/20 focus:border-azure focus:ring-2 focus:ring-azure/20 outline-none text-navy placeholder-navy/40"
+            placeholder="8 caractères minimum">
           @if (form.get('password')?.invalid && form.get('password')?.touched) {
-            <p class="text-red-500 text-xs mt-1">La contraseña debe tener al menos 8 caracteres.</p>
+            <p class="text-red-500 text-xs mt-1">Le mot de passe doit contenir au moins 8 caractères.</p>
           }
         </div>
 
-        <!-- Teléfono + País -->
-        <div class="grid grid-cols-2 gap-3 mb-4">
-          <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Teléfono (opcional)</label>
-            <input type="tel" formControlName="phone"
-              class="w-full px-3 py-2.5 rounded-lg border border-navy/20 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none text-navy text-sm">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">País (código ISO)</label>
-            <input type="text" formControlName="countryCode" maxlength="2" placeholder="ES"
-              class="w-full px-3 py-2.5 rounded-lg border border-navy/20 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none text-navy text-sm uppercase">
-          </div>
+        <!-- E-mail facultatif -->
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-navy mb-1.5">
+            Adresse e-mail <span class="text-navy/40 font-normal">(facultatif)</span>
+          </label>
+          <input id="email" type="email" formControlName="email" autocomplete="email"
+            class="w-full px-4 py-3 rounded-lg border border-navy/20 focus:border-azure focus:ring-2 focus:ring-azure/20 outline-none text-navy placeholder-navy/40"
+            placeholder="vous@exemple.com">
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <p class="text-red-500 text-xs mt-1">Adresse e-mail invalide.</p>
+          } @else {
+            <p class="text-navy/50 text-xs mt-1">Uniquement pour recevoir les alertes par e-mail.</p>
+          }
         </div>
 
-        <!-- Datos empresa (solo dealers) -->
-        @if (isDealer) {
-          <div class="grid grid-cols-2 gap-3 mb-4 p-4 bg-gold/5 border border-gold/20 rounded-xl">
-            <div>
-              <label class="block text-sm font-medium text-navy mb-1.5">Nombre de la empresa</label>
-              <input type="text" formControlName="companyName"
-                class="w-full px-3 py-2.5 rounded-lg border border-navy/20 focus:border-gold outline-none text-navy text-sm">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-navy mb-1.5">CIF / VAT</label>
-              <input type="text" formControlName="companyVat"
-                class="w-full px-3 py-2.5 rounded-lg border border-navy/20 focus:border-gold outline-none text-navy text-sm">
-            </div>
-          </div>
-        }
-
-        <button type="submit" class="w-full btn-gold py-3 text-base font-semibold mt-2" [disabled]="loading()">
+        <button type="submit" class="w-full btn-azure py-3 text-base font-semibold mt-2" [disabled]="loading()">
           @if (loading()) {
             <span class="flex items-center justify-center gap-2">
-              <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
               </svg>
-              Creando cuenta...
+              Création du compte…
             </span>
           } @else {
-            Crear cuenta gratuita
+            Créer mon compte gratuit
           }
         </button>
       </form>
 
       <p class="text-center text-navy/60 text-sm mt-6">
-        ¿Ya tienes cuenta?
-        <a routerLink="/auth/login" class="text-gold font-medium hover:underline">Inicia sesión</a>
+        Vous avez déjà un compte&nbsp;?
+        <a routerLink="/auth/login" queryParamsHandling="preserve" class="text-azure font-medium hover:underline">Se connecter</a>
       </p>
     </div>
   </div>

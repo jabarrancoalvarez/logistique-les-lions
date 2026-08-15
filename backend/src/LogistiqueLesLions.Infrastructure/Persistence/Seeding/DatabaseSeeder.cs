@@ -143,18 +143,19 @@ public class DatabaseSeeder(
         // de auth real lo hashea correctamente, esto es solo para datos demo).
         const string demoHash = "$2a$11$abcdefghijklmnopqrstuv0123456789ABCDEFGHIJKLMNOPQRSTUVWX";
 
+        // Usuarios senegaleses: el teléfono es el identificador de la cuenta.
         var list = new List<UserProfile>
         {
-            new() { Email="admin@logistique-les-lions.test",  PasswordHash=demoHash, FirstName="Admin",   LastName="Sistema",  Role=UserRole.Admin,    CountryCode="ES", City="Madrid",   IsVerified=true, IsActive=true, CompanyName="Les Lions HQ", Bio="Administrador de la plataforma." },
-            new() { Email="moderator@les-lions.test",         PasswordHash=demoHash, FirstName="Marie",   LastName="Dubois",   Role=UserRole.Moderator,CountryCode="FR", City="Lyon",     IsVerified=true, IsActive=true },
-            new() { Email="dealer.berlin@les-lions.test",     PasswordHash=demoHash, FirstName="Hans",    LastName="Müller",   Role=UserRole.Dealer,   CountryCode="DE", City="Berlín",   IsVerified=true, IsActive=true, CompanyName="Berlin Premium Cars", CompanyVat="DE123456789" },
-            new() { Email="dealer.madrid@les-lions.test",     PasswordHash=demoHash, FirstName="Carlos",  LastName="Ramírez",  Role=UserRole.Dealer,   CountryCode="ES", City="Madrid",   IsVerified=true, IsActive=true, CompanyName="Auto Madrid Plus",   CompanyVat="ESB87654321" },
-            new() { Email="seller.paris@les-lions.test",      PasswordHash=demoHash, FirstName="Sophie",  LastName="Martin",   Role=UserRole.Seller,   CountryCode="FR", City="París",    IsVerified=true, IsActive=true },
-            new() { Email="seller.tokyo@les-lions.test",      PasswordHash=demoHash, FirstName="Yuki",    LastName="Tanaka",   Role=UserRole.Seller,   CountryCode="JP", City="Tokio",    IsVerified=false,IsActive=true },
-            new() { Email="buyer.barcelona@les-lions.test",   PasswordHash=demoHash, FirstName="Laura",   LastName="García",   Role=UserRole.Buyer,    CountryCode="ES", City="Barcelona",IsVerified=true, IsActive=true },
-            new() { Email="buyer.lisbon@les-lions.test",      PasswordHash=demoHash, FirstName="João",    LastName="Silva",    Role=UserRole.Buyer,    CountryCode="PT", City="Lisboa",   IsVerified=true, IsActive=true },
-            new() { Email="buyer.london@les-lions.test",      PasswordHash=demoHash, FirstName="Oliver",  LastName="Smith",    Role=UserRole.Buyer,    CountryCode="GB", City="Londres",  IsVerified=true, IsActive=true },
-            new() { Email="buyer.casablanca@les-lions.test",  PasswordHash=demoHash, FirstName="Amina",   LastName="El Idrissi",Role=UserRole.Buyer,   CountryCode="MA", City="Casablanca",IsVerified=false,IsActive=true },
+            new() { Phone="+221770000001", Email="admin@yoonuauto.test", PasswordHash=demoHash, DisplayName="Administration Yoon", Role=UserRole.Admin, AccountType=AccountType.Professionnel, Region="DK", City="Dakar",       PhoneVerified=true,  Bio="Administrateur de la plateforme." },
+            new() { Phone="+221770000002", Email="auto.dakar@yoonuauto.test", PasswordHash=demoHash, DisplayName="Auto Dakar Services", AccountType=AccountType.Professionnel, Region="DK", City="Dakar",       PhoneVerified=true,  VerifiedSalesCount=8 },
+            new() { Phone="+221770000003", Email="sahel.motors@yoonuauto.test", PasswordHash=demoHash, DisplayName="Sahel Motors",      AccountType=AccountType.Professionnel, Region="TH", City="Thiès",       PhoneVerified=true,  VerifiedSalesCount=5 },
+            new() { Phone="+221770000004", Email="teranga.auto@yoonuauto.test", PasswordHash=demoHash, DisplayName="Teranga Auto",      AccountType=AccountType.Professionnel, Region="DK", City="Rufisque",    PhoneVerified=true,  VerifiedSalesCount=3 },
+            new() { Phone="+221770000005", PasswordHash=demoHash, DisplayName="Mamadou Diop",     AccountType=AccountType.Particulier,  Region="DK", City="Dakar",       PhoneVerified=true,  VerifiedSalesCount=2 },
+            new() { Phone="+221770000006", PasswordHash=demoHash, DisplayName="Fatou Ndiaye",     AccountType=AccountType.Particulier,  Region="TH", City="Mbour",       PhoneVerified=true },
+            new() { Phone="+221770000007", PasswordHash=demoHash, DisplayName="Ousmane Sarr",     AccountType=AccountType.Particulier,  Region="SL", City="Saint-Louis", PhoneVerified=true },
+            new() { Phone="+221770000008", PasswordHash=demoHash, DisplayName="Aïssatou Fall",    AccountType=AccountType.Particulier,  Region="DB", City="Touba",       PhoneVerified=false },
+            new() { Phone="+221770000009", PasswordHash=demoHash, DisplayName="Ibrahima Bâ",      AccountType=AccountType.Particulier,  Region="ZG", City="Ziguinchor",  PhoneVerified=true },
+            new() { Phone="+221770000010", PasswordHash=demoHash, DisplayName="Awa Sow",          AccountType=AccountType.Particulier,  Region="KL", City="Kaolack",     PhoneVerified=false },
         };
 
         foreach (var u in list)
@@ -162,11 +163,12 @@ public class DatabaseSeeder(
             u.CreatedAt   = now.AddDays(-Random.Shared.Next(1, 180));
             u.UpdatedAt   = now;
             u.LastLoginAt = now.AddDays(-Random.Shared.Next(0, 14));
+            u.LastActivityAt = u.LastLoginAt;
         }
 
         db.UserProfiles.AddRange(list);
         await db.SaveChangesAsync(ct);
-        logger.LogInformation("  · {N} usuarios (admin: admin@logistique-les-lions.test / demo1234)", list.Count);
+        logger.LogInformation("  · {N} usuarios (admin: +221770000001 / demo1234)", list.Count);
         return list;
     }
 
@@ -206,7 +208,8 @@ public class DatabaseSeeder(
         if (await db.Vehicles.AnyAsync(ct))
             return await db.Vehicles.ToListAsync(ct);
 
-        var sellers = users.Where(u => u.Role is UserRole.Seller or UserRole.Dealer).ToList();
+        // Cualquier usuario puede vender: excluimos solo la cuenta de administración.
+        var sellers = users.Where(u => u.Role != UserRole.Admin).ToList();
         var rng = new Random(42);
 
         string Slug(string make, string model, int year, int idx) =>
@@ -214,26 +217,39 @@ public class DatabaseSeeder(
 
         var data = new (string Make, string Model, int Year, int Mileage, decimal Price, FuelType Fuel, TransmissionType Tx, BodyType Body, string Color, string Country, string City, bool Featured, bool ExportReady, VehicleStatus Status)[]
         {
-            ("BMW","Serie 3",2022, 35000, 32500, FuelType.Diesel,    TransmissionType.Automatic, BodyType.Sedan,     "Negro",   "DE","Múnich",     true,  true,  VehicleStatus.Active),
-            ("BMW","X5",     2021, 48000, 56500, FuelType.Hybrid,    TransmissionType.Automatic, BodyType.SUV,       "Blanco",  "DE","Hamburgo",   true,  true,  VehicleStatus.Active),
-            ("Mercedes-Benz","Clase C",2023,12000,45000, FuelType.PluginHybrid,TransmissionType.Automatic, BodyType.Sedan,"Plata","DE","Stuttgart", true,  true,  VehicleStatus.Active),
-            ("Mercedes-Benz","GLE",   2022, 28000, 68000, FuelType.Diesel,    TransmissionType.Automatic, BodyType.SUV,   "Gris",   "DE","Berlín",     false, true,  VehicleStatus.Active),
-            ("Audi","A4",    2021, 55000, 28900, FuelType.Diesel,    TransmissionType.Automatic, BodyType.Sedan,    "Azul",    "DE","Frankfurt",  false, true,  VehicleStatus.Active),
-            ("Audi","Q5",    2023,  8000, 52000, FuelType.PluginHybrid,TransmissionType.Automatic,BodyType.SUV,     "Negro",   "DE","Múnich",     true,  true,  VehicleStatus.Active),
-            ("Volkswagen","Golf",2022,22000,24500, FuelType.Gasoline,TransmissionType.Manual,    BodyType.Hatchback,"Rojo",    "ES","Madrid",     false, false, VehicleStatus.Active),
-            ("Volkswagen","ID.4",2023, 5000, 38900, FuelType.Electric, TransmissionType.Automatic,BodyType.SUV,     "Blanco",  "ES","Barcelona",  true,  true,  VehicleStatus.Active),
-            ("Toyota","Corolla",2022,30000,21500, FuelType.Hybrid,    TransmissionType.Automatic, BodyType.Sedan,    "Plata",   "FR","Lyon",       false, true,  VehicleStatus.Active),
-            ("Toyota","RAV4",   2021, 65000, 27500, FuelType.Hybrid,    TransmissionType.Automatic, BodyType.SUV,    "Verde",   "FR","París",      false, true,  VehicleStatus.Active),
-            ("Tesla","Model 3", 2022, 25000, 41900, FuelType.Electric, TransmissionType.Automatic, BodyType.Sedan,    "Blanco",  "NL","Ámsterdam",  true,  true,  VehicleStatus.Active),
-            ("Tesla","Model Y", 2023, 12000, 49500, FuelType.Electric, TransmissionType.Automatic, BodyType.SUV,      "Negro",   "DE","Berlín",     true,  true,  VehicleStatus.Active),
-            ("Renault","Megane",2021, 70000, 14500, FuelType.Diesel,   TransmissionType.Manual,    BodyType.Hatchback,"Gris",    "FR","Marsella",   false, false, VehicleStatus.Active),
-            ("Peugeot","3008",  2022, 38000, 26900, FuelType.Diesel,   TransmissionType.Automatic, BodyType.SUV,      "Azul",    "FR","Toulouse",   false, true,  VehicleStatus.Active),
-            ("Seat","Leon",     2023, 15000, 22500, FuelType.Gasoline, TransmissionType.Manual,    BodyType.Hatchback,"Rojo",    "ES","Valencia",   false, true,  VehicleStatus.Active),
-            ("Honda","Civic",   2022, 42000, 19900, FuelType.Gasoline, TransmissionType.Automatic, BodyType.Hatchback,"Negro",   "ES","Sevilla",    false, false, VehicleStatus.Active),
-            ("Hyundai","Tucson",2021, 60000, 22900, FuelType.Diesel,   TransmissionType.Manual,    BodyType.SUV,      "Blanco",  "PT","Lisboa",     false, true,  VehicleStatus.Active),
-            ("Ford","Mustang",  2020, 32000, 39500, FuelType.Gasoline, TransmissionType.Automatic, BodyType.Coupe,    "Amarillo","US","Los Ángeles",true,  true,  VehicleStatus.Active),
-            ("BMW","Serie 1",   2023, 10000, 28500, FuelType.Gasoline, TransmissionType.Automatic, BodyType.Hatchback,"Blanco",  "DE","Düsseldorf", false, true,  VehicleStatus.Reviewing),
-            ("Audi","A1",       2022, 25000, 19500, FuelType.Gasoline, TransmissionType.Manual,    BodyType.Hatchback,"Rojo",    "DE","Colonia",    false, true,  VehicleStatus.Reviewing),
+            ("BMW","Serie 3",2022, 35000, 32500, FuelType.Diesel,    TransmissionType.Automatique, BodyType.Berline,     "Negro",   "DE","Múnich",     true,  true,  VehicleStatus.Actif),
+            ("BMW","X5",     2021, 48000, 56500, FuelType.Hybride,    TransmissionType.Automatique, BodyType.Suv,       "Blanco",  "DE","Hamburgo",   true,  true,  VehicleStatus.Actif),
+            ("Mercedes-Benz","Clase C",2023,12000,45000, FuelType.HybrideRechargeable,TransmissionType.Automatique, BodyType.Berline,"Plata","DE","Stuttgart", true,  true,  VehicleStatus.Actif),
+            ("Mercedes-Benz","GLE",   2022, 28000, 68000, FuelType.Diesel,    TransmissionType.Automatique, BodyType.Suv,   "Gris",   "DE","Berlín",     false, true,  VehicleStatus.Actif),
+            ("Audi","A4",    2021, 55000, 28900, FuelType.Diesel,    TransmissionType.Automatique, BodyType.Berline,    "Azul",    "DE","Frankfurt",  false, true,  VehicleStatus.Actif),
+            ("Audi","Q5",    2023,  8000, 52000, FuelType.HybrideRechargeable,TransmissionType.Automatique,BodyType.Suv,     "Negro",   "DE","Múnich",     true,  true,  VehicleStatus.Actif),
+            ("Volkswagen","Golf",2022,22000,24500, FuelType.Essence,TransmissionType.Manuel,    BodyType.Citadine,"Rojo",    "ES","Madrid",     false, false, VehicleStatus.Actif),
+            ("Volkswagen","ID.4",2023, 5000, 38900, FuelType.Electrique, TransmissionType.Automatique,BodyType.Suv,     "Blanco",  "ES","Barcelona",  true,  true,  VehicleStatus.Actif),
+            ("Toyota","Corolla",2022,30000,21500, FuelType.Hybride,    TransmissionType.Automatique, BodyType.Berline,    "Plata",   "FR","Lyon",       false, true,  VehicleStatus.Actif),
+            ("Toyota","RAV4",   2021, 65000, 27500, FuelType.Hybride,    TransmissionType.Automatique, BodyType.Suv,    "Verde",   "FR","París",      false, true,  VehicleStatus.Actif),
+            ("Tesla","Model 3", 2022, 25000, 41900, FuelType.Electrique, TransmissionType.Automatique, BodyType.Berline,    "Blanco",  "NL","Ámsterdam",  true,  true,  VehicleStatus.Actif),
+            ("Tesla","Model Y", 2023, 12000, 49500, FuelType.Electrique, TransmissionType.Automatique, BodyType.Suv,      "Negro",   "DE","Berlín",     true,  true,  VehicleStatus.Actif),
+            ("Renault","Megane",2021, 70000, 14500, FuelType.Diesel,   TransmissionType.Manuel,    BodyType.Citadine,"Gris",    "FR","Marsella",   false, false, VehicleStatus.Actif),
+            ("Peugeot","3008",  2022, 38000, 26900, FuelType.Diesel,   TransmissionType.Automatique, BodyType.Suv,      "Azul",    "FR","Toulouse",   false, true,  VehicleStatus.Actif),
+            ("Seat","Leon",     2023, 15000, 22500, FuelType.Essence, TransmissionType.Manuel,    BodyType.Citadine,"Rojo",    "ES","Valencia",   false, true,  VehicleStatus.Actif),
+            ("Honda","Civic",   2022, 42000, 19900, FuelType.Essence, TransmissionType.Automatique, BodyType.Citadine,"Negro",   "ES","Sevilla",    false, false, VehicleStatus.Actif),
+            ("Hyundai","Tucson",2021, 60000, 22900, FuelType.Diesel,   TransmissionType.Manuel,    BodyType.Suv,      "Blanco",  "PT","Lisboa",     false, true,  VehicleStatus.Actif),
+            ("Ford","Mustang",  2020, 32000, 39500, FuelType.Essence, TransmissionType.Automatique, BodyType.Coupe,    "Amarillo","US","Los Ángeles",true,  true,  VehicleStatus.Actif),
+            ("BMW","Serie 1",   2023, 10000, 28500, FuelType.Essence, TransmissionType.Automatique, BodyType.Citadine,"Blanco",  "DE","Düsseldorf", false, true,  VehicleStatus.Brouillon),
+            ("Audi","A1",       2022, 25000, 19500, FuelType.Essence, TransmissionType.Manuel,    BodyType.Citadine,"Rojo",    "DE","Colonia",    false, true,  VehicleStatus.Brouillon),
+
+            // Grupo de RAV4 comparables entre sí: sin una muestra de este tamaño el
+            // indicador estadístico de precio nunca llegaría al mínimo de comparables y
+            // no podría verse en el entorno de demo.
+            ("Toyota","RAV4",   2019, 126000, 8900000, FuelType.Essence, TransmissionType.Automatique, BodyType.Suv, "Gris",   "SN","Dakar",   true,  false, VehicleStatus.Actif),
+            ("Toyota","RAV4",   2019, 118000, 9400000, FuelType.Essence, TransmissionType.Automatique, BodyType.Suv, "Blanco", "SN","Dakar",   false, false, VehicleStatus.Actif),
+            ("Toyota","RAV4",   2020,  95000, 10200000,FuelType.Essence, TransmissionType.Automatique, BodyType.Suv, "Negro",  "SN","Thiès",   false, false, VehicleStatus.Actif),
+            ("Toyota","RAV4",   2018, 140000, 7800000, FuelType.Diesel,  TransmissionType.Automatique, BodyType.Suv, "Gris",   "SN","Mbour",   false, false, VehicleStatus.Actif),
+            ("Toyota","RAV4",   2020, 102000, 10800000,FuelType.Essence, TransmissionType.Automatique, BodyType.Suv, "Azul",   "SN","Rufisque",false, false, VehicleStatus.Actif),
+            ("Toyota","RAV4",   2018, 155000, 7200000, FuelType.Diesel,  TransmissionType.Manuel,      BodyType.Suv, "Blanco", "SN","Kaolack", false, false, VehicleStatus.Actif),
+            // Uno claramente barato y otro claramente caro, para ver los tres resultados.
+            ("Toyota","RAV4",   2019, 130000, 6500000, FuelType.Essence, TransmissionType.Automatique, BodyType.Suv, "Verde",  "SN","Dakar",   false, false, VehicleStatus.Actif),
+            ("Toyota","RAV4",   2019,  88000, 13500000,FuelType.Essence, TransmissionType.Automatique, BodyType.Suv, "Negro",  "SN","Dakar",   false, false, VehicleStatus.Actif),
         };
 
         var vehicles = new List<Vehicle>();
@@ -246,16 +262,17 @@ public class DatabaseSeeder(
             var model = models.FirstOrDefault(m => m.MakeId == make.Id && m.Name == d.Model);
             var seller = sellers[rng.Next(sellers.Count)];
 
+            // El vendedor de demo vive en Senegal: el anuncio hereda su región y ciudad.
+            var customs = (CustomsStatus)(1 + (idx % 3));
+
             var v = new Vehicle
             {
+                PublicReference = $"YU{90000 + idx:D5}",
                 Slug          = Slug(d.Make, d.Model, d.Year, idx++),
                 Title         = $"{d.Make} {d.Model} {d.Year}",
-                DescriptionEs = $"{d.Make} {d.Model} de {d.Year} en excelente estado. " +
-                                $"{d.Mileage:N0} km, {d.Fuel}, {d.Tx}. Color {d.Color.ToLower()}. " +
-                                $"Procedente de {d.City} ({d.Country}). Listo para exportación con toda la documentación al día.",
-                DescriptionEn = $"{d.Year} {d.Make} {d.Model} in excellent condition. " +
-                                $"{d.Mileage:N0} km, {d.Fuel}, {d.Tx}. {d.Color} colour. " +
-                                $"From {d.City} ({d.Country}). Export ready with full documentation.",
+                Description   = $"{d.Make} {d.Model} de {d.Year} en très bon état. " +
+                                $"{d.Mileage:N0} km, {d.Fuel}, {d.Tx}. Couleur {d.Color.ToLower()}. " +
+                                $"Entretien à jour, papiers en règle. Visible à {seller.City}.",
                 MakeId        = make.Id,
                 ModelId       = model?.Id,
                 Year          = d.Year,
@@ -265,12 +282,19 @@ public class DatabaseSeeder(
                 FuelType      = d.Fuel,
                 Transmission  = d.Tx,
                 Color         = d.Color,
+                Doors         = d.Body is BodyType.Citadine or BodyType.Coupe ? 3 : 5,
+                Seats         = d.Body is BodyType.Monospace ? 7 : 5,
+                PowerCv       = rng.Next(70, 250),
+                EngineDisplacementCc = rng.Next(1000, 3000),
+                Drivetrain    = d.Body is BodyType.Suv ? Drivetrain.Integrale : Drivetrain.Avant,
                 Vin           = $"WBA{rng.Next(10000000, 99999999)}{rng.Next(1000, 9999)}",
+                CustomsStatus = customs,
                 Price         = d.Price,
-                Currency      = "EUR",
+                Currency      = "XOF",
                 PriceNegotiable = rng.NextDouble() > 0.6,
                 CountryOrigin = d.Country,
-                City          = d.City,
+                Region        = seller.Region,
+                City          = seller.City,
                 Status        = d.Status,
                 IsFeatured    = d.Featured,
                 IsExportReady = d.ExportReady,
@@ -278,9 +302,19 @@ public class DatabaseSeeder(
                 FavoritesCount= rng.Next(0, 80),
                 ContactsCount = rng.Next(0, 25),
                 SellerId      = seller.Id,
+                PublishedAt   = now.AddDays(-rng.Next(1, 90)),
                 CreatedAt     = now.AddDays(-rng.Next(1, 90)),
                 UpdatedAt     = now.AddDays(-rng.Next(0, 7))
             };
+
+            // Punto inicial del histórico de precios, necesario para «Évolution du prix».
+            v.PriceHistory.Add(new VehiclePriceHistory
+            {
+                VehicleId = v.Id,
+                Price     = v.Price,
+                ChangedAt = v.CreatedAt
+            });
+
             vehicles.Add(v);
 
             // 3 fotos reales de Unsplash por vehículo (IDs curados en UnsplashCarPhotoIds).
@@ -427,14 +461,14 @@ public class DatabaseSeeder(
         if (await db.ImportExportProcesses.AnyAsync(ct))
             return await db.ImportExportProcesses.ToListAsync(ct);
 
-        var buyers = users.Where(u => u.Role == UserRole.Buyer).ToList();
+        var buyers = users.Where(u => u.Role != UserRole.Admin).ToList();
         var rng = new Random(7);
 
         var processes = new List<ImportExportProcess>();
-        foreach (var v in vehicles.Where(x => x.Status == VehicleStatus.Active).Take(8))
+        foreach (var v in vehicles.Where(x => x.Status == VehicleStatus.Actif).Take(8))
         {
             var buyer = buyers[rng.Next(buyers.Count)];
-            var dest  = buyer.CountryCode ?? "ES";
+            var dest  = "SN";
             if (dest == v.CountryOrigin) dest = "FR";
             var status = (ProcessStatus)rng.Next(1, 6);
             var processType = v.CountryOrigin is "DE" or "FR" or "IT" or "PT" or "NL"
@@ -517,7 +551,7 @@ public class DatabaseSeeder(
     {
         if (await db.ProcessIncidents.AnyAsync(ct)) return;
 
-        var moderator = users.FirstOrDefault(u => u.Role == UserRole.Moderator);
+        var moderator = users.FirstOrDefault(u => u.Role == UserRole.Admin);
         var rng = new Random(13);
 
         var samples = new (string Title, string Body, IncidentSeverity Sev)[]
@@ -556,17 +590,17 @@ public class DatabaseSeeder(
     private async Task SeedConversationsAsync(
         List<Vehicle> vehicles, List<UserProfile> users, DateTimeOffset now, CancellationToken ct)
     {
-        if (await db.Conversations.AnyAsync(ct)) return;
+        if (await db.Negotiations.AnyAsync(ct)) return;
 
-        var buyers  = users.Where(u => u.Role == UserRole.Buyer).ToList();
+        var buyers  = users.Where(u => u.Role != UserRole.Admin).ToList();
         var rng = new Random(17);
-        var convs = new List<Conversation>();
+        var convs = new List<Negotiation>();
         var msgs  = new List<Message>();
 
-        foreach (var v in vehicles.Where(x => x.Status == VehicleStatus.Active).Take(6))
+        foreach (var v in vehicles.Where(x => x.Status == VehicleStatus.Actif).Take(6))
         {
             var buyer = buyers[rng.Next(buyers.Count)];
-            var conv = new Conversation
+            var conv = new Negotiation
             {
                 BuyerId   = buyer.Id,
                 SellerId  = v.SellerId,
@@ -593,7 +627,7 @@ public class DatabaseSeeder(
                 var senderId = role == "buyer" ? buyer.Id : v.SellerId;
                 msgs.Add(new Message
                 {
-                    ConversationId = conv.Id,
+                    NegotiationId = conv.Id,
                     SenderId       = senderId,
                     Body           = body,
                     IsRead         = i < lines.Length - 1,
@@ -605,7 +639,7 @@ public class DatabaseSeeder(
             }
         }
 
-        db.Conversations.AddRange(convs);
+        db.Negotiations.AddRange(convs);
         db.Messages.AddRange(msgs);
         await db.SaveChangesAsync(ct);
         logger.LogInformation("  · {C} conversaciones, {M} mensajes", convs.Count, msgs.Count);

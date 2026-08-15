@@ -15,7 +15,7 @@ public class GetFeaturedVehiclesQueryHandler(IApplicationDbContext context)
     {
         var vehicles = await context.Vehicles
             .AsNoTracking()
-            .Where(v => v.IsFeatured && v.Status == VehicleStatus.Active)
+            .Where(v => v.IsFeatured && v.Status == VehicleStatus.Actif)
             .OrderByDescending(v => v.CreatedAt)
             .Take(request.Count)
             .Include(v => v.Make)

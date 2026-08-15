@@ -1,4 +1,4 @@
-# Logistique Les Lions
+# Yoon U Auto
 
 Plataforma SaaS de compraventa internacional de vehículos con gestión documental transfronteriza completa: aduanas, homologaciones y trámites legales por país.
 
@@ -128,4 +128,4 @@ ASPNETCORE_ENVIRONMENT=Production
 
 ## Licencia
 
-Proyecto privado — Logistique Les Lions © 2026
+Proyecto privado — Yoon U Auto © 2026

@@ -1,0 +1,98 @@
+<section class="bg-frost min-h-[70vh] py-8">
+  <div class="max-w-2xl mx-auto px-4">
+
+    <h1 class="font-heading font-bold text-navy text-2xl sm:text-3xl mb-6">Paramètres</h1>
+
+    @if (loading()) {
+      <p class="text-sm text-navy/50 py-10 text-center">Chargement…</p>
+    }
+
+    @if (error()) {
+      <p class="text-sm text-red-600 mb-4" role="alert">{{ error() }}</p>
+    }
+
+    @if (profile(); as p) {
+      <!-- ─── Compte ────────────────────────────────────────────────────── -->
+      <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+        <h2 class="font-heading font-semibold text-navy mb-3">Compte</h2>
+        <dl class="text-sm space-y-2">
+          <div class="flex justify-between gap-3">
+            <dt class="text-navy/60">Téléphone</dt>
+            <dd class="text-navy font-mono">
+              {{ p.phone }}
+              @if (p.phoneVerified) {
+                <span class="text-green-700 text-xs ml-1">vérifié ✓</span>
+              }
+            </dd>
+          </div>
+          <div class="flex justify-between gap-3">
+            <dt class="text-navy/60">E-mail</dt>
+            <dd class="text-navy">{{ p.email ?? '—' }}</dd>
+          </div>
+        </dl>
+        <p class="text-xs text-navy/40 mt-3">
+          Le téléphone identifie votre compte. L'e-mail sert uniquement aux notifications.
+        </p>
+        <a routerLink="/perfil" class="btn-outline text-sm mt-4 inline-block">
+          Modifier mon profil
+        </a>
+      </div>
+
+      <!-- ─── Notifications ─────────────────────────────────────────────── -->
+      <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+        <h2 class="font-heading font-semibold text-navy mb-1">Notifications</h2>
+        <p class="text-xs text-navy/50 mb-4">
+          Les alertes propres à une recherche enregistrée se règlent dans
+          <a routerLink="/busquedas-guardadas" class="text-azure-dark hover:underline">
+            Recherches enregistrées</a>, et celles d'un véhicule précis dans
+          <a routerLink="/favoritos" class="text-azure-dark hover:underline">Favoris</a>.
+        </p>
+
+        @if (favoriteAlerts() !== null) {
+          <label class="flex items-start gap-3 text-sm text-navy cursor-pointer">
+            <input type="checkbox" [checked]="favoriteAlerts()" [disabled]="saving()"
+              (change)="toggleFavoriteAlerts()" class="mt-0.5" />
+            <span>
+              Recevoir une alerte quand le prix d'un favori baisse
+              <span class="block text-xs text-navy/50">
+                S'applique à tous vos favoris.
+              </span>
+            </span>
+          </label>
+        }
+      </div>
+
+      <!-- ─── Contact ───────────────────────────────────────────────────── -->
+      <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+        <h2 class="font-heading font-semibold text-navy mb-3">Contact</h2>
+        <label class="flex items-start gap-3 text-sm text-navy cursor-pointer">
+          <input type="checkbox" [checked]="p.allowWhatsAppContact" [disabled]="saving()"
+            (change)="toggleWhatsApp()" class="mt-0.5" />
+          <span>
+            Autoriser le contact par WhatsApp
+            <span class="block text-xs text-navy/50">
+              La messagerie interne de Yoon u Auto reste le canal principal.
+            </span>
+          </span>
+        </label>
+      </div>
+
+      <!-- ─── Langue ────────────────────────────────────────────────────── -->
+      <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
+        <h2 class="font-heading font-semibold text-navy mb-1">Langue</h2>
+        <p class="text-sm text-navy/60">Français</p>
+        <p class="text-xs text-navy/40 mt-1">
+          Yoon u Auto est disponible en français.
+        </p>
+      </div>
+
+      <!-- ─── Session ───────────────────────────────────────────────────── -->
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h2 class="font-heading font-semibold text-navy mb-3">Session</h2>
+        <button type="button" (click)="logout()" class="btn-outline text-sm">
+          Se déconnecter
+        </button>
+      </div>
+    }
+  </div>
+</section>

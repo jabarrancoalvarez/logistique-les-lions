@@ -20,25 +20,25 @@ interface FinancingPlan {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, CommonModule, DecimalPipe, FormsModule],
   template: `
-    <div class="min-h-screen bg-ivory">
+    <div class="min-h-screen bg-frost">
 
       <!-- ── Hero ───────────────────────────────────────────────────────── -->
       <div class="bg-navy py-20 px-4">
         <div class="container mx-auto max-w-5xl">
           <div class="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <p class="divider-gold mb-6">Financiación inteligente</p>
-              <h1 class="font-heading text-4xl lg:text-5xl font-bold text-ivory mb-4 leading-tight">
+              <p class="divider-azure mb-6">Financiación inteligente</p>
+              <h1 class="font-heading text-4xl lg:text-5xl font-bold text-frost mb-4 leading-tight">
                 Tu vehículo de importación,
-                <span class="text-gold"> sin esperar</span>
+                <span class="text-azure"> sin esperar</span>
               </h1>
-              <p class="text-lg leading-relaxed mb-8" style="color:rgba(248,246,240,0.7)">
+              <p class="text-lg leading-relaxed mb-8" style="color:rgba(244,248,251,0.7)">
                 Financiación flexible con las mejores condiciones del mercado. Desde vehículos de ocasión
                 hasta superdeportivos, tenemos una solución para cada cliente.
               </p>
               <div class="flex flex-wrap gap-3">
-                <a routerLink="/vehiculos" class="btn-gold py-3 px-6">Ver vehículos</a>
-                <button (click)="scrollToCalc()" class="btn-outline btn-outline-gold py-3 px-6">
+                <a routerLink="/vehiculos" class="btn-azure py-3 px-6">Ver vehículos</a>
+                <button (click)="scrollToCalc()" class="btn-outline btn-outline-azure py-3 px-6">
                   Calcular cuota
                 </button>
               </div>
@@ -46,8 +46,8 @@ interface FinancingPlan {
             <div class="grid grid-cols-2 gap-4">
               @for (stat of heroStats; track stat.label) {
                 <div class="bg-white/5 border border-white/10 rounded-xl p-5 text-center">
-                  <p class="font-heading text-3xl font-bold text-gold mb-1">{{ stat.value }}</p>
-                  <p class="text-xs" style="color:rgba(248,246,240,0.6)">{{ stat.label }}</p>
+                  <p class="font-heading text-3xl font-bold text-azure mb-1">{{ stat.value }}</p>
+                  <p class="text-xs" style="color:rgba(244,248,251,0.6)">{{ stat.label }}</p>
                 </div>
               }
             </div>
@@ -59,49 +59,49 @@ interface FinancingPlan {
 
         <!-- ── Plans ────────────────────────────────────────────────────── -->
         <div class="text-center mb-12">
-          <p class="divider-gold justify-center mb-4">Productos de financiación</p>
+          <p class="divider-azure justify-center mb-4">Productos de financiación</p>
           <h2 class="font-heading text-3xl font-bold text-navy">Elige el plan que más te convenga</h2>
         </div>
         <div class="grid md:grid-cols-3 gap-6 mb-16">
           @for (plan of plans; track plan.name) {
             <div [class]="planCardClass(plan)">
               @if (plan.highlighted) {
-                <div class="badge badge-gold self-start mb-4">Más solicitado</div>
+                <div class="badge badge-azure self-start mb-4">Más solicitado</div>
               }
               <div class="mb-4">
                 <p class="badge badge-navy text-xs mb-3">{{ plan.tag }}</p>
-                <h3 [class]="plan.highlighted ? 'font-heading text-xl font-bold text-ivory mb-1' : 'font-heading text-xl font-bold text-navy mb-1'">
+                <h3 [class]="plan.highlighted ? 'font-heading text-xl font-bold text-frost mb-1' : 'font-heading text-xl font-bold text-navy mb-1'">
                   {{ plan.name }}
                 </h3>
-                <p [class]="plan.highlighted ? 'text-sm opacity-60 text-ivory' : 'text-sm opacity-60 text-navy'">
+                <p [class]="plan.highlighted ? 'text-sm opacity-60 text-frost' : 'text-sm opacity-60 text-navy'">
                   {{ plan.description }}
                 </p>
               </div>
-              <div class="py-4 my-4" [style]="plan.highlighted ? 'border-top:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1)' : 'border-top:1px solid rgba(11,31,58,0.08);border-bottom:1px solid rgba(11,31,58,0.08)'">
+              <div class="py-4 my-4" [style]="plan.highlighted ? 'border-top:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1)' : 'border-top:1px solid rgba(10,46,77,0.08);border-bottom:1px solid rgba(10,46,77,0.08)'">
                 <div class="flex justify-between items-center mb-2">
-                  <span [class]="plan.highlighted ? 'text-xs text-ivory/50' : 'text-xs opacity-50 text-navy'">TIN desde</span>
-                  <span [class]="plan.highlighted ? 'font-heading font-bold text-gold text-xl' : 'font-heading font-bold text-gold text-xl'">{{ plan.rate }}</span>
+                  <span [class]="plan.highlighted ? 'text-xs text-frost/50' : 'text-xs opacity-50 text-navy'">TIN desde</span>
+                  <span [class]="plan.highlighted ? 'font-heading font-bold text-azure text-xl' : 'font-heading font-bold text-azure text-xl'">{{ plan.rate }}</span>
                 </div>
                 <div class="flex justify-between items-center mb-2">
-                  <span [class]="plan.highlighted ? 'text-xs text-ivory/50' : 'text-xs opacity-50 text-navy'">Plazo</span>
-                  <span [class]="plan.highlighted ? 'text-sm font-medium text-ivory' : 'text-sm font-medium text-navy'">{{ plan.term }}</span>
+                  <span [class]="plan.highlighted ? 'text-xs text-frost/50' : 'text-xs opacity-50 text-navy'">Plazo</span>
+                  <span [class]="plan.highlighted ? 'text-sm font-medium text-frost' : 'text-sm font-medium text-navy'">{{ plan.term }}</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span [class]="plan.highlighted ? 'text-xs text-ivory/50' : 'text-xs opacity-50 text-navy'">Importe mínimo</span>
-                  <span [class]="plan.highlighted ? 'text-sm font-medium text-ivory' : 'text-sm font-medium text-navy'">{{ plan.minAmount }}</span>
+                  <span [class]="plan.highlighted ? 'text-xs text-frost/50' : 'text-xs opacity-50 text-navy'">Importe mínimo</span>
+                  <span [class]="plan.highlighted ? 'text-sm font-medium text-frost' : 'text-sm font-medium text-navy'">{{ plan.minAmount }}</span>
                 </div>
               </div>
               <ul class="space-y-2.5 mb-6 flex-1">
                 @for (feat of plan.features; track feat) {
                   <li class="flex items-start gap-2 text-sm">
-                    <svg class="w-4 h-4 shrink-0 mt-0.5 text-gold" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-4 h-4 shrink-0 mt-0.5 text-azure" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
-                    <span [class]="plan.highlighted ? 'opacity-80 text-ivory' : 'opacity-70 text-navy'">{{ feat }}</span>
+                    <span [class]="plan.highlighted ? 'opacity-80 text-frost' : 'opacity-70 text-navy'">{{ feat }}</span>
                   </li>
                 }
               </ul>
-              <a routerLink="/vehiculos" [class]="plan.highlighted ? 'block text-center py-3 px-6 rounded-lg font-semibold text-sm bg-gold text-navy hover:bg-gold-dark transition-colors' : 'block text-center py-3 px-6 rounded-lg font-semibold text-sm bg-navy text-ivory hover:bg-navy-light transition-colors'">
+              <a routerLink="/vehiculos" [class]="plan.highlighted ? 'block text-center py-3 px-6 rounded-lg font-semibold text-sm bg-azure text-navy hover:bg-azure-dark transition-colors' : 'block text-center py-3 px-6 rounded-lg font-semibold text-sm bg-navy text-frost hover:bg-navy-light transition-colors'">
                 Solicitar financiación
               </a>
             </div>
@@ -111,8 +111,8 @@ interface FinancingPlan {
         <!-- ── Calculator ──────────────────────────────────────────────── -->
         <div id="calculadora" class="bg-white rounded-2xl shadow-card overflow-hidden mb-16">
           <div class="bg-navy px-8 py-6">
-            <h2 class="font-heading text-xl font-bold text-ivory">Calculadora de cuota mensual</h2>
-            <p class="text-sm mt-1" style="color:rgba(248,246,240,0.6)">Simulación orientativa. La cuota real puede variar según tu perfil crediticio.</p>
+            <h2 class="font-heading text-xl font-bold text-frost">Calculadora de cuota mensual</h2>
+            <p class="text-sm mt-1" style="color:rgba(244,248,251,0.6)">Simulación orientativa. La cuota real puede variar según tu perfil crediticio.</p>
           </div>
           <div class="p-8">
             <div class="grid lg:grid-cols-2 gap-10 items-start">
@@ -120,45 +120,45 @@ interface FinancingPlan {
               <div class="space-y-6">
                 <div>
                   <label class="block text-sm font-semibold text-navy mb-2">
-                    Precio del vehículo: <span class="text-gold">{{ vehiclePrice() | number:'1.0-0' }}€</span>
+                    Precio del vehículo: <span class="text-azure">{{ vehiclePrice() | number:'1.0-0' }}€</span>
                   </label>
                   <input type="range" [min]="5000" [max]="200000" [step]="1000"
                     [(ngModel)]="vehiclePriceVal"
-                    class="w-full h-2 bg-navy/10 rounded-full appearance-none cursor-pointer accent-gold">
-                  <div class="flex justify-between text-xs mt-1" style="color:rgba(11,31,58,0.4)">
+                    class="w-full h-2 bg-navy/10 rounded-full appearance-none cursor-pointer accent-azure">
+                  <div class="flex justify-between text-xs mt-1" style="color:rgba(10,46,77,0.4)">
                     <span>5.000€</span><span>200.000€</span>
                   </div>
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-navy mb-2">
-                    Entrada: <span class="text-gold">{{ downPayment() | number:'1.0-0' }}€ ({{ downPaymentPct() }}%)</span>
+                    Entrada: <span class="text-azure">{{ downPayment() | number:'1.0-0' }}€ ({{ downPaymentPct() }}%)</span>
                   </label>
                   <input type="range" [min]="0" [max]="50" [step]="5"
                     [(ngModel)]="downPaymentPctVal"
-                    class="w-full h-2 bg-navy/10 rounded-full appearance-none cursor-pointer accent-gold">
-                  <div class="flex justify-between text-xs mt-1" style="color:rgba(11,31,58,0.4)">
+                    class="w-full h-2 bg-navy/10 rounded-full appearance-none cursor-pointer accent-azure">
+                  <div class="flex justify-between text-xs mt-1" style="color:rgba(10,46,77,0.4)">
                     <span>Sin entrada</span><span>50%</span>
                   </div>
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-navy mb-2">
-                    Plazo: <span class="text-gold">{{ termMonths() }} meses</span>
+                    Plazo: <span class="text-azure">{{ termMonths() }} meses</span>
                   </label>
                   <input type="range" [min]="12" [max]="84" [step]="12"
                     [(ngModel)]="termMonthsVal"
-                    class="w-full h-2 bg-navy/10 rounded-full appearance-none cursor-pointer accent-gold">
-                  <div class="flex justify-between text-xs mt-1" style="color:rgba(11,31,58,0.4)">
+                    class="w-full h-2 bg-navy/10 rounded-full appearance-none cursor-pointer accent-azure">
+                  <div class="flex justify-between text-xs mt-1" style="color:rgba(10,46,77,0.4)">
                     <span>12 meses</span><span>84 meses</span>
                   </div>
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-navy mb-2">
-                    TIN: <span class="text-gold">{{ tinPct() }}%</span>
+                    TIN: <span class="text-azure">{{ tinPct() }}%</span>
                   </label>
                   <input type="range" [min]="3" [max]="12" [step]="0.5"
                     [(ngModel)]="tinPctVal"
-                    class="w-full h-2 bg-navy/10 rounded-full appearance-none cursor-pointer accent-gold">
-                  <div class="flex justify-between text-xs mt-1" style="color:rgba(11,31,58,0.4)">
+                    class="w-full h-2 bg-navy/10 rounded-full appearance-none cursor-pointer accent-azure">
+                  <div class="flex justify-between text-xs mt-1" style="color:rgba(10,46,77,0.4)">
                     <span>3%</span><span>12%</span>
                   </div>
                 </div>
@@ -166,23 +166,23 @@ interface FinancingPlan {
 
               <!-- Result -->
               <div class="bg-navy rounded-2xl p-8 text-center">
-                <p class="text-sm mb-2" style="color:rgba(248,246,240,0.6)">Cuota mensual estimada</p>
-                <p class="font-heading text-5xl font-bold text-gold mb-1">{{ monthlyPayment() | number:'1.0-0' }}<span class="text-2xl">€</span></p>
-                <p class="text-xs mb-8" style="color:rgba(248,246,240,0.4)">/mes durante {{ termMonths() }} meses</p>
+                <p class="text-sm mb-2" style="color:rgba(244,248,251,0.6)">Cuota mensual estimada</p>
+                <p class="font-heading text-5xl font-bold text-azure mb-1">{{ monthlyPayment() | number:'1.0-0' }}<span class="text-2xl">€</span></p>
+                <p class="text-xs mb-8" style="color:rgba(244,248,251,0.4)">/mes durante {{ termMonths() }} meses</p>
 
                 <div class="space-y-3 text-left mb-8">
                   @for (row of calcSummary(); track row.label) {
                     <div class="flex justify-between items-center py-2" style="border-bottom:1px solid rgba(255,255,255,0.07)">
-                      <span class="text-xs" style="color:rgba(248,246,240,0.5)">{{ row.label }}</span>
-                      <span class="text-sm font-medium text-ivory">{{ row.value }}</span>
+                      <span class="text-xs" style="color:rgba(244,248,251,0.5)">{{ row.label }}</span>
+                      <span class="text-sm font-medium text-frost">{{ row.value }}</span>
                     </div>
                   }
                 </div>
 
-                <a routerLink="/vehiculos" class="btn-gold w-full text-center py-3 px-6 block">
+                <a routerLink="/vehiculos" class="btn-azure w-full text-center py-3 px-6 block">
                   Buscar vehículo a financiar
                 </a>
-                <p class="text-xs mt-3" style="color:rgba(248,246,240,0.3)">
+                <p class="text-xs mt-3" style="color:rgba(244,248,251,0.3)">
                   Simulación sin carácter contractual. Sujeta a aprobación crediticia.
                 </p>
               </div>
@@ -197,14 +197,14 @@ interface FinancingPlan {
             <ul class="space-y-4">
               @for (req of reqsParticular; track req.label) {
                 <li class="flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="w-8 h-8 rounded-full bg-azure/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-azure" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="req.icon"/>
                     </svg>
                   </div>
                   <div>
                     <p class="font-semibold text-navy text-sm">{{ req.label }}</p>
-                    <p class="text-xs mt-0.5" style="color:rgba(11,31,58,0.55)">{{ req.desc }}</p>
+                    <p class="text-xs mt-0.5" style="color:rgba(10,46,77,0.55)">{{ req.desc }}</p>
                   </div>
                 </li>
               }
@@ -215,14 +215,14 @@ interface FinancingPlan {
             <ul class="space-y-4">
               @for (req of reqsEmpresa; track req.label) {
                 <li class="flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="w-8 h-8 rounded-full bg-azure/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-azure" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="req.icon"/>
                     </svg>
                   </div>
                   <div>
                     <p class="font-semibold text-navy text-sm">{{ req.label }}</p>
-                    <p class="text-xs mt-0.5" style="color:rgba(11,31,58,0.55)">{{ req.desc }}</p>
+                    <p class="text-xs mt-0.5" style="color:rgba(10,46,77,0.55)">{{ req.desc }}</p>
                   </div>
                 </li>
               }
@@ -232,15 +232,15 @@ interface FinancingPlan {
 
         <!-- ── Process ─────────────────────────────────────────────────── -->
         <div class="bg-navy rounded-2xl p-8 lg:p-12 mb-16">
-          <h2 class="font-heading text-2xl font-bold text-ivory mb-10 text-center">Proceso de solicitud</h2>
+          <h2 class="font-heading text-2xl font-bold text-frost mb-10 text-center">Proceso de solicitud</h2>
           <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             @for (step of steps; track step.num) {
               <div class="text-center">
-                <div class="w-12 h-12 rounded-full bg-gold flex items-center justify-center text-navy font-bold font-heading text-lg mx-auto mb-4">
+                <div class="w-12 h-12 rounded-full bg-azure flex items-center justify-center text-navy font-bold font-heading text-lg mx-auto mb-4">
                   {{ step.num }}
                 </div>
-                <h3 class="font-semibold text-ivory text-sm mb-2">{{ step.title }}</h3>
-                <p class="text-xs leading-relaxed" style="color:rgba(248,246,240,0.5)">{{ step.desc }}</p>
+                <h3 class="font-semibold text-frost text-sm mb-2">{{ step.title }}</h3>
+                <p class="text-xs leading-relaxed" style="color:rgba(244,248,251,0.5)">{{ step.desc }}</p>
               </div>
             }
           </div>
@@ -248,7 +248,7 @@ interface FinancingPlan {
 
         <!-- ── Partners ────────────────────────────────────────────────── -->
         <div class="text-center mb-16">
-          <p class="text-sm font-semibold uppercase tracking-widest mb-6" style="color:rgba(11,31,58,0.4)">Trabajamos con las principales entidades financieras</p>
+          <p class="text-sm font-semibold uppercase tracking-widest mb-6" style="color:rgba(10,46,77,0.4)">Trabajamos con las principales entidades financieras</p>
           <div class="flex flex-wrap justify-center gap-6">
             @for (bank of banks; track bank) {
               <div class="bg-white rounded-xl px-6 py-4 shadow-card text-navy/50 font-semibold text-sm">{{ bank }}</div>
@@ -259,7 +259,7 @@ interface FinancingPlan {
         <!-- ── CTA ─────────────────────────────────────────────────────── -->
         <div class="text-center">
           <h2 class="font-heading text-2xl font-bold text-navy mb-3">¿Tienes alguna duda?</h2>
-          <p class="mb-6" style="color:rgba(11,31,58,0.6)">Nuestros asesores financieros resuelven todas tus preguntas sin compromiso</p>
+          <p class="mb-6" style="color:rgba(10,46,77,0.6)">Nuestros asesores financieros resuelven todas tus preguntas sin compromiso</p>
           <div class="flex flex-wrap gap-3 justify-center">
             <a routerLink="/vehiculos" class="btn-primary py-3 px-8">Buscar vehículo</a>
             <a routerLink="/tramitacion" class="btn-outline py-3 px-8">Tramitación documental</a>
@@ -314,7 +314,7 @@ export class FinancingPageComponent {
   planCardClass(plan: FinancingPlan): string {
     const base = 'rounded-2xl p-7 flex flex-col';
     return plan.highlighted
-      ? `${base} bg-navy ring-2 ring-gold shadow-navy`
+      ? `${base} bg-navy ring-2 ring-azure shadow-navy`
       : `${base} bg-white shadow-card`;
   }
 

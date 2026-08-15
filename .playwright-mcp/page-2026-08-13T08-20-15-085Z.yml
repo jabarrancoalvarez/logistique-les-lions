@@ -1,0 +1,91 @@
+- generic [ref=f6e3]:
+  - navigation "Navegación principal" [ref=f6e5]:
+    - generic [ref=f6e7]:
+      - link [ref=f6e8] [cursor=pointer]:
+        - /url: /
+        - img "Yoon U Auto — Services Automobiles" [ref=f6e10]
+      - button "Abrir menú" [ref=f6e11] [cursor=pointer]
+  - main
+  - contentinfo [ref=f6e16]:
+    - generic [ref=f6e18]:
+      - generic [ref=f6e19]:
+        - generic [ref=f6e20]:
+          - link [ref=f6e21] [cursor=pointer]:
+            - /url: /
+            - img "Yoon U Auto — Services Automobiles" [ref=f6e22]
+          - paragraph [ref=f6e23]: Plataforma líder en compraventa internacional de vehículos con gestión completa de documentación transfronteriza, aduanas y homologaciones.
+          - generic [ref=f6e24]:
+            - link "LinkedIn" [ref=f6e25] [cursor=pointer]:
+              - /url: https://linkedin.com
+            - link "X (Twitter)" [ref=f6e28] [cursor=pointer]:
+              - /url: https://x.com
+            - link "Instagram" [ref=f6e31] [cursor=pointer]:
+              - /url: https://instagram.com
+        - generic [ref=f6e34]:
+          - heading "Plataforma" [level=3] [ref=f6e35]
+          - list [ref=f6e36]:
+            - listitem [ref=f6e37]:
+              - link "Buscar vehículos" [ref=f6e38] [cursor=pointer]:
+                - /url: /vehiculos
+            - listitem [ref=f6e39]:
+              - link "Publicar anuncio" [ref=f6e40] [cursor=pointer]:
+                - /url: /vehiculos/nuevo
+            - listitem [ref=f6e41]:
+              - link "Precios de mercado" [ref=f6e42] [cursor=pointer]:
+                - /url: /precios
+            - listitem [ref=f6e43]:
+              - link "Calculadora de costes" [ref=f6e44] [cursor=pointer]:
+                - /url: /calculadora
+            - listitem [ref=f6e45]:
+              - link "Inspectores certificados" [ref=f6e46] [cursor=pointer]:
+                - /url: /inspectores
+        - generic [ref=f6e47]:
+          - heading "Servicios" [level=3] [ref=f6e48]
+          - list [ref=f6e49]:
+            - listitem [ref=f6e50]:
+              - link "Tramitación documental" [ref=f6e51] [cursor=pointer]:
+                - /url: /tramitacion
+            - listitem [ref=f6e52]:
+              - link "Guía de importación" [ref=f6e53] [cursor=pointer]:
+                - /url: /guias/importacion
+            - listitem [ref=f6e54]:
+              - link "Guía de exportación" [ref=f6e55] [cursor=pointer]:
+                - /url: /guias/exportacion
+            - listitem [ref=f6e56]:
+              - link "Homologaciones UE" [ref=f6e57] [cursor=pointer]:
+                - /url: /guias/homologacion
+            - listitem [ref=f6e58]:
+              - link "Transporte internacional" [ref=f6e59] [cursor=pointer]:
+                - /url: /logistica
+            - listitem [ref=f6e60]:
+              - link "Financiación" [ref=f6e61] [cursor=pointer]:
+                - /url: /financiacion
+        - generic [ref=f6e62]:
+          - heading "Legal" [level=3] [ref=f6e63]
+          - list [ref=f6e64]:
+            - listitem [ref=f6e65]:
+              - link "Aviso legal" [ref=f6e66] [cursor=pointer]:
+                - /url: /legal/aviso-legal
+            - listitem [ref=f6e67]:
+              - link "Política de privacidad" [ref=f6e68] [cursor=pointer]:
+                - /url: /legal/privacidad
+            - listitem [ref=f6e69]:
+              - link "Política de cookies" [ref=f6e70] [cursor=pointer]:
+                - /url: /legal/cookies
+            - listitem [ref=f6e71]:
+              - link "Términos y condiciones" [ref=f6e72] [cursor=pointer]:
+                - /url: /legal/terminos
+            - listitem [ref=f6e73]:
+              - link "Protección de datos" [ref=f6e74] [cursor=pointer]:
+                - /url: /legal/rgpd
+          - generic [ref=f6e75]: Conforme al RGPD
+      - generic [ref=f6e79]:
+        - heading "Recibe alertas de vehículos importados" [level=3] [ref=f6e80]
+        - paragraph [ref=f6e81]: Nuevos anuncios, guías de tramitación y ofertas exclusivas.
+        - generic [ref=f6e82]:
+          - textbox "Email para newsletter" [ref=f6e83]:
+            - /placeholder: tu@email.com
+          - button "Suscribirme" [ref=f6e84] [cursor=pointer]
+    - generic [ref=f6e86]:
+      - paragraph [ref=f6e87]: © 2026 Yoon U Auto. Todos los derechos reservados.
+      - generic [ref=f6e88]: España · Francia · Alemania · Marruecos · +8 países

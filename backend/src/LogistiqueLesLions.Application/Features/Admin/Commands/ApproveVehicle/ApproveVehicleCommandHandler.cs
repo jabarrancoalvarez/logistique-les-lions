@@ -18,7 +18,7 @@ public class ApproveVehicleCommandHandler(IApplicationDbContext db)
         if (vehicle is null)
             return Result<Unit>.Failure("Vehicle.NotFound");
 
-        vehicle.Status = VehicleStatus.Active;
+        vehicle.Status = VehicleStatus.Actif;
         await db.SaveChangesAsync(ct);
         return Result<Unit>.Success(Unit.Value);
     }

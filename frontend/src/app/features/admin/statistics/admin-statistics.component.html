@@ -1,0 +1,326 @@
+<section class="p-6 lg:p-8">
+
+  <header class="flex flex-wrap items-start justify-between gap-4 mb-6">
+    <div>
+      <h1 class="font-heading text-2xl font-bold text-navy">Statistiques</h1>
+      <p class="text-sm text-navy/60 mt-1">
+        Ce que les gens cherchent, ce qui est publié, et où la vente s'arrête.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-1" role="group" aria-label="Période">
+      @for (p of periods; track p.days) {
+        <button type="button" (click)="changePeriod(p.days)"
+          class="px-3 py-1.5 text-sm rounded-lg border transition-colors"
+          [class]="days === p.days
+            ? 'bg-navy text-white border-navy'
+            : 'bg-white text-navy border-navy/15 hover:border-navy/40'">
+          {{ p.label }}
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 mb-4" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="text-sm text-navy/50 py-10">Chargement…</p>
+  }
+
+  @if (stats(); as s) {
+
+    <!-- ─── Utilisateurs ────────────────────────────────────────────────── -->
+    <h2 class="font-heading font-semibold text-navy mb-3">Utilisateurs</h2>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Comptes</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ s.users.total }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Nouveaux sur la période</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ s.users.newInPeriod }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Actifs</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ s.users.active }}</p>
+        <p class="text-xs text-navy/40 mt-0.5">Connectés au moins une fois</p>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Particuliers / Professionnels</p>
+        <p class="font-heading text-2xl font-bold text-navy">
+          {{ s.users.particuliers }} <span class="text-navy/30">/</span> {{ s.users.professionnels }}
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-navy/10 p-5 mb-8">
+      <h3 class="text-sm font-medium text-navy mb-3">Répartition géographique</h3>
+      @if (s.users.byRegion.length === 0) {
+        <p class="text-sm text-navy/50">Personne n'a encore renseigné sa région.</p>
+      } @else {
+        <ul class="space-y-2" role="list">
+          @for (r of s.users.byRegion; track r.label) {
+            <li>
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-navy">{{ regionName(r.label) }}</span>
+                <span class="text-navy/60 tabular-nums">{{ r.count }}</span>
+              </div>
+              <div class="h-1.5 bg-frost-dark rounded-full mt-1 overflow-hidden">
+                <div class="h-full bg-azure-dark rounded-full"
+                  [style.width]="barWidth(s.users.byRegion, r.count)"></div>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <!-- ─── Offre ───────────────────────────────────────────────────────── -->
+    <h2 class="font-heading font-semibold text-navy mb-3">Offre</h2>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Annonces actives</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ s.supply.activeListings }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Publiées sur la période</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ s.supply.publishedInPeriod }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Prix médian</p>
+        <p class="font-heading text-xl font-bold text-navy">
+          {{ s.supply.medianPrice !== null ? (s.supply.medianPrice | fcfa) : '—' }}
+        </p>
+        <p class="text-xs text-navy/40 mt-0.5">
+          Moyenne&nbsp;:
+          {{ s.supply.averagePrice !== null ? (s.supply.averagePrice | fcfa) : '—' }}
+        </p>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Kilométrage / année médians</p>
+        <p class="font-heading text-xl font-bold text-navy">
+          {{ s.supply.medianMileage !== null ? (s.supply.medianMileage | number:'1.0-0') + ' km' : '—' }}
+        </p>
+        <p class="text-xs text-navy/40 mt-0.5">{{ s.supply.medianYear ?? '—' }}</p>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-3 mb-4">
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h3 class="text-sm font-medium text-navy mb-3">Marques les plus publiées</h3>
+        <ul class="space-y-2" role="list">
+          @for (m of s.supply.topMakes; track m.label) {
+            <li class="flex items-center justify-between text-sm">
+              <span class="text-navy">{{ m.label }}</span>
+              <span class="text-navy/60 tabular-nums">{{ m.count }}</span>
+            </li>
+          } @empty {
+            <li class="text-sm text-navy/50">Aucune annonce.</li>
+          }
+        </ul>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h3 class="text-sm font-medium text-navy mb-3">Modèles les plus publiés</h3>
+        <ul class="space-y-2" role="list">
+          @for (m of s.supply.topModels; track m.label) {
+            <li class="flex items-center justify-between text-sm">
+              <span class="text-navy">{{ m.label }}</span>
+              <span class="text-navy/60 tabular-nums">{{ m.count }}</span>
+            </li>
+          } @empty {
+            <li class="text-sm text-navy/50">Aucune annonce.</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-3 mb-8">
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h3 class="text-sm font-medium text-navy mb-3">Villes</h3>
+        <ul class="space-y-1.5" role="list">
+          @for (c of s.supply.byCity; track c.label) {
+            <li class="flex items-center justify-between text-sm">
+              <span class="text-navy">{{ c.label }}</span>
+              <span class="text-navy/60 tabular-nums">{{ c.count }}</span>
+            </li>
+          } @empty {
+            <li class="text-sm text-navy/50">—</li>
+          }
+        </ul>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h3 class="text-sm font-medium text-navy mb-3">Carburant</h3>
+        <ul class="space-y-1.5" role="list">
+          @for (f of s.supply.byFuel; track f.label) {
+            <li class="flex items-center justify-between text-sm">
+              <span class="text-navy">{{ f.label }}</span>
+              <span class="text-navy/60 tabular-nums">{{ f.count }}</span>
+            </li>
+          } @empty {
+            <li class="text-sm text-navy/50">—</li>
+          }
+        </ul>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h3 class="text-sm font-medium text-navy mb-3">Statut douanier</h3>
+        <ul class="space-y-1.5" role="list">
+          @for (d of s.supply.byCustomsStatus; track d.label) {
+            <li class="flex items-center justify-between text-sm">
+              <span class="text-navy">{{ d.label }}</span>
+              <span class="text-navy/60 tabular-nums">{{ d.count }}</span>
+            </li>
+          } @empty {
+            <li class="text-sm text-navy/50">—</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- ─── Demande ─────────────────────────────────────────────────────── -->
+    <h2 class="font-heading font-semibold text-navy mb-3">Demande</h2>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Recherches enregistrées</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ s.demand.savedSearches }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Favoris</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ s.demand.favoritesTotal }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Demandes «&nbsp;Trouvez-moi&nbsp;»</p>
+        <p class="font-heading text-2xl font-bold text-navy">{{ s.demand.requests }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        <p class="text-xs text-navy/50">Budget médian recherché</p>
+        <p class="font-heading text-xl font-bold text-navy">
+          {{ s.demand.medianSearchBudget !== null ? (s.demand.medianSearchBudget | fcfa) : '—' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- L'écart entre ce qu'on cherche et ce qu'il y a -->
+    <div class="bg-white rounded-xl border-2 border-azure-dark/30 p-5 mb-4">
+      <h3 class="font-heading font-semibold text-navy">
+        Ce qu'on cherche et qu'on ne trouve pas
+      </h3>
+      <p class="text-xs text-navy/50 mt-1 mb-4">
+        Modèles demandés par les utilisateurs, comparés aux annonces disponibles.
+      </p>
+
+      @if (s.demand.gaps.length === 0) {
+        <p class="text-sm text-navy/50">
+          Pas encore assez de recherches enregistrées pour en tirer quelque chose.
+        </p>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs text-navy/50 border-b border-navy/10">
+                <th scope="col" class="pb-2 font-medium">Modèle</th>
+                <th scope="col" class="pb-2 font-medium text-right">Personnes</th>
+                <th scope="col" class="pb-2 font-medium text-right">Demandes</th>
+                <th scope="col" class="pb-2 font-medium text-right">Annonces</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (g of s.demand.gaps; track g.label) {
+                <tr class="border-b border-navy/5 last:border-0">
+                  <td class="py-2 text-navy font-medium">{{ g.label }}</td>
+                  <td class="py-2 text-right tabular-nums text-navy/70">{{ g.searchingUsers }}</td>
+                  <td class="py-2 text-right tabular-nums text-navy/70">{{ g.requests }}</td>
+                  <td class="py-2 text-right tabular-nums"
+                    [class]="g.availableListings === 0 ? 'text-red-600 font-semibold' : 'text-navy/70'">
+                    {{ g.availableListings }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-3 mb-8">
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h3 class="text-sm font-medium text-navy mb-3">Marques les plus cherchées</h3>
+        <ul class="space-y-1.5" role="list">
+          @for (m of s.demand.topSearchedMakes; track m.label) {
+            <li class="flex items-center justify-between text-sm">
+              <span class="text-navy">{{ m.label }}</span>
+              <span class="text-navy/60 tabular-nums">{{ m.count }}</span>
+            </li>
+          } @empty {
+            <li class="text-sm text-navy/50">—</li>
+          }
+        </ul>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h3 class="text-sm font-medium text-navy mb-3">Modèles les plus mis en favori</h3>
+        <ul class="space-y-1.5" role="list">
+          @for (m of s.demand.topFavoritedModels; track m.label) {
+            <li class="flex items-center justify-between text-sm">
+              <span class="text-navy">{{ m.label }}</span>
+              <span class="text-navy/60 tabular-nums">{{ m.count }}</span>
+            </li>
+          } @empty {
+            <li class="text-sm text-navy/50">—</li>
+          }
+        </ul>
+      </div>
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h3 class="text-sm font-medium text-navy mb-3">Filtres les plus utilisés</h3>
+        <ul class="space-y-1.5" role="list">
+          @for (f of s.demand.topUsedFilters; track f.label) {
+            <li class="flex items-center justify-between text-sm">
+              <span class="text-navy">{{ f.label }}</span>
+              <span class="text-navy/60 tabular-nums">{{ f.count }}</span>
+            </li>
+          } @empty {
+            <li class="text-sm text-navy/50">—</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- ─── Conversion ──────────────────────────────────────────────────── -->
+    <h2 class="font-heading font-semibold text-navy mb-1">Conversion</h2>
+    <p class="text-xs text-navy/50 mb-3">
+      Les vues sont cumulées depuis toujours&nbsp;; les autres étapes portent sur la période.
+    </p>
+
+    <div class="bg-white rounded-xl border border-navy/10 p-5 mb-8">
+      <ul class="space-y-3" role="list">
+        @for (step of funnelSteps(); track step.label) {
+          <li>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-navy">{{ step.label }}</span>
+              <span class="tabular-nums">
+                <span class="text-navy font-medium">{{ step.value }}</span>
+                @if (step.from !== null) {
+                  <span class="text-navy/40 text-xs ml-2">{{ rate(step.from, step.value) }}</span>
+                }
+              </span>
+            </div>
+            <div class="h-2 bg-frost-dark rounded-full mt-1 overflow-hidden">
+              <div class="h-full bg-navy rounded-full"
+                [style.width]="s.funnel.views > 0
+                  ? (step.value / s.funnel.views * 100) + '%'
+                  : '0%'"></div>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <p class="text-xs text-navy/40">
+      Les véhicules les plus comparés ne sont pas mesurés&nbsp;: le comparateur reste
+      dans le navigateur de chaque personne.
+    </p>
+  }
+</section>

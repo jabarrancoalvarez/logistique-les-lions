@@ -47,3 +47,5 @@ logs/
 
 # ─── Uploads locales ───────────────────────────────────────────────────────
 uploads/
+# Documentación privada de Mon Garage: fuera del directorio servido estáticamente.
+private-uploads/

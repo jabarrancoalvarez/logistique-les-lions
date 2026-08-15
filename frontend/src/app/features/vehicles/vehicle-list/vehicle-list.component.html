@@ -1,13 +1,14 @@
-<div class="min-h-screen bg-ivory/50">
+<div class="min-h-screen bg-frost/50">
   <!-- Header -->
   <div class="bg-navy text-white py-10">
     <div class="container mx-auto px-4 lg:px-6">
-      <h1 class="font-heading text-3xl lg:text-4xl font-bold">Vehículos de importación</h1>
+      <h1 class="font-heading text-3xl lg:text-4xl font-bold">Véhicules d'occasion au Sénégal</h1>
       <p class="mt-2 text-white/70">
-        @if (!isLoading() && totalCount() > 0) {
-          {{ totalCount() | number }} vehículos disponibles
-        } @else if (isLoading()) {
-          Buscando vehículos...
+        @if (isLoading()) {
+          Recherche en cours…
+        } @else {
+          {{ totalCount() | number:'1.0-0' }}
+          {{ totalCount() === 1 ? 'véhicule disponible' : 'véhicules disponibles' }}
         }
       </p>
     </div>
@@ -16,14 +17,14 @@
   <div class="container mx-auto px-4 lg:px-6 py-8">
     <div class="flex flex-col lg:flex-row gap-8">
 
-      <!-- Sidebar filtros (desktop) / Panel mobile -->
+      <!-- Filtres -->
       <aside class="lg:w-72 flex-shrink-0">
         <button
           (click)="toggleFilters()"
           class="lg:hidden btn-outline w-full mb-4 flex items-center justify-between"
         >
-          <span>Filtros</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span>Filtres</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               [attr.d]="showFilters() ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'"/>
           </svg>
@@ -37,76 +38,78 @@
         </div>
       </aside>
 
-      <!-- Contenido principal -->
+      <!-- Résultats -->
       <main class="flex-1 min-w-0">
 
-        <!-- Barra de ordenación -->
-        <div class="flex items-center justify-between mb-6">
-          <p class="text-navy/60 text-sm">
+        <!-- Compteur et tri -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <p class="text-navy/70 text-sm">
             @if (!isLoading()) {
-              Mostrando {{ vehicles().length }} de {{ totalCount() | number }}
+              <span class="font-semibold text-navy">{{ totalCount() | number:'1.0-0' }}</span>
+              {{ totalCount() === 1 ? 'résultat' : 'résultats' }}
             }
           </p>
-          <select
-            class="input w-auto text-sm"
-            [value]="sortValue"
-            (change)="onSortChange($any($event.target).value)"
-          >
-            @for (opt of sortOptions; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
-            }
-          </select>
+          <label class="flex items-center gap-2 text-sm text-navy/60">
+            <span class="hidden sm:inline">Trier par</span>
+            <select
+              class="input w-auto text-sm"
+              [value]="sortValue"
+              (change)="onSortChange($any($event.target).value)"
+              aria-label="Trier les résultats"
+            >
+              @for (opt of sortOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </label>
         </div>
 
-        <!-- Estado de carga -->
+        <!-- Chargement -->
         @if (isLoading()) {
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             @for (i of [1,2,3,4,5,6]; track i) {
-              <div class="card skeleton h-72"></div>
+              <div class="card skeleton h-80"></div>
             }
           </div>
         }
 
-        <!-- Error -->
+        <!-- Erreur -->
         @if (error()) {
           <div class="text-center py-16">
             <p class="text-red-600 mb-4">{{ error() }}</p>
-            <button (click)="loadVehicles()" class="btn-primary">Reintentar</button>
+            <button (click)="loadVehicles()" class="btn-primary">Réessayer</button>
           </div>
         }
 
-        <!-- Sin resultados -->
+        <!-- Aucun résultat -->
         @if (isEmpty()) {
           <div class="text-center py-16">
-            <svg class="w-16 h-16 mx-auto text-navy/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-16 h-16 mx-auto text-navy/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <h3 class="font-heading text-xl text-navy mb-2">No encontramos vehículos</h3>
-            <p class="text-navy/60">Prueba con otros filtros de búsqueda.</p>
+            <h2 class="font-heading text-xl text-navy mb-2">Aucun véhicule ne correspond</h2>
+            <p class="text-navy/60">Essayez d'élargir vos critères de recherche.</p>
           </div>
         }
 
-        <!-- Grid de vehículos -->
+        <!-- Grille -->
         @if (!isLoading() && hasResults()) {
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             @for (vehicle of vehicles(); track vehicle.id) {
-              <lll-vehicle-card
-                [vehicle]="vehicle"
-                [routerLink]="['/vehiculos', vehicle.slug]"
-              />
+              <lll-vehicle-card [vehicle]="vehicle" />
             }
           </div>
 
-          <!-- Paginación -->
+          <!-- Pagination -->
           @if (totalPages() > 1) {
-            <nav class="mt-10 flex items-center justify-center gap-2" aria-label="Paginación">
+            <nav class="mt-10 flex items-center justify-center gap-2" aria-label="Pagination">
               <button
                 (click)="goToPage(currentPage() - 1)"
                 [disabled]="currentPage() === 1"
                 class="btn-outline py-2 px-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                ← Anterior
+                ← Précédent
               </button>
 
               @for (p of pageRange; track p) {
@@ -116,6 +119,7 @@
                   [class.text-white]="p === currentPage()"
                   [class.btn-outline]="p !== currentPage()"
                   class="py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+                  [attr.aria-current]="p === currentPage() ? 'page' : null"
                 >
                   {{ p }}
                 </button>
@@ -126,7 +130,7 @@
                 [disabled]="currentPage() === totalPages()"
                 class="btn-outline py-2 px-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Siguiente →
+                Suivant →
               </button>
             </nav>
           }
@@ -134,4 +138,20 @@
       </main>
     </div>
   </div>
+
+  <!-- Barre flottante du comparateur -->
+  @if (comparator.count() > 0) {
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 bg-navy text-frost px-4 py-3 rounded-full shadow-navy">
+      <span class="text-sm font-medium">{{ comparator.label() }}</span>
+      <a routerLink="/comparateur" class="text-sm font-semibold text-azure-light hover:underline">
+        Comparer
+      </a>
+      <button type="button" (click)="comparator.clear()"
+        class="text-frost/60 hover:text-frost transition-colors" aria-label="Vider le comparateur">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  }
 </div>

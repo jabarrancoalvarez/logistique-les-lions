@@ -16,14 +16,23 @@ public class UpdateProfileCommandHandler(IApplicationDbContext db)
         if (user is null)
             return Result<Unit>.Failure("User.NotFound");
 
-        user.FirstName   = request.FirstName.Trim();
-        user.LastName    = request.LastName.Trim();
-        user.Phone       = request.Phone;
-        user.CountryCode = request.CountryCode;
-        user.City        = request.City;
-        user.CompanyName = request.CompanyName;
-        user.CompanyVat  = request.CompanyVat;
-        user.Bio         = request.Bio;
+        var email = string.IsNullOrWhiteSpace(request.Email)
+            ? null
+            : request.Email.Trim().ToLowerInvariant();
+
+        if (email is not null && email != user.Email
+            && await db.UserProfiles.AnyAsync(u => u.Email == email && u.Id != user.Id, ct))
+            return Result<Unit>.Failure("Auth.EmailAlreadyExists");
+
+        user.DisplayName          = request.DisplayName.Trim();
+        user.AccountType          = request.AccountType;
+        user.Region               = string.IsNullOrWhiteSpace(request.Region) ? null : request.Region.Trim();
+        user.City                 = string.IsNullOrWhiteSpace(request.City) ? null : request.City.Trim();
+        user.Email                = email;
+        user.Bio                  = request.Bio;
+        user.AllowWhatsAppContact = request.AllowWhatsAppContact;
+        user.LastActivityAt       = DateTimeOffset.UtcNow;
+
         if (request.AvatarUrl is not null)
             user.AvatarUrl = request.AvatarUrl;
 

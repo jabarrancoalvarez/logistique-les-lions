@@ -55,6 +55,8 @@ try
     builder.Services.AddSingleton<LogistiqueLesLions.API.Telemetry.BusinessMetrics>();
     builder.Services.AddScoped<LogistiqueLesLions.Application.Common.Interfaces.INotificationService,
                                LogistiqueLesLions.API.Hubs.SignalRNotificationService>();
+    builder.Services.AddScoped<LogistiqueLesLions.Application.Common.Interfaces.INotificationPusher,
+                               LogistiqueLesLions.API.Hubs.SignalRNotificationPusher>();
     builder.Services.AddScoped<LogistiqueLesLions.Infrastructure.Persistence.Seeding.DatabaseSeeder>();
 
     // ─── OpenTelemetry ──────────────────────────────────────────────────────────
@@ -184,22 +186,19 @@ try
         });
 
     // ─── Authorization policies ─────────────────────────────────────────────────
-    // Roles del dominio (UserRole enum): Buyer, Seller, Dealer, Admin, Moderator.
-    // Política composite: agrupar roles por capacidad para no hardcodear nombres
-    // de rol en cada endpoint.
+    // La especificación funcional define únicamente dos roles: User y Admin.
+    // Todas las funcionalidades de usuario son gratuitas y sin límites, por lo que
+    // publicar, comprar o negociar solo exige estar autenticado.
     builder.Services.AddAuthorization(options =>
     {
-        // Roles individuales
-        options.AddPolicy("AdminOnly",     p => p.RequireRole("Admin"));
-        options.AddPolicy("ModeratorOnly", p => p.RequireRole("Moderator"));
-        options.AddPolicy("DealerOnly",    p => p.RequireRole("Dealer"));
+        options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
 
         // Capacidades — usar éstas en endpoints en lugar de roles directos
-        options.AddPolicy("CanModerate",       p => p.RequireRole("Admin", "Moderator"));
-        options.AddPolicy("CanPublishVehicle", p => p.RequireRole("Admin", "Dealer", "Seller"));
+        options.AddPolicy("CanModerate",       p => p.RequireRole("Admin"));
         options.AddPolicy("CanManageUsers",    p => p.RequireRole("Admin"));
-        options.AddPolicy("CanViewAdminPanel", p => p.RequireRole("Admin", "Moderator"));
-        options.AddPolicy("CanBuyVehicle",     p => p.RequireRole("Admin", "Dealer", "Buyer"));
+        options.AddPolicy("CanViewAdminPanel", p => p.RequireRole("Admin"));
+        options.AddPolicy("CanPublishVehicle", p => p.RequireAuthenticatedUser());
+        options.AddPolicy("CanBuyVehicle",     p => p.RequireAuthenticatedUser());
     });
 
     // ─── Health checks ──────────────────────────────────────────────────────────
@@ -336,6 +335,26 @@ try
         .WithTags("Vehículos")
         .MapVehicleCrudEndpoints();
 
+    v1.MapGroup("/saved-searches")
+        .WithTags("Recherches enregistrées")
+        .MapSavedSearchEndpoints();
+
+    v1.MapGroup("/vehicle-requests")
+        .WithTags("Trouvez-moi une voiture")
+        .MapVehicleRequestEndpoints();
+
+    v1.MapGroup("/negotiations")
+        .WithTags("Mes négociations")
+        .MapNegotiationEndpoints();
+
+    v1.MapGroup("/listings")
+        .WithTags("Mes annonces")
+        .MapListingEndpoints();
+
+    v1.MapGroup("/garage")
+        .WithTags("Mon Garage")
+        .MapGarageEndpoints();
+
     v1.MapGroup("/compliance")
         .WithTags("Tramitación / Compliance")
         .MapComplianceEndpoints();
@@ -356,6 +375,10 @@ try
         .WithTags("Administración")
         .MapAdminEndpoints();
 
+    v1.MapGroup("/platform")
+        .WithTags("Plateforme")
+        .MapPlatformEndpoints();
+
     v1.MapGroup("/newsletter")
         .WithTags("Newsletter")
         .MapNewsletterEndpoints();
@@ -364,6 +387,11 @@ try
     v1.MapGroup("/public/tracking")
         .WithTags("Tracking público")
         .MapPublicTrackingEndpoints();
+
+    // Endpoint público sin autenticación — verificación del QR de un contrato
+    v1.MapGroup("/public/contracts")
+        .WithTags("Vérification de contrat")
+        .MapContractVerificationEndpoints();
 
     v1.MapGroup("/exports")
         .WithTags("Exportaciones")

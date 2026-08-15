@@ -1,0 +1,807 @@
+- generic [ref=e3]:
+  - navigation "Navegación principal" [ref=e5]:
+    - generic [ref=e7]:
+      - link "Logistique Les Lions" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img "Logistique Les Lions" [ref=e10]
+      - list [ref=e11]:
+        - listitem [ref=e12]:
+          - link "Vehículos" [ref=e13] [cursor=pointer]:
+            - /url: /vehiculos
+        - listitem [ref=e14]:
+          - link "Tramitación" [ref=e15] [cursor=pointer]:
+            - /url: /tramitacion
+        - listitem [ref=e16]:
+          - link "Cómo funciona" [ref=e17] [cursor=pointer]:
+            - /url: "#como-funciona"
+        - listitem [ref=e18]:
+          - link "Países" [ref=e19] [cursor=pointer]:
+            - /url: "#paises"
+        - listitem [ref=e20]:
+          - link "Concesionarios" [ref=e21] [cursor=pointer]:
+            - /url: /concesionarios
+      - generic [ref=e22]:
+        - button "Cambiar idioma" [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+          - text: ES
+          - img [ref=e27]
+        - link "Publicar vehículo" [ref=e140] [cursor=pointer]:
+          - /url: /vehiculos/nuevo
+        - link "Mensajes" [ref=e141] [cursor=pointer]:
+          - /url: /mensajes
+          - img [ref=e142]
+        - button "T" [ref=e145] [cursor=pointer]:
+          - generic [ref=e146]: T
+  - main [ref=e32]:
+    - generic [ref=e147]:
+      - region "Compraventa de vehículos inteligente" [ref=e149]:
+        - img [ref=e152]
+        - generic [ref=e157]:
+          - generic [ref=e158]: Más de 12 países · Documentación completa incluida
+          - heading "Compraventa de vehículos inteligente" [level=1] [ref=e160]:
+            - text: Compraventa de vehículos
+            - text: inteligente
+          - paragraph [ref=e161]: "Importa o exporta tu vehículo con toda la documentación gestionada: aduanas, homologaciones, aranceles y trámites legales en un solo lugar."
+          - search "Buscar vehículos" [ref=e162]:
+            - generic [ref=e163]:
+              - generic [ref=e164]:
+                - generic [ref=e165]: Marca
+                - combobox "Marca" [ref=e166]
+              - generic [ref=e167]:
+                - generic [ref=e168]: País de origen
+                - combobox "País de origen" [ref=e169]:
+                  - option "Todos los países" [selected]
+                  - option "🇪🇸 España"
+                  - option "🇩🇪 Alemania"
+                  - option "🇫🇷 Francia"
+                  - option "🇮🇹 Italia"
+                  - option "🇵🇹 Portugal"
+                  - option "🇳🇱 Países Bajos"
+                  - option "🇧🇪 Bélgica"
+                  - option "🇬🇧 Reino Unido"
+                  - option "🇺🇸 Estados Unidos"
+                  - option "🇲🇦 Marruecos"
+                  - option "🇯🇵 Japón"
+                  - option "🇨🇭 Suiza"
+              - generic [ref=e170]:
+                - generic [ref=e171]: País destino
+                - combobox "País destino" [ref=e172]:
+                  - option "¿Dónde importas?" [selected]
+                  - option "🇪🇸 España"
+                  - option "🇩🇪 Alemania"
+                  - option "🇫🇷 Francia"
+                  - option "🇮🇹 Italia"
+                  - option "🇵🇹 Portugal"
+                  - option "🇳🇱 Países Bajos"
+                  - option "🇧🇪 Bélgica"
+                  - option "🇬🇧 Reino Unido"
+                  - option "🇺🇸 Estados Unidos"
+                  - option "🇯🇵 Japón"
+                  - option "🇨🇭 Suiza"
+              - generic [ref=e173]:
+                - generic [ref=e174]: Precio desde (€)
+                - spinbutton "Precio desde (€)" [ref=e175]
+              - generic [ref=e176]:
+                - generic [ref=e177]: Precio hasta (€)
+                - spinbutton "Precio hasta (€)" [ref=e178]
+              - generic [ref=e179]:
+                - generic [ref=e180]: Estado
+                - combobox "Estado" [ref=e181]:
+                  - option "Todos" [selected]
+                  - option "Nuevo"
+                  - option "De ocasión"
+                  - option "Km 0"
+            - button "Buscar vehículos importados" [ref=e182] [cursor=pointer]:
+              - img [ref=e183]
+              - text: Buscar vehículos importados
+            - generic [ref=e185]:
+              - generic [ref=e186]: "Búsquedas populares:"
+              - button "BMW Alemania" [ref=e187] [cursor=pointer]
+              - button "Tesla eléctrico" [ref=e188] [cursor=pointer]
+              - button "SUV Francia" [ref=e189] [cursor=pointer]
+              - button "Japoneses importados" [ref=e190] [cursor=pointer]
+          - generic "Garantías de la plataforma" [ref=e191]:
+            - generic [ref=e192]:
+              - img [ref=e193]
+              - generic [ref=e195]: Documentación 100% gestionada
+            - generic [ref=e196]:
+              - img [ref=e197]
+              - generic [ref=e199]: Pago con escrow seguro
+            - generic [ref=e200]:
+              - img [ref=e201]
+              - generic [ref=e203]: +1.200 transacciones
+            - generic [ref=e204]:
+              - img [ref=e205]
+              - generic [ref=e207]: Soporte en 5 idiomas
+        - img [ref=e209]
+      - region "Estadísticas de la plataforma" [ref=e212]:
+        - img [ref=e214]
+        - generic [ref=e217]:
+          - img "0+ Vehículos activos" [ref=e218]:
+            - generic [ref=e219]: 🚗
+            - generic [ref=e220]: 0+
+            - generic [ref=e221]: Vehículos activos
+            - generic [ref=e222]: Anuncios verificados disponibles ahora
+          - img "0 Países operativos" [ref=e223]:
+            - generic [ref=e224]: 🌍
+            - generic [ref=e225]: "0"
+            - generic [ref=e226]: Países operativos
+            - generic [ref=e227]: Con documentación de importación/exportación
+          - img "0+ Transacciones completadas" [ref=e228]:
+            - generic [ref=e229]: ✅
+            - generic [ref=e230]: 0+
+            - generic [ref=e231]: Transacciones completadas
+            - generic [ref=e232]: Operaciones cerradas con éxito
+          - img "0+ Marcas disponibles" [ref=e233]:
+            - generic [ref=e234]: 🏷️
+            - generic [ref=e235]: 0+
+            - generic [ref=e236]: Marcas disponibles
+            - generic [ref=e237]: De los mejores fabricantes del mundo
+        - generic:
+          - img
+      - region "¿Qué tipo de vehículo buscas?" [ref=e238]:
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - generic [ref=e241]: Explorar por tipo
+            - heading "¿Qué tipo de vehículo buscas?" [level=2] [ref=e242]
+            - paragraph [ref=e243]: Desde berlinas de lujo hasta 4x4 de aventura — todos con documentación de importación incluida.
+          - generic [ref=e244]:
+            - link "Turismos 340+ anuncios" [ref=e245] [cursor=pointer]:
+              - /url: /vehiculos?bodyType=Sedan
+              - generic [ref=e246]: 🚗
+              - generic [ref=e247]: Turismos
+              - generic [ref=e248]: 340+ anuncios
+            - link "SUV / 4x4 280+ anuncios" [ref=e249] [cursor=pointer]:
+              - /url: /vehiculos?bodyType=SUV
+              - generic [ref=e250]: 🚙
+              - generic [ref=e251]: SUV / 4x4
+              - generic [ref=e252]: 280+ anuncios
+            - link "Furgonetas 95+ anuncios" [ref=e253] [cursor=pointer]:
+              - /url: /vehiculos?bodyType=Van
+              - generic [ref=e254]: 🚐
+              - generic [ref=e255]: Furgonetas
+              - generic [ref=e256]: 95+ anuncios
+            - link "Motos 120+ anuncios" [ref=e257] [cursor=pointer]:
+              - /url: /vehiculos?bodyType=Motorcycle
+              - generic [ref=e258]: 🏍️
+              - generic [ref=e259]: Motos
+              - generic [ref=e260]: 120+ anuncios
+            - link "Camiones 45+ anuncios" [ref=e261] [cursor=pointer]:
+              - /url: /vehiculos?bodyType=Truck
+              - generic [ref=e262]: 🚛
+              - generic [ref=e263]: Camiones
+              - generic [ref=e264]: 45+ anuncios
+            - link "Eléctricos 160+ anuncios" [ref=e265] [cursor=pointer]:
+              - /url: /vehiculos?bodyType=Electric
+              - generic [ref=e266]: ⚡
+              - generic [ref=e267]: Eléctricos
+              - generic [ref=e268]: 160+ anuncios
+      - region "Vehículos destacados" [ref=e270]:
+        - generic [ref=e271]:
+          - generic [ref=e272]:
+            - generic [ref=e273]:
+              - generic [ref=e274]: Selección destacada
+              - heading "Vehículos destacados" [level=2] [ref=e275]
+              - paragraph [ref=e276]: Seleccionados por calidad y documentación completa
+            - link "Ver todos los vehículos disponibles" [ref=e277] [cursor=pointer]:
+              - /url: /vehiculos
+              - text: Ver todos
+              - img [ref=e278]
+          - generic [ref=e280]:
+            - article [ref=e283] [cursor=pointer]:
+              - link "Tesla Model Y 2023, 49500 EUR" [ref=e284]:
+                - /url: /vehiculos/tesla-model-y-2023-12
+                - generic [ref=e285]:
+                  - img "Tesla Model Y 2023" [ref=e286]
+                  - generic [ref=e289]: Km 0
+                  - button "Añadir a favoritos" [ref=e290]:
+                    - img [ref=e291]
+                  - generic [ref=e293]: 🇩🇪 DE
+                - generic [ref=e294]:
+                  - paragraph [ref=e295]: Tesla
+                  - heading "Tesla Model Y 2023" [level=3] [ref=e296]
+                  - generic [ref=e297]:
+                    - generic [ref=e298]:
+                      - img [ref=e299]
+                      - text: "2023"
+                    - generic [ref=e301]:
+                      - img [ref=e302]
+                      - text: 12.000 km
+                    - generic [ref=e304]:
+                      - img [ref=e305]
+                      - text: Eléctrico
+                  - generic [ref=e307]:
+                    - generic [ref=e308]:
+                      - paragraph [ref=e309]: 49,500 EUR
+                      - paragraph [ref=e310]: Ayer
+                    - generic [ref=e312]:
+                      - img [ref=e313]
+                      - text: "2288"
+            - article [ref=e318] [cursor=pointer]:
+              - link "Tesla Model 3 2022, 41900 EUR" [ref=e319]:
+                - /url: /vehiculos/tesla-model-3-2022-11
+                - generic [ref=e320]:
+                  - img "Tesla Model 3 2022" [ref=e321]
+                  - generic [ref=e324]: Ocasión
+                  - button "Añadir a favoritos" [ref=e325]:
+                    - img [ref=e326]
+                  - generic [ref=e328]: 🇳🇱 NL
+                - generic [ref=e329]:
+                  - paragraph [ref=e330]: Tesla
+                  - heading "Tesla Model 3 2022" [level=3] [ref=e331]
+                  - generic [ref=e332]:
+                    - generic [ref=e333]:
+                      - img [ref=e334]
+                      - text: "2022"
+                    - generic [ref=e336]:
+                      - img [ref=e337]
+                      - text: 25.000 km
+                    - generic [ref=e339]:
+                      - img [ref=e340]
+                      - text: Eléctrico
+                  - generic [ref=e342]:
+                    - generic [ref=e343]:
+                      - paragraph [ref=e344]: 41,900 EUR
+                      - paragraph [ref=e345]: Ayer
+                    - generic [ref=e347]:
+                      - img [ref=e348]
+                      - text: "2954"
+            - article [ref=e353] [cursor=pointer]:
+              - link "Volkswagen ID.4 2023, 38900 EUR" [ref=e354]:
+                - /url: /vehiculos/volkswagen-id4-2023-8
+                - generic [ref=e355]:
+                  - img "Volkswagen ID.4 2023" [ref=e356]
+                  - generic [ref=e359]: Km 0
+                  - button "Añadir a favoritos" [ref=e360]:
+                    - img [ref=e361]
+                  - generic [ref=e363]: 🇪🇸 ES
+                - generic [ref=e364]:
+                  - paragraph [ref=e365]: Volkswagen
+                  - heading "Volkswagen ID.4 2023" [level=3] [ref=e366]
+                  - generic [ref=e367]:
+                    - generic [ref=e368]:
+                      - img [ref=e369]
+                      - text: "2023"
+                    - generic [ref=e371]:
+                      - img [ref=e372]
+                      - text: 5000 km
+                    - generic [ref=e374]:
+                      - img [ref=e375]
+                      - text: Eléctrico
+                  - generic [ref=e377]:
+                    - generic [ref=e378]:
+                      - paragraph [ref=e379]: 38,900 EUR
+                      - paragraph [ref=e380]: Ayer
+                    - generic [ref=e382]:
+                      - img [ref=e383]
+                      - text: "2347"
+            - article [ref=e388] [cursor=pointer]:
+              - link "Audi Q5 2023, 52000 EUR" [ref=e389]:
+                - /url: /vehiculos/audi-q5-2023-6
+                - generic [ref=e390]:
+                  - img "Audi Q5 2023" [ref=e391]
+                  - generic [ref=e394]: Km 0
+                  - button "Añadir a favoritos" [ref=e395]:
+                    - img [ref=e396]
+                  - generic [ref=e398]: 🇩🇪 DE
+                - generic [ref=e399]:
+                  - paragraph [ref=e400]: Audi
+                  - heading "Audi Q5 2023" [level=3] [ref=e401]
+                  - generic [ref=e402]:
+                    - generic [ref=e403]:
+                      - img [ref=e404]
+                      - text: "2023"
+                    - generic [ref=e406]:
+                      - img [ref=e407]
+                      - text: 8000 km
+                    - generic [ref=e409]:
+                      - img [ref=e410]
+                      - text: Híbrido enchufable
+                  - generic [ref=e412]:
+                    - generic [ref=e413]:
+                      - paragraph [ref=e414]: 52,000 EUR
+                      - paragraph [ref=e415]: Ayer
+                    - generic [ref=e417]:
+                      - img [ref=e418]
+                      - text: "3873"
+            - article [ref=e423] [cursor=pointer]:
+              - link "Mercedes-Benz Clase C 2023, 45000 EUR" [ref=e424]:
+                - /url: /vehiculos/mercedes-benz-clase-c-2023-3
+                - generic [ref=e425]:
+                  - img "Mercedes-Benz Clase C 2023" [ref=e426]
+                  - generic [ref=e429]: Km 0
+                  - button "Añadir a favoritos" [ref=e430]:
+                    - img [ref=e431]
+                  - generic [ref=e433]: 🇩🇪 DE
+                - generic [ref=e434]:
+                  - paragraph [ref=e435]: Mercedes-Benz
+                  - heading "Mercedes-Benz Clase C 2023" [level=3] [ref=e436]
+                  - generic [ref=e437]:
+                    - generic [ref=e438]:
+                      - img [ref=e439]
+                      - text: "2023"
+                    - generic [ref=e441]:
+                      - img [ref=e442]
+                      - text: 12.000 km
+                    - generic [ref=e444]:
+                      - img [ref=e445]
+                      - text: Híbrido enchufable
+                  - generic [ref=e447]:
+                    - generic [ref=e448]:
+                      - paragraph [ref=e449]: 45,000 EUR
+                      - paragraph [ref=e450]: Ayer
+                    - generic [ref=e452]:
+                      - img [ref=e453]
+                      - text: "496"
+            - article [ref=e458] [cursor=pointer]:
+              - link "BMW X5 2021, 56500 EUR" [ref=e459]:
+                - /url: /vehiculos/bmw-x5-2021-2
+                - generic [ref=e460]:
+                  - img "BMW X5 2021" [ref=e461]
+                  - generic [ref=e464]: Ocasión
+                  - button "Añadir a favoritos" [ref=e465]:
+                    - img [ref=e466]
+                  - generic [ref=e468]: 🇩🇪 DE
+                - generic [ref=e469]:
+                  - paragraph [ref=e470]: BMW
+                  - heading "BMW X5 2021" [level=3] [ref=e471]
+                  - generic [ref=e472]:
+                    - generic [ref=e473]:
+                      - img [ref=e474]
+                      - text: "2021"
+                    - generic [ref=e476]:
+                      - img [ref=e477]
+                      - text: 48.000 km
+                    - generic [ref=e479]:
+                      - img [ref=e480]
+                      - text: Híbrido
+                  - generic [ref=e482]:
+                    - generic [ref=e483]:
+                      - paragraph [ref=e484]: 56,500 EUR
+                      - paragraph [ref=e485]: Ayer
+                    - generic [ref=e487]:
+                      - img [ref=e488]
+                      - text: "1635"
+          - link "Explorar todos los vehículos importados" [ref=e492] [cursor=pointer]:
+            - /url: /vehiculos
+            - text: Explorar todos los vehículos importados
+            - img [ref=e493]
+      - region "¿Cómo funciona?" [ref=e496]:
+        - generic [ref=e497]:
+          - generic [ref=e498]:
+            - generic [ref=e499]: Proceso simplificado
+            - heading "¿Cómo funciona?" [level=2] [ref=e500]
+            - paragraph [ref=e501]: De la búsqueda a las llaves en mano, te acompañamos en cada paso de la importación o exportación de tu vehículo.
+          - tablist "Tipo de usuario" [ref=e502]:
+            - generic [ref=e503]:
+              - tab "🛒 Soy comprador" [selected] [ref=e504] [cursor=pointer]
+              - tab "🏷️ Soy vendedor" [ref=e505] [cursor=pointer]
+          - tabpanel "Pasos para compradores" [ref=e506]:
+            - generic [ref=e509]:
+              - generic [ref=e510]:
+                - generic [ref=e512]: "01"
+                - generic [ref=e513]: 🔍
+              - heading "Busca y compara" [level=3] [ref=e514]
+              - paragraph [ref=e515]: Explora miles de vehículos verificados de toda Europa y más allá. Filtra por marca, país, precio y tipo de combustible.
+            - generic [ref=e518]:
+              - generic [ref=e519]:
+                - generic [ref=e521]: "02"
+                - generic [ref=e522]: 📋
+              - heading "Calcula el coste total" [level=3] [ref=e523]
+              - paragraph [ref=e524]: "Nuestra calculadora te muestra el precio final real: aranceles, IVA, homologación, transporte y tasas de matriculación."
+            - generic [ref=e526]:
+              - generic [ref=e527]:
+                - generic [ref=e529]: "03"
+                - generic [ref=e530]: 📄
+              - heading "Gestión documental automática" [level=3] [ref=e531]
+              - paragraph [ref=e532]: La plataforma genera el checklist completo de documentos necesarios para importar el vehículo a tu país.
+            - generic [ref=e535]:
+              - generic [ref=e536]:
+                - generic [ref=e538]: "04"
+                - generic [ref=e539]: 🔒
+              - heading "Pago seguro con escrow" [level=3] [ref=e540]
+              - paragraph [ref=e541]: Tu dinero queda protegido hasta confirmar la recepción del vehículo y la documentación en regla.
+            - generic [ref=e544]:
+              - generic [ref=e545]:
+                - generic [ref=e547]: "05"
+                - generic [ref=e548]: 🚛
+              - heading "Transporte y entrega" [level=3] [ref=e549]
+              - paragraph [ref=e550]: Coordinamos el transporte desde origen hasta tu puerta. Seguimiento en tiempo real incluido.
+            - generic [ref=e552]:
+              - generic [ref=e553]:
+                - generic [ref=e555]: "06"
+                - generic [ref=e556]: ✅
+              - heading "Matriculación y disfrute" [level=3] [ref=e557]
+              - paragraph [ref=e558]: Con todos los documentos homologados y validados, registra el vehículo y a disfrutar.
+          - link "Empezar a buscar vehículos" [ref=e560] [cursor=pointer]:
+            - /url: /vehiculos
+      - region "Países donde operamos" [ref=e562]:
+        - generic [ref=e563]:
+          - generic [ref=e564]:
+            - generic [ref=e565]: Cobertura global
+            - heading "Países donde operamos" [level=2] [ref=e566]
+            - paragraph [ref=e567]: Gestión documental completa para importar y exportar vehículos entre los principales mercados del mundo.
+          - generic [ref=e568]:
+            - button "España - Miembro UE" [ref=e569] [cursor=pointer]:
+              - generic [ref=e570]: 🇪🇸
+              - generic [ref=e571]: España
+              - generic [ref=e572]:
+                - generic [ref=e573]: ↓ Import
+                - generic [ref=e574]: ↑ Export
+              - generic [ref=e575]: 🇪🇺
+            - button "Alemania - Miembro UE" [ref=e576] [cursor=pointer]:
+              - generic [ref=e577]: 🇩🇪
+              - generic [ref=e578]: Alemania
+              - generic [ref=e579]:
+                - generic [ref=e580]: ↓ Import
+                - generic [ref=e581]: ↑ Export
+              - generic [ref=e582]: 🇪🇺
+            - button "Francia - Miembro UE" [ref=e583] [cursor=pointer]:
+              - generic [ref=e584]: 🇫🇷
+              - generic [ref=e585]: Francia
+              - generic [ref=e586]:
+                - generic [ref=e587]: ↓ Import
+                - generic [ref=e588]: ↑ Export
+              - generic [ref=e589]: 🇪🇺
+            - button "Italia - Miembro UE" [ref=e590] [cursor=pointer]:
+              - generic [ref=e591]: 🇮🇹
+              - generic [ref=e592]: Italia
+              - generic [ref=e593]:
+                - generic [ref=e594]: ↓ Import
+                - generic [ref=e595]: ↑ Export
+              - generic [ref=e596]: 🇪🇺
+            - button "Portugal - Miembro UE" [ref=e597] [cursor=pointer]:
+              - generic [ref=e598]: 🇵🇹
+              - generic [ref=e599]: Portugal
+              - generic [ref=e600]:
+                - generic [ref=e601]: ↓ Import
+                - generic [ref=e602]: ↑ Export
+              - generic [ref=e603]: 🇪🇺
+            - button "Países Bajos - Miembro UE" [ref=e604] [cursor=pointer]:
+              - generic [ref=e605]: 🇳🇱
+              - generic [ref=e606]: Países Bajos
+              - generic [ref=e607]:
+                - generic [ref=e608]: ↓ Import
+                - generic [ref=e609]: ↑ Export
+              - generic [ref=e610]: 🇪🇺
+            - button "Bélgica - Miembro UE" [ref=e611] [cursor=pointer]:
+              - generic [ref=e612]: 🇧🇪
+              - generic [ref=e613]: Bélgica
+              - generic [ref=e614]:
+                - generic [ref=e615]: ↓ Import
+                - generic [ref=e616]: ↑ Export
+              - generic [ref=e617]: 🇪🇺
+            - button "Reino Unido - Extra-UE" [ref=e618] [cursor=pointer]:
+              - generic [ref=e619]: 🇬🇧
+              - generic [ref=e620]: Reino Unido
+              - generic [ref=e621]:
+                - generic [ref=e622]: ↓ Import
+                - generic [ref=e623]: ↑ Export
+            - button "Estados Unidos - Extra-UE" [ref=e624] [cursor=pointer]:
+              - generic [ref=e625]: 🇺🇸
+              - generic [ref=e626]: Estados Unidos
+              - generic [ref=e628]: ↓ Import
+            - button "Marruecos - Extra-UE" [ref=e629] [cursor=pointer]:
+              - generic [ref=e630]: 🇲🇦
+              - generic [ref=e631]: Marruecos
+              - generic [ref=e633]: ↑ Export
+            - button "Japón - Extra-UE" [ref=e634] [cursor=pointer]:
+              - generic [ref=e635]: 🇯🇵
+              - generic [ref=e636]: Japón
+              - generic [ref=e638]: ↓ Import
+            - button "Suiza - Extra-UE" [ref=e639] [cursor=pointer]:
+              - generic [ref=e640]: 🇨🇭
+              - generic [ref=e641]: Suiza
+              - generic [ref=e642]:
+                - generic [ref=e643]: ↓ Import
+                - generic [ref=e644]: ↑ Export
+          - paragraph [ref=e645]:
+            - text: La cobertura puede variar según el tipo de vehículo y las normativas vigentes de cada país.
+            - link "Consulta los detalles completos" [ref=e646] [cursor=pointer]:
+              - /url: /tramitacion
+            - text: .
+      - region "Planes para cada necesidad" [ref=e647]:
+        - generic [ref=e648]:
+          - generic [ref=e649]:
+            - generic [ref=e650]: Sin letra pequeña
+            - heading "Planes para cada necesidad" [level=2] [ref=e651]
+            - paragraph [ref=e652]: Acceso completo desde gratis. Sin comisiones ocultas sobre las transacciones.
+          - generic [ref=e653]:
+            - generic [ref=e654]:
+              - generic [ref=e655]:
+                - paragraph [ref=e656]: Para compradores
+                - heading "Particular" [level=3] [ref=e657]
+                - generic [ref=e658]:
+                  - generic [ref=e659]: Gratis
+                  - generic [ref=e660]: siempre
+                - paragraph [ref=e661]: Busca, contacta y compra vehículos importados sin coste.
+              - list [ref=e662]:
+                - listitem [ref=e663]:
+                  - img [ref=e664]
+                  - generic [ref=e666]: Hasta 3 anuncios publicados
+                - listitem [ref=e667]:
+                  - img [ref=e668]
+                  - generic [ref=e670]: Búsqueda avanzada con todos los filtros
+                - listitem [ref=e671]:
+                  - img [ref=e672]
+                  - generic [ref=e674]: Contacto directo con vendedores
+                - listitem [ref=e675]:
+                  - img [ref=e676]
+                  - generic [ref=e678]: Guardado de favoritos
+                - listitem [ref=e679]:
+                  - img [ref=e680]
+                  - generic [ref=e682]: Alertas de nuevos vehículos
+              - link "Empezar gratis" [ref=e683] [cursor=pointer]:
+                - /url: /auth/register
+            - generic [ref=e684]:
+              - generic [ref=e686]: Más popular
+              - generic [ref=e687]:
+                - paragraph [ref=e688]: Para vendedores
+                - heading "Profesional" [level=3] [ref=e689]
+                - generic [ref=e690]:
+                  - generic [ref=e691]: 49€
+                  - generic [ref=e692]: / mes
+                - paragraph [ref=e693]: Para importadores y vendedores con volumen de vehículos.
+              - list [ref=e694]:
+                - listitem [ref=e695]:
+                  - img [ref=e696]
+                  - generic [ref=e698]: Anuncios ilimitados
+                - listitem [ref=e699]:
+                  - img [ref=e700]
+                  - generic [ref=e702]: Posición destacada en búsquedas
+                - listitem [ref=e703]:
+                  - img [ref=e704]
+                  - generic [ref=e706]: Calculadora avanzada de importación
+                - listitem [ref=e707]:
+                  - img [ref=e708]
+                  - generic [ref=e710]: Estadísticas de tus anuncios
+                - listitem [ref=e711]:
+                  - img [ref=e712]
+                  - generic [ref=e714]: Soporte prioritario por chat
+                - listitem [ref=e715]:
+                  - img [ref=e716]
+                  - generic [ref=e718]: Badge de vendedor verificado
+              - link "Empezar 14 días gratis" [ref=e719] [cursor=pointer]:
+                - /url: /auth/register
+            - generic [ref=e720]:
+              - generic [ref=e721]:
+                - paragraph [ref=e722]: Para empresas
+                - heading "Concesionario" [level=3] [ref=e723]
+                - generic [ref=e724]:
+                  - generic [ref=e725]: 199€
+                  - generic [ref=e726]: / mes
+                - paragraph [ref=e727]: Gestión completa de flota y documentación para empresas.
+              - list [ref=e728]:
+                - listitem [ref=e729]:
+                  - img [ref=e730]
+                  - generic [ref=e732]: Todo lo del plan Profesional
+                - listitem [ref=e733]:
+                  - img [ref=e734]
+                  - generic [ref=e736]: Página de concesionario personalizada
+                - listitem [ref=e737]:
+                  - img [ref=e738]
+                  - generic [ref=e740]: API para importación de stock
+                - listitem [ref=e741]:
+                  - img [ref=e742]
+                  - generic [ref=e744]: Hasta 10 usuarios por cuenta
+                - listitem [ref=e745]:
+                  - img [ref=e746]
+                  - generic [ref=e748]: Gestor de cuenta dedicado
+                - listitem [ref=e749]:
+                  - img [ref=e750]
+                  - generic [ref=e752]: Informes mensuales de mercado
+              - link "Contactar con ventas" [ref=e753] [cursor=pointer]:
+                - /url: /auth/register
+          - paragraph [ref=e754]:
+            - text: ¿Necesitas servicios de tramitación, homologación o transporte?
+            - link "Ver todas las tarifas →" [ref=e755] [cursor=pointer]:
+              - /url: /precios
+      - region "Lo que dicen nuestros clientes" [ref=e756]:
+        - img [ref=e758]
+        - generic [ref=e760]:
+          - generic [ref=e761]:
+            - generic [ref=e762]: Clientes satisfechos
+            - heading "Lo que dicen nuestros clientes" [level=2] [ref=e763]
+            - paragraph [ref=e764]: Más de 1.200 transacciones internacionales completadas con éxito.
+          - generic [ref=e765]:
+            - article [ref=e766]:
+              - generic [ref=e767]: "\""
+              - generic "5 estrellas de 5" [ref=e768]:
+                - img [ref=e769]
+                - img [ref=e771]
+                - img [ref=e773]
+                - img [ref=e775]
+                - img [ref=e777]
+              - blockquote [ref=e779]:
+                - paragraph [ref=e780]: "\"Importé un BMW Serie 3 desde Alemania sin salir de casa. La plataforma gestionó todo: homologación, aranceles, ITV. En 3 semanas el coche estaba en mi garaje.\""
+              - generic [ref=e781]:
+                - generic [ref=e782]: CM
+                - generic [ref=e783]:
+                  - paragraph [ref=e784]: Carlos M.
+                  - paragraph [ref=e785]: Comprador privado · 🇪🇸 España
+            - article [ref=e786]:
+              - generic [ref=e787]: "\""
+              - generic "5 estrellas de 5" [ref=e788]:
+                - img [ref=e789]
+                - img [ref=e791]
+                - img [ref=e793]
+                - img [ref=e795]
+                - img [ref=e797]
+              - blockquote [ref=e799]:
+                - paragraph [ref=e800]: "\"Como concesionario, hemos abierto un canal de importación desde Japón que antes era impensable. La documentación que genera la plataforma es impecable.\""
+              - generic [ref=e801]:
+                - generic [ref=e802]: JP
+                - generic [ref=e803]:
+                  - paragraph [ref=e804]: Jean-Pierre D.
+                  - paragraph [ref=e805]: Concesionario · 🇫🇷 Francia
+            - article [ref=e806]:
+              - generic [ref=e807]: "\""
+              - generic "5 estrellas de 5" [ref=e808]:
+                - img [ref=e809]
+                - img [ref=e811]
+                - img [ref=e813]
+                - img [ref=e815]
+                - img [ref=e817]
+              - blockquote [ref=e819]:
+                - paragraph [ref=e820]: "\"Vendí mi Range Rover a un comprador en Alemania. El escrow me dio seguridad total. Los papeles de exportación se generaron automáticamente.\""
+              - generic [ref=e821]:
+                - generic [ref=e822]: FA
+                - generic [ref=e823]:
+                  - paragraph [ref=e824]: Fatima A.
+                  - paragraph [ref=e825]: Vendedora privada · 🇲🇦 Marruecos
+      - region "¿Eres concesionario o importador?" [ref=e826]:
+        - generic [ref=e828]:
+          - img [ref=e830]
+          - generic [ref=e832]: 🦁
+          - generic [ref=e833]: 🦁
+          - generic [ref=e834]:
+            - generic [ref=e835]: Para profesionales
+            - heading "¿Eres concesionario o importador?" [level=2] [ref=e836]
+            - paragraph [ref=e837]: Accede a anuncios ilimitados, estadísticas avanzadas, badge verificado y gestión documental prioritaria.
+            - generic [ref=e838]:
+              - generic [ref=e839]:
+                - img [ref=e840]
+                - text: Anuncios ilimitados
+              - generic [ref=e842]:
+                - img [ref=e843]
+                - text: Badge verificado
+              - generic [ref=e845]:
+                - img [ref=e846]
+                - text: Estadísticas avanzadas
+              - generic [ref=e848]:
+                - img [ref=e849]
+                - text: Soporte prioritario
+            - generic [ref=e851]:
+              - link "Registrar mi concesionario" [ref=e852] [cursor=pointer]:
+                - /url: /concesionarios/registro
+              - link "Ver planes y precios" [ref=e853] [cursor=pointer]:
+                - /url: /concesionarios/planes
+      - region "Alertas de vehículos importados" [ref=e855]:
+        - img [ref=e857]
+        - generic [ref=e860]:
+          - generic [ref=e861]: Mantente informado
+          - heading "Alertas de vehículos importados" [level=2] [ref=e862]
+          - paragraph [ref=e863]: Recibe en tu email los mejores vehículos según tus preferencias, guías de importación actualizadas y ofertas exclusivas.
+          - generic [ref=e864]:
+            - generic [ref=e865]:
+              - generic [ref=e866]:
+                - generic [ref=e867]: Tu dirección de email
+                - textbox "Tu dirección de email" [ref=e868]:
+                  - /placeholder: tu@email.com
+              - button "Suscribirme gratis" [ref=e869] [cursor=pointer]
+            - generic [ref=e870]:
+              - checkbox "Acepto la política de privacidad. Puedes darte de baja en cualquier momento." [ref=e871]
+              - generic [ref=e872]: Acepto la política de privacidad. Puedes darte de baja en cualquier momento.
+          - generic [ref=e873]:
+            - generic [ref=e874]:
+              - img [ref=e875]
+              - text: Sin spam, prometido
+            - generic [ref=e877]:
+              - img [ref=e878]
+              - text: Cancela cuando quieras
+            - generic [ref=e880]:
+              - img [ref=e881]
+              - text: +2.400 suscriptores activos
+  - contentinfo [ref=e34]:
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - link "Logistique Les Lions" [ref=e39] [cursor=pointer]:
+            - /url: /
+            - img "Logistique Les Lions" [ref=e40]
+          - paragraph [ref=e41]: Plataforma líder en compraventa internacional de vehículos con gestión completa de documentación transfronteriza, aduanas y homologaciones.
+          - generic [ref=e42]:
+            - link "LinkedIn" [ref=e43] [cursor=pointer]:
+              - /url: https://linkedin.com
+              - img [ref=e44]
+            - link "X (Twitter)" [ref=e46] [cursor=pointer]:
+              - /url: https://x.com
+              - img [ref=e47]
+            - link "Instagram" [ref=e49] [cursor=pointer]:
+              - /url: https://instagram.com
+              - img [ref=e50]
+        - generic [ref=e52]:
+          - heading "Plataforma" [level=3] [ref=e53]
+          - list [ref=e54]:
+            - listitem [ref=e55]:
+              - link "Buscar vehículos" [ref=e56] [cursor=pointer]:
+                - /url: /vehiculos
+            - listitem [ref=e57]:
+              - link "Publicar anuncio" [ref=e58] [cursor=pointer]:
+                - /url: /vehiculos/publicar
+            - listitem [ref=e59]:
+              - link "Precios de mercado" [ref=e60] [cursor=pointer]:
+                - /url: /precios
+            - listitem [ref=e61]:
+              - link "Calculadora de costes" [ref=e62] [cursor=pointer]:
+                - /url: /calculadora
+            - listitem [ref=e63]:
+              - link "Inspectores certificados" [ref=e64] [cursor=pointer]:
+                - /url: /inspectores
+        - generic [ref=e65]:
+          - heading "Servicios" [level=3] [ref=e66]
+          - list [ref=e67]:
+            - listitem [ref=e68]:
+              - link "Tramitación documental" [ref=e69] [cursor=pointer]:
+                - /url: /tramitacion
+            - listitem [ref=e70]:
+              - link "Guía de importación" [ref=e71] [cursor=pointer]:
+                - /url: /guias/importacion
+            - listitem [ref=e72]:
+              - link "Guía de exportación" [ref=e73] [cursor=pointer]:
+                - /url: /guias/exportacion
+            - listitem [ref=e74]:
+              - link "Homologaciones UE" [ref=e75] [cursor=pointer]:
+                - /url: /guias/homologacion
+            - listitem [ref=e76]:
+              - link "Transporte internacional" [ref=e77] [cursor=pointer]:
+                - /url: /logistica
+            - listitem [ref=e78]:
+              - link "Financiación" [ref=e79] [cursor=pointer]:
+                - /url: /financiacion
+        - generic [ref=e80]:
+          - heading "Legal" [level=3] [ref=e81]
+          - list [ref=e82]:
+            - listitem [ref=e83]:
+              - link "Aviso legal" [ref=e84] [cursor=pointer]:
+                - /url: /legal/aviso-legal
+            - listitem [ref=e85]:
+              - link "Política de privacidad" [ref=e86] [cursor=pointer]:
+                - /url: /legal/privacidad
+            - listitem [ref=e87]:
+              - link "Política de cookies" [ref=e88] [cursor=pointer]:
+                - /url: /legal/cookies
+            - listitem [ref=e89]:
+              - link "Términos y condiciones" [ref=e90] [cursor=pointer]:
+                - /url: /legal/terminos
+            - listitem [ref=e91]:
+              - link "Protección de datos" [ref=e92] [cursor=pointer]:
+                - /url: /legal/rgpd
+          - generic [ref=e93]:
+            - img [ref=e94]
+            - text: Conforme al RGPD
+      - generic [ref=e97]:
+        - heading "Recibe alertas de vehículos importados" [level=3] [ref=e98]
+        - paragraph [ref=e99]: Nuevos anuncios, guías de tramitación y ofertas exclusivas.
+        - generic [ref=e100]:
+          - textbox "Email para newsletter" [ref=e101]:
+            - /placeholder: tu@email.com
+          - button "Suscribirme" [ref=e102] [cursor=pointer]
+    - generic [ref=e104]:
+      - paragraph [ref=e105]: © 2026 Logistique Les Lions. Todos los derechos reservados.
+      - generic [ref=e107]: España · Francia · Alemania · Marruecos · +8 países
+  - dialog "Privacidad y cookies" [ref=e127]:
+    - generic [ref=e128]:
+      - generic [ref=e129]:
+        - generic [ref=e130]:
+          - generic [ref=e131]: 🍪
+          - heading "Privacidad y cookies" [level=2] [ref=e132]
+        - paragraph [ref=e133]:
+          - text: Usamos cookies para mejorar tu experiencia y mostrarte contenido relevante.
+          - link "Saber más" [ref=e134] [cursor=pointer]:
+            - /url: /legal/cookies
+      - generic [ref=e135]:
+        - button "Aceptar todas" [ref=e136] [cursor=pointer]
+        - generic [ref=e137]:
+          - button "Personalizar" [ref=e138] [cursor=pointer]
+          - button "Solo necesarias" [ref=e139] [cursor=pointer]

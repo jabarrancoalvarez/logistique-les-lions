@@ -41,14 +41,14 @@ public class ChatHub(ISender sender, ICurrentUser currentUser) : Hub
     }
 
     /// <summary>Unirse al grupo de la conversación para recibir mensajes de ese hilo.</summary>
-    public async Task JoinConversation(Guid conversationId)
+    public async Task JoinConversation(Guid negotiationId)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, conversationId.ToString());
+        await Groups.AddToGroupAsync(Context.ConnectionId, negotiationId.ToString());
     }
 
-    public async Task LeaveConversation(Guid conversationId)
+    public async Task LeaveConversation(Guid negotiationId)
     {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, conversationId.ToString());
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, negotiationId.ToString());
     }
 
     /// <summary>

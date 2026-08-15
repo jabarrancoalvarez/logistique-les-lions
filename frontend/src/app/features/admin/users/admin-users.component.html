@@ -1,0 +1,411 @@
+<section class="p-6 lg:p-8 max-w-6xl">
+
+  <header class="mb-5">
+    <h1 class="font-heading text-2xl font-bold text-navy">Utilisateurs</h1>
+    <p class="text-sm text-navy/60 mt-1">
+      Rechercher, consulter et gérer les comptes. Toute restriction laisse une trace.
+    </p>
+  </header>
+
+  <!-- ─── Filtres ───────────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-xl border border-navy/10 p-4 mb-5">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div class="lg:col-span-2">
+        <label for="f-search" class="block text-xs text-navy/60 mb-1">
+          Nom, téléphone ou e-mail
+        </label>
+        <input id="f-search" type="text" [(ngModel)]="filters.search" (keyup.enter)="search()"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label for="f-city" class="block text-xs text-navy/60 mb-1">Ville</label>
+        <input id="f-city" type="text" [(ngModel)]="filters.city" (keyup.enter)="search()"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label for="f-type" class="block text-xs text-navy/60 mb-1">Type</label>
+        <select id="f-type" [(ngModel)]="filters.accountType"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+          <option [ngValue]="undefined">Tous</option>
+          @for (t of accountTypes; track t) {
+            <option [ngValue]="t">{{ t }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label for="f-status" class="block text-xs text-navy/60 mb-1">Statut</label>
+        <select id="f-status" [(ngModel)]="filters.status"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+          <option [ngValue]="undefined">Tous</option>
+          @for (s of statuses; track s) {
+            <option [ngValue]="s">{{ statusLabel(s) }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3 mt-3">
+      <button type="button" (click)="search()" class="btn-primary text-sm">Rechercher</button>
+      <button type="button" (click)="resetFilters()" class="text-sm text-navy/60 hover:underline">
+        Réinitialiser
+      </button>
+      <label class="flex items-center gap-2 text-sm text-navy/70 ml-auto cursor-pointer">
+        <input type="checkbox" [(ngModel)]="filters.phoneVerified" (change)="search()" />
+        Téléphone vérifié uniquement
+      </label>
+    </div>
+  </div>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 mb-4" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="text-sm text-navy/50 py-10">Chargement…</p>
+  }
+
+  <!-- ─── Liste ─────────────────────────────────────────────────────────── -->
+  @if (data(); as d) {
+    <p class="text-xs text-navy/50 mb-2">
+      {{ d.totalCount }} {{ d.totalCount === 1 ? 'utilisateur' : 'utilisateurs' }}
+    </p>
+
+    <div class="bg-white rounded-xl border border-navy/10 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-frost text-navy/60 text-xs uppercase">
+            <tr>
+              <th class="px-4 py-3 text-left">Utilisateur</th>
+              <th class="px-4 py-3 text-left">Ville</th>
+              <th class="px-4 py-3 text-left">Type</th>
+              <th class="px-4 py-3 text-right">Annonces</th>
+              <th class="px-4 py-3 text-right">Ventes</th>
+              <th class="px-4 py-3 text-left">Statut</th>
+              <th class="px-4 py-3 text-left">Inscrit le</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-navy/10">
+            @for (u of d.items; track u.id) {
+              <tr class="hover:bg-frost/60 cursor-pointer" (click)="openDetail(u)">
+                <td class="px-4 py-3">
+                  <p class="text-navy font-medium">{{ u.displayName }}</p>
+                  <p class="text-xs text-navy/50 font-mono">
+                    {{ u.phone }}
+                    @if (u.phoneVerified) { <span class="text-green-700">✓</span> }
+                  </p>
+                </td>
+                <td class="px-4 py-3 text-navy/70">{{ u.city ?? '—' }}</td>
+                <td class="px-4 py-3 text-navy/70">{{ u.accountType }}</td>
+                <td class="px-4 py-3 text-right text-navy/70">{{ u.listingsCount }}</td>
+                <td class="px-4 py-3 text-right text-navy/70">{{ u.verifiedSalesCount }}</td>
+                <td class="px-4 py-3">
+                  <span class="text-xs font-medium px-2 py-0.5 rounded-full"
+                    [class]="statusClass(u.status)">
+                    {{ statusLabel(u.status) }}
+                  </span>
+                  @if (u.suspendedUntil) {
+                    <span class="block text-xs text-navy/40 mt-0.5">
+                      jusqu'au {{ u.suspendedUntil | date:'dd/MM/yyyy' }}
+                    </span>
+                  }
+                </td>
+                <td class="px-4 py-3 text-navy/50 text-xs">
+                  {{ u.createdAt | date:'dd/MM/yyyy' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (d.items.length === 0) {
+        <p class="text-sm text-navy/50 p-6 text-center">Aucun utilisateur.</p>
+      }
+    </div>
+
+    @if (lastPage > 1) {
+      <div class="flex items-center justify-center gap-4 mt-4 text-sm">
+        <button type="button" (click)="changePage(-1)" [disabled]="d.page <= 1"
+          class="text-navy/60 hover:underline disabled:opacity-30">← Précédent</button>
+        <span class="text-navy/50">{{ d.page }} / {{ lastPage }}</span>
+        <button type="button" (click)="changePage(1)" [disabled]="d.page >= lastPage"
+          class="text-navy/60 hover:underline disabled:opacity-30">Suivant →</button>
+      </div>
+    }
+  }
+
+  <!-- ─── Fiche ─────────────────────────────────────────────────────────── -->
+  @if (detailLoading()) {
+    <p class="text-sm text-navy/50 mt-6">Chargement de la fiche…</p>
+  }
+
+  @if (detail(); as d) {
+    <div class="bg-white rounded-xl border-2 border-azure/40 p-5 mt-6">
+      <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+          <h2 class="font-heading font-semibold text-navy text-lg">{{ d.profile.displayName }}</h2>
+          <p class="text-xs text-navy/50 font-mono mt-0.5">{{ d.profile.id }}</p>
+        </div>
+        <button type="button" (click)="closeDetail()" class="text-sm text-navy/50 hover:underline">
+          Fermer
+        </button>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-5">
+        <!-- Profil -->
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Profil</h3>
+          <dl class="text-sm space-y-1.5">
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Téléphone</dt>
+              <dd class="text-navy font-mono">
+                {{ d.profile.phone }}
+                @if (d.profile.phoneVerified) { <span class="text-green-700 text-xs">vérifié ✓</span> }
+              </dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">E-mail</dt>
+              <dd class="text-navy">{{ d.profile.email ?? '—' }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Localisation</dt>
+              <dd class="text-navy">{{ d.profile.city ?? '—' }} {{ d.region ? '(' + d.region + ')' : '' }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Type de compte</dt>
+              <dd class="text-navy">{{ d.profile.accountType }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Inscrit le</dt>
+              <dd class="text-navy">{{ d.profile.createdAt | date:'dd/MM/yyyy' }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Dernière activité</dt>
+              <dd class="text-navy">
+                {{ d.profile.lastLoginAt ? (d.profile.lastLoginAt | date:'dd/MM/yyyy') : '—' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Activité -->
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Activité</h3>
+          <dl class="text-sm space-y-1.5">
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Annonces publiées</dt>
+              <dd class="text-navy">{{ d.activity.listingsPublished }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Annonces vendues</dt>
+              <dd class="text-navy">{{ d.activity.listingsSold }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Négociations</dt>
+              <dd class="text-navy">{{ d.activity.negotiations }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Offres émises</dt>
+              <dd class="text-navy">{{ d.activity.offersMade }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Contrats</dt>
+              <dd class="text-navy">{{ d.activity.contracts }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Ventes vérifiées</dt>
+              <dd class="text-navy font-medium">{{ d.activity.verifiedSales }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Demandes</dt>
+              <dd class="text-navy">{{ d.activity.requests }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Véhicules dans Mon Garage</dt>
+              <dd class="text-navy">{{ d.activity.garageVehicles }}</dd>
+            </div>
+          </dl>
+          <p class="text-xs text-navy/40 mt-2">
+            Le contenu de Mon Garage est privé&nbsp;: seul le nombre est indiqué.
+          </p>
+        </div>
+      </div>
+
+      <!-- Points de fidélité -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h3 class="text-sm font-medium text-navy">Points de fidélité</h3>
+          <button type="button" (click)="loadPoints(d.profile.id)"
+            class="text-sm text-azure-dark hover:underline">
+            {{ points()?.userId === d.profile.id ? 'Masquer' : 'Consulter le solde' }}
+          </button>
+        </div>
+
+        @if (points(); as p) {
+          <div class="mt-3">
+            <p class="text-sm text-navy">
+              Solde&nbsp;: <span class="font-heading text-xl font-bold">{{ p.balance }}</span>
+              points
+              <span class="text-xs text-navy/50 ml-2">
+                {{ p.verifiedSalesCount }} vente(s) vérifiée(s)
+              </span>
+            </p>
+
+            @if (p.entries.length > 0) {
+              <ul class="mt-3 divide-y divide-navy/5" role="list">
+                @for (e of p.entries; track e.id) {
+                  <li class="py-2 flex flex-wrap items-start justify-between gap-3 text-sm">
+                    <span class="min-w-0">
+                      <span class="text-navy">{{ originLabel(e.origin) }}</span>
+                      @if (e.contractReference) {
+                        <span class="text-xs text-navy/50 font-mono ml-1">
+                          #{{ e.contractReference }}
+                        </span>
+                      }
+                      @if (e.note) {
+                        <span class="block text-xs text-navy/50">{{ e.note }}</span>
+                      }
+                      @if (e.adminName) {
+                        <span class="block text-xs text-navy/40">{{ e.adminName }}</span>
+                      }
+                    </span>
+                    <span class="text-right whitespace-nowrap">
+                      <span class="font-medium tabular-nums"
+                        [class]="e.points > 0 ? 'text-green-700' : 'text-red-600'">
+                        {{ e.points > 0 ? '+' : '' }}{{ e.points }}
+                      </span>
+                      <span class="block text-xs text-navy/40">
+                        {{ e.at | date:'dd/MM/yyyy' }}
+                      </span>
+                    </span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="text-sm text-navy/50 mt-2">Aucun mouvement.</p>
+            }
+
+            <!-- Ajustement manuel -->
+            <div class="grid sm:grid-cols-3 gap-3 mt-4">
+              <div>
+                <label for="p-points" class="block text-xs text-navy/60 mb-1">
+                  Points (+ ou −)
+                </label>
+                <input id="p-points" type="number" [(ngModel)]="pointsForm.points"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div class="sm:col-span-2">
+                <label for="p-reason" class="block text-xs text-navy/60 mb-1">
+                  Motif (obligatoire)
+                </label>
+                <input id="p-reason" type="text" [(ngModel)]="pointsForm.reason"
+                  placeholder="geste commercial"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+            </div>
+
+            <button type="button" (click)="adjustPoints(d.profile.id)"
+              class="btn-outline text-sm mt-3" [disabled]="busy()">
+              Ajuster
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Actions sur le compte -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-2">Statut du compte</h3>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div>
+            <label for="s-status" class="block text-xs text-navy/60 mb-1">Nouveau statut</label>
+            <select id="s-status" [(ngModel)]="statusForm.status"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+              @for (s of statuses; track s) {
+                <option [ngValue]="s">{{ statusLabel(s) }}</option>
+              }
+            </select>
+          </div>
+          @if (statusForm.status === 'Suspended') {
+            <div>
+              <label for="s-until" class="block text-xs text-navy/60 mb-1">Jusqu'au</label>
+              <input id="s-until" type="date" [(ngModel)]="statusForm.suspendedUntil"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            </div>
+          }
+          <div [class.sm:col-span-2]="statusForm.status !== 'Suspended'">
+            <label for="s-reason" class="block text-xs text-navy/60 mb-1">
+              Motif @if (statusForm.status !== 'Active') { <span class="text-red-600">*</span> }
+            </label>
+            <input id="s-reason" type="text" [(ngModel)]="statusForm.reason"
+              placeholder="Restera dans l'historique"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          </div>
+        </div>
+        <button type="button" (click)="applyStatus()" class="btn-primary text-sm mt-3"
+          [disabled]="busy()">
+          Appliquer
+        </button>
+      </div>
+
+      <!-- Historique administratif -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-2">Historique administratif</h3>
+        @if (d.actions.length === 0) {
+          <p class="text-sm text-navy/50">Aucune action enregistrée.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (a of d.actions; track a.id) {
+              <li class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-navy">{{ actionLabel(a) }}</p>
+                  @if (a.reason) {
+                    <p class="text-xs text-navy/60">{{ a.reason }}</p>
+                  }
+                </div>
+                <p class="text-xs text-navy/40 whitespace-nowrap">
+                  {{ a.adminName }} · {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Notes internes -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-1">Notes internes</h3>
+        <p class="text-xs text-navy/50 mb-3">Jamais visibles par l'utilisateur.</p>
+
+        <div class="flex flex-wrap gap-2 mb-3">
+          <input type="text" [(ngModel)]="noteBody" (keyup.enter)="addNote()"
+            placeholder="Ajouter une note…"
+            class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          <button type="button" (click)="addNote()" class="btn-outline text-sm" [disabled]="busy()">
+            Ajouter
+          </button>
+        </div>
+
+        @if (d.notes.length === 0) {
+          <p class="text-sm text-navy/50">Aucune note.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (n of d.notes; track n.id) {
+              <li class="flex items-start justify-between gap-3">
+                <p class="text-navy">{{ n.body }}</p>
+                <div class="flex items-center gap-3 shrink-0">
+                  <span class="text-xs text-navy/40 whitespace-nowrap">
+                    {{ n.adminName }} · {{ n.createdAt | date:'dd/MM/yyyy' }}
+                  </span>
+                  <button type="button" (click)="deleteNote(n.id)" [disabled]="busy()"
+                    class="text-xs text-red-600 hover:underline">
+                    Retirer
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+</section>

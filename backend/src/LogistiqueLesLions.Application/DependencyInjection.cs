@@ -1,6 +1,8 @@
 using System.Reflection;
 using FluentValidation;
 using LogistiqueLesLions.Application.Common.Behaviors;
+using LogistiqueLesLions.Application.Common.Interfaces;
+using LogistiqueLesLions.Application.Services;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +22,12 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(assembly);
+
+        services.AddScoped<IPriceIndicatorService, PriceIndicatorService>();
+        services.AddScoped<IPriceDropAlertService, PriceDropAlertService>();
+        services.AddScoped<INewVehicleAlertService, NewVehicleAlertService>();
+        services.AddScoped<IReminderService, ReminderService>();
+        services.AddScoped<IVehicleValuationService, VehicleValuationService>();
 
         return services;
     }

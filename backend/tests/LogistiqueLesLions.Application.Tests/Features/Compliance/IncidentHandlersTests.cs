@@ -142,7 +142,7 @@ public class IncidentHandlersTests : IDisposable
         {
             Id = vehicleId, Slug = "audi-x", Title = "Audi X", MakeId = make.Id, Year = 2023,
             Price = 30000, Currency = "EUR", CountryOrigin = "DE",
-            Condition = VehicleCondition.Used, Status = VehicleStatus.Active,
+            Condition = VehicleCondition.Used, Status = VehicleStatus.Actif,
             CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
         });
         _db.ImportExportProcesses.Add(new ImportExportProcess

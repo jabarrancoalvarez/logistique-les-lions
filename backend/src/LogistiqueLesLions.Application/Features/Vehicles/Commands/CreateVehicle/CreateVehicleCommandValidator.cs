@@ -7,34 +7,51 @@ public class CreateVehicleCommandValidator : AbstractValidator<CreateVehicleComm
     public CreateVehicleCommandValidator()
     {
         RuleFor(x => x.Title)
-            .NotEmpty().WithMessage("El título es obligatorio.")
-            .MaximumLength(200).WithMessage("El título no puede superar 200 caracteres.");
+            .NotEmpty().WithMessage("Le titre est obligatoire.")
+            .MaximumLength(200);
+
+        RuleFor(x => x.Description).MaximumLength(5000);
+        RuleFor(x => x.Version).MaximumLength(100);
 
         RuleFor(x => x.MakeId)
-            .NotEmpty().WithMessage("La marca es obligatoria.");
+            .NotEmpty().WithMessage("La marque est obligatoire.");
 
         RuleFor(x => x.Year)
             .InclusiveBetween(1900, DateTime.UtcNow.Year + 1)
-            .WithMessage($"El año debe estar entre 1900 y {DateTime.UtcNow.Year + 1}.");
+            .WithMessage($"L'année doit être comprise entre 1900 et {DateTime.UtcNow.Year + 1}.");
 
         RuleFor(x => x.Mileage)
             .GreaterThanOrEqualTo(0).When(x => x.Mileage.HasValue)
-            .WithMessage("El kilometraje no puede ser negativo.");
+            .WithMessage("Le kilométrage ne peut pas être négatif.");
 
         RuleFor(x => x.Price)
-            .GreaterThan(0).WithMessage("El precio debe ser mayor que 0.");
+            .GreaterThan(0).WithMessage("Le prix doit être supérieur à 0.");
 
-        RuleFor(x => x.Currency)
-            .NotEmpty().Length(3).WithMessage("La divisa debe ser un código ISO 4217 de 3 caracteres.");
-
-        RuleFor(x => x.CountryOrigin)
-            .NotEmpty().Length(2).WithMessage("El país de origen debe ser un código ISO2 de 2 caracteres.");
+        // Bloque destacado de la ficha: siempre debe declararse en los anuncios nuevos.
+        RuleFor(x => x.CustomsStatus)
+            .IsInEnum().WithMessage("Le statut douanier est obligatoire.");
 
         RuleFor(x => x.SellerId)
-            .NotEmpty().WithMessage("El vendedor es obligatorio.");
+            .NotEmpty();
 
         RuleFor(x => x.Vin)
             .Length(17).When(x => !string.IsNullOrEmpty(x.Vin))
-            .WithMessage("El VIN debe tener exactamente 17 caracteres.");
+            .WithMessage("Le VIN doit contenir exactement 17 caractères.");
+
+        RuleFor(x => x.PowerCv)
+            .InclusiveBetween(1, 2000).When(x => x.PowerCv.HasValue);
+
+        RuleFor(x => x.EngineDisplacementCc)
+            .InclusiveBetween(1, 10000).When(x => x.EngineDisplacementCc.HasValue);
+
+        RuleFor(x => x.Doors)
+            .InclusiveBetween(1, 7).When(x => x.Doors.HasValue);
+
+        RuleFor(x => x.Seats)
+            .InclusiveBetween(1, 20).When(x => x.Seats.HasValue);
+
+        RuleFor(x => x.Region).MaximumLength(10);
+        RuleFor(x => x.City).MaximumLength(100);
+        RuleFor(x => x.District).MaximumLength(100);
     }
 }

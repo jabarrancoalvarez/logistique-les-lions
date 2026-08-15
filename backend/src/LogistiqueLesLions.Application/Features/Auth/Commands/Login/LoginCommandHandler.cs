@@ -1,5 +1,7 @@
+using LogistiqueLesLions.Application.Common;
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Common.Models;
+using LogistiqueLesLions.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,28 +14,38 @@ public class LoginCommandHandler(
 {
     public async Task<Result<AuthResponseDto>> Handle(LoginCommand request, CancellationToken ct)
     {
-        var emailLower = request.Email.Trim().ToLowerInvariant();
-        var user = await db.UserProfiles
-            .FirstOrDefaultAsync(u => u.Email == emailLower, ct);
+        var phone = SenegalPhone.Normalize(request.Identifier);
+
+        var user = phone is not null
+            ? await db.UserProfiles.FirstOrDefaultAsync(u => u.Phone == phone, ct)
+            : await LookupByEmailAsync(request.Identifier, ct);
 
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             return Result<AuthResponseDto>.Failure("Auth.InvalidCredentials");
 
-        if (!user.IsActive)
-            return Result<AuthResponseDto>.Failure("Auth.AccountDisabled");
+        if (user.Status == AccountStatus.Blocked)
+            return Result<AuthResponseDto>.Failure("Auth.AccountBlocked");
+
+        if (user.Status == AccountStatus.Suspended)
+            return Result<AuthResponseDto>.Failure("Auth.AccountSuspended");
 
         var refreshToken           = jwt.GenerateRefreshToken();
-        user.RefreshToken           = refreshToken;
-        user.RefreshTokenExpiresAt  = DateTimeOffset.UtcNow.AddDays(30);
-        user.LastLoginAt            = DateTimeOffset.UtcNow;
+        user.RefreshToken          = refreshToken;
+        user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(30);
+        user.LastLoginAt           = DateTimeOffset.UtcNow;
+        user.LastActivityAt        = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
         var access    = jwt.GenerateAccessToken(user);
         var expiresAt = DateTimeOffset.UtcNow.AddMinutes(15);
 
-        return Result<AuthResponseDto>.Success(new AuthResponseDto(
-            access, refreshToken, expiresAt,
-            new UserDto(user.Id, user.Email, user.FirstName, user.LastName,
-                        user.Role.ToString(), user.AvatarUrl, user.IsVerified)));
+        return Result<AuthResponseDto>.Success(
+            new AuthResponseDto(access, refreshToken, expiresAt, UserDto.From(user)));
+    }
+
+    private Task<Domain.Entities.UserProfile?> LookupByEmailAsync(string identifier, CancellationToken ct)
+    {
+        var email = identifier.Trim().ToLowerInvariant();
+        return db.UserProfiles.FirstOrDefaultAsync(u => u.Email == email, ct);
     }
 }

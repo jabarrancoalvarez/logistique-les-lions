@@ -10,7 +10,7 @@ public class GetConversationsQueryHandler(IApplicationDbContext db)
 {
     public async Task<Result<List<ConversationSummaryDto>>> Handle(GetConversationsQuery request, CancellationToken ct)
     {
-        var conversations = await db.Conversations
+        var conversations = await db.Negotiations
             .AsNoTracking()
             .Where(c => c.BuyerId == request.UserId || c.SellerId == request.UserId)
             .Include(c => c.Buyer)
@@ -32,7 +32,7 @@ public class GetConversationsQueryHandler(IApplicationDbContext db)
             return new ConversationSummaryDto(
                 c.Id,
                 other.Id,
-                $"{other.FirstName} {other.LastName}",
+                other.DisplayName,
                 other.AvatarUrl,
                 c.VehicleId,
                 c.Vehicle.Title,

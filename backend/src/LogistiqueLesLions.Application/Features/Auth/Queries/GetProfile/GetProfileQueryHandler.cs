@@ -1,5 +1,6 @@
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Common.Models;
+using LogistiqueLesLions.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,10 +18,26 @@ public class GetProfileQueryHandler(IApplicationDbContext db)
         if (user is null)
             return Result<ProfileDto>.Failure("User.NotFound");
 
+        var activeListings = await db.Vehicles
+            .AsNoTracking()
+            .CountAsync(v => v.SellerId == user.Id && v.Status == VehicleStatus.Actif, ct);
+
         return Result<ProfileDto>.Success(new ProfileDto(
-            user.Id, user.Email, user.FirstName, user.LastName,
-            user.Role.ToString(), user.Phone, user.AvatarUrl,
-            user.CountryCode, user.City, user.CompanyName, user.CompanyVat,
-            user.Bio, user.IsVerified, user.LastLoginAt, user.CreatedAt));
+            user.Id,
+            user.DisplayName,
+            user.Phone,
+            user.PhoneVerified,
+            user.Email,
+            user.Role.ToString(),
+            user.AccountType.ToString(),
+            user.AvatarUrl,
+            user.Region,
+            user.City,
+            user.Bio,
+            user.AllowWhatsAppContact,
+            user.VerifiedSalesCount,
+            activeListings,
+            user.LastLoginAt,
+            user.CreatedAt));
     }
 }

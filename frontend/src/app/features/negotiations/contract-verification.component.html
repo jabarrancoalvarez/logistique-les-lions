@@ -1,0 +1,110 @@
+<section class="min-h-[70vh] bg-frost py-10">
+  <div class="max-w-2xl mx-auto px-4">
+
+    <div class="text-center mb-8">
+      <h1 class="font-heading font-bold text-navy text-2xl sm:text-3xl">
+        Vérification d'une vente
+      </h1>
+      <p class="text-sm text-navy/60 mt-2">
+        Saisissez le code figurant sur le contrat, ou scannez son QR&nbsp;: vous saurez
+        immédiatement si la vente a bien été enregistrée sur Yoon u Auto.
+      </p>
+    </div>
+
+    <!-- ─── Recherche par code ────────────────────────────────────────── -->
+    <div class="bg-white rounded-xl border border-navy/10 p-4 mb-6">
+      <label for="code" class="block text-sm font-medium text-navy mb-1">
+        Code de vérification
+      </label>
+      <div class="flex gap-2">
+        <input id="code" type="text" [(ngModel)]="code" (keyup.enter)="search()"
+          placeholder="Ex.&nbsp;: K7M2QRSTUVWX3456" autocomplete="off"
+          class="flex-1 rounded-lg border border-navy/15 px-3 py-2 text-sm font-mono uppercase" />
+        <button type="button" (click)="search()" class="btn-primary text-sm"
+          [disabled]="loading()">
+          Vérifier
+        </button>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="text-sm text-navy/50 text-center py-6">Vérification…</p>
+    }
+
+    <!-- ─── Code inconnu ──────────────────────────────────────────────── -->
+    @if (notFound() && !loading()) {
+      <div class="bg-white rounded-xl border-2 border-red-200 p-6 text-center">
+        <p class="text-3xl mb-2" aria-hidden="true">✕</p>
+        <h2 class="font-heading font-semibold text-navy text-lg">Aucune vente trouvée</h2>
+        <p class="text-sm text-navy/60 mt-2">
+          Ce code ne correspond à aucune vente vérifiée sur Yoon u Auto. Vérifiez la saisie&nbsp;;
+          si le doute persiste, ne poursuivez pas la transaction.
+        </p>
+      </div>
+    }
+
+    <!-- ─── Vente vérifiée ────────────────────────────────────────────── -->
+    @if (result() && !loading()) {
+      @let v = result()!;
+      <div class="bg-white rounded-xl border-2 border-green-300 overflow-hidden">
+        <div class="bg-green-50 px-6 py-4 text-center border-b border-green-200">
+          <p class="text-3xl mb-1" aria-hidden="true">✓</p>
+          <h2 class="font-heading font-semibold text-green-900 text-lg">Vente vérifiée</h2>
+          <p class="text-xs text-green-800/80 mt-1">
+            Contrat #{{ v.publicReference }} · validé le {{ v.validatedAt | date:'dd/MM/yyyy' }}
+          </p>
+        </div>
+
+        <dl class="p-6 grid sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+          <div class="sm:col-span-2">
+            <dt class="text-xs text-navy/50">Véhicule</dt>
+            <dd class="text-navy font-medium">
+              {{ v.vehicleMake }} {{ v.vehicleModel }} {{ v.vehicleVersion }} · {{ v.vehicleYear }}
+            </dd>
+          </div>
+          @if (v.vehicleVin) {
+            <div>
+              <dt class="text-xs text-navy/50">Numéro de châssis (VIN)</dt>
+              <dd class="text-navy font-mono text-xs">{{ v.vehicleVin }}</dd>
+            </div>
+          }
+          @if (v.registrationPlate) {
+            <div>
+              <dt class="text-xs text-navy/50">Immatriculation</dt>
+              <dd class="text-navy">{{ v.registrationPlate }}</dd>
+            </div>
+          }
+          <div>
+            <dt class="text-xs text-navy/50">Prix convenu</dt>
+            <dd class="text-navy font-heading font-semibold">{{ v.agreedPrice | fcfa }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-navy/50">Date de la vente</dt>
+            <dd class="text-navy">{{ v.saleDate | date:'dd/MM/yyyy' }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-navy/50">Vendeur</dt>
+            <dd class="text-navy">{{ v.sellerLegalName }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-navy/50">Acheteur</dt>
+            <dd class="text-navy">{{ v.buyerLegalName }}</dd>
+          </div>
+          <div class="sm:col-span-2 border-t border-navy/10 pt-4">
+            <dt class="text-xs text-navy/50">Annonce d'origine</dt>
+            <dd class="text-navy">#{{ v.vehicleReference }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <p class="text-xs text-navy/50 text-center mt-4">
+        Yoon u Auto atteste que les deux parties ont validé ce contrat sur la plateforme.
+        Les pièces d'identité et les coordonnées des parties ne sont pas publiées ici.
+      </p>
+    }
+
+    <p class="text-center mt-8">
+      <a routerLink="/" class="text-sm text-azure-dark hover:underline">Retour à l'accueil</a>
+    </p>
+  </div>
+</section>

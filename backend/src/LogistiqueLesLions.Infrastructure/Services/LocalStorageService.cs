@@ -58,4 +58,65 @@ public class LocalStorageService(
             File.Delete(filePath);
         return Task.CompletedTask;
     }
+
+    // ─── Archivos privados ─────────────────────────────────────────────────
+    /// <summary>
+    /// Fuera del directorio servido estáticamente: estos archivos no deben tener URL.
+    /// </summary>
+    private readonly string _privatePath =
+        configuration["Storage:PrivatePath"] ?? "private-uploads";
+
+    public async Task<string> UploadPrivateAsync(
+        Stream content,
+        string fileName,
+        string contentType,
+        string folder,
+        CancellationToken ct = default)
+    {
+        var ext      = Path.GetExtension(fileName).ToLowerInvariant();
+        var safeName = $"{Guid.NewGuid()}{ext}";
+        var dir      = Path.Combine(_privatePath, folder);
+
+        Directory.CreateDirectory(dir);
+
+        await using var fs = File.Create(Path.Combine(dir, safeName));
+        await content.CopyToAsync(fs, ct);
+
+        // La clave es relativa: el almacenamiento puede cambiar de sitio sin tocar la BD.
+        return $"{folder}/{safeName}";
+    }
+
+    public Task<Stream?> OpenPrivateAsync(string key, CancellationToken ct = default)
+    {
+        var path = ResolvePrivatePath(key);
+        if (path is null || !File.Exists(path)) return Task.FromResult<Stream?>(null);
+
+        return Task.FromResult<Stream?>(File.OpenRead(path));
+    }
+
+    public Task DeletePrivateAsync(string key, CancellationToken ct = default)
+    {
+        var path = ResolvePrivatePath(key);
+        if (path is not null && File.Exists(path)) File.Delete(path);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Convierte la clave en una ruta, comprobando que no se sale del directorio privado.
+    /// </summary>
+    /// <remarks>
+    /// La clave viene de la base de datos, pero una ruta construida a ciegas es un
+    /// camino directo al resto del disco si algún día llega manipulada.
+    /// </remarks>
+    private string? ResolvePrivatePath(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key)) return null;
+
+        var root = Path.GetFullPath(_privatePath);
+        var full = Path.GetFullPath(Path.Combine(root, key.Replace('/', Path.DirectorySeparatorChar)));
+
+        return full.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.Ordinal)
+            ? full
+            : null;
+    }
 }

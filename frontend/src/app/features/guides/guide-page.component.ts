@@ -121,7 +121,7 @@ const GUIDES: Record<string, GuideContent> = {
       'Para exportaciones fuera de la UE puedes recuperar el IVA si el vehículo fue comprado con IVA en España',
       'Algunos países tienen restricciones de edad para vehículos importados',
       'El valor del vehículo puede depreciarse durante el transporte — asegúralo correctamente',
-      'Logistique Les Lions puede gestionar todo el proceso por ti, incluyendo el transporte'
+      'Yoon U Auto puede gestionar todo el proceso por ti, incluyendo el transporte'
     ],
     documents: [
       'Permiso de circulación original',
@@ -195,30 +195,30 @@ const GUIDES: Record<string, GuideContent> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, CommonModule],
   template: `
-    <div class="min-h-screen bg-ivory">
+    <div class="min-h-screen bg-frost">
       <!-- Header -->
       <div class="bg-navy py-16 px-4">
         <div class="container mx-auto max-w-4xl">
-          <a routerLink="/" class="inline-flex items-center gap-2 text-ivory/60 hover:text-gold text-sm mb-6 transition-colors">
+          <a routerLink="/" class="inline-flex items-center gap-2 text-frost/60 hover:text-azure text-sm mb-6 transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
             Volver al inicio
           </a>
-          <h1 class="font-heading text-3xl lg:text-5xl font-bold text-ivory mb-4">{{ guide().heading }}</h1>
-          <p class="text-ivory/70 text-lg mb-8 leading-relaxed">{{ guide().subtitle }}</p>
+          <h1 class="font-heading text-3xl lg:text-5xl font-bold text-frost mb-4">{{ guide().heading }}</h1>
+          <p class="text-frost/70 text-lg mb-8 leading-relaxed">{{ guide().subtitle }}</p>
           <div class="flex flex-wrap gap-4">
             <div class="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2">
-              <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-azure" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              <span class="text-ivory/80 text-sm">Duración: <strong class="text-ivory">{{ guide().duration }}</strong></span>
+              <span class="text-frost/80 text-sm">Duración: <strong class="text-frost">{{ guide().duration }}</strong></span>
             </div>
             <div class="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2">
-              <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-azure" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
               </svg>
-              <span class="text-ivory/80 text-sm">Complejidad: <strong class="text-ivory">{{ guide().complexity }}</strong></span>
+              <span class="text-frost/80 text-sm">Complejidad: <strong class="text-frost">{{ guide().complexity }}</strong></span>
             </div>
           </div>
         </div>
@@ -233,7 +233,7 @@ const GUIDES: Record<string, GuideContent> = {
         <div class="space-y-6 mb-12">
           @for (step of guide().steps; track step.number) {
             <div class="flex gap-5 p-6 bg-white rounded-xl shadow-card hover:shadow-card-hover transition-shadow">
-              <div class="w-10 h-10 rounded-full bg-gold flex items-center justify-center text-navy font-bold font-heading text-lg shrink-0">
+              <div class="w-10 h-10 rounded-full bg-azure flex items-center justify-center text-navy font-bold font-heading text-lg shrink-0">
                 {{ step.number }}
               </div>
               <div>
@@ -247,9 +247,9 @@ const GUIDES: Record<string, GuideContent> = {
         <!-- Two columns: Tips + Documents -->
         <div class="grid lg:grid-cols-2 gap-8 mb-12">
           <!-- Tips -->
-          <div class="bg-gold/5 border border-gold/20 rounded-xl p-6">
+          <div class="bg-azure/5 border border-azure/20 rounded-xl p-6">
             <h2 class="font-heading text-xl font-bold text-navy mb-5 flex items-center gap-2">
-              <svg class="w-5 h-5 text-gold" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-azure" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 01-1 1H9a1 1 0 01-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7zm3 19H9v1a1 1 0 001 1h4a1 1 0 001-1v-1z"/>
               </svg>
               Consejos prácticos
@@ -257,7 +257,7 @@ const GUIDES: Record<string, GuideContent> = {
             <ul class="space-y-3">
               @for (tip of guide().tips; track tip) {
                 <li class="flex gap-2 text-sm text-navy/70">
-                  <svg class="w-4 h-4 text-gold shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="w-4 h-4 text-azure shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                   </svg>
                   {{ tip }}
@@ -289,11 +289,11 @@ const GUIDES: Record<string, GuideContent> = {
 
         <!-- CTA -->
         <div class="bg-navy rounded-2xl p-8 text-center">
-          <h2 class="font-heading text-2xl font-bold text-ivory mb-3">¿Necesitas ayuda con el proceso?</h2>
-          <p class="text-ivory/70 mb-6">Nuestro equipo de especialistas gestiona todo el proceso por ti. Desde la compra hasta la matriculación.</p>
+          <h2 class="font-heading text-2xl font-bold text-frost mb-3">¿Necesitas ayuda con el proceso?</h2>
+          <p class="text-frost/70 mb-6">Nuestro equipo de especialistas gestiona todo el proceso por ti. Desde la compra hasta la matriculación.</p>
           <div class="flex flex-wrap gap-3 justify-center">
-            <a routerLink="/tramitacion" class="btn-gold py-3 px-6">Ver servicios de tramitación</a>
-            <a routerLink="/vehiculos" class="btn-outline btn-outline-gold py-3 px-6">Buscar vehículos</a>
+            <a routerLink="/tramitacion" class="btn-azure py-3 px-6">Ver servicios de tramitación</a>
+            <a routerLink="/vehiculos" class="btn-outline btn-outline-azure py-3 px-6">Buscar vehículos</a>
           </div>
         </div>
       </div>

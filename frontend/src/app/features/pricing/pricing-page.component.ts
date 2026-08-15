@@ -24,15 +24,15 @@ interface MarketFee {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, CommonModule],
   template: `
-    <div class="min-h-screen bg-ivory">
+    <div class="min-h-screen bg-frost">
       <!-- Header -->
       <div class="bg-navy py-20 px-4 text-center">
         <div class="container mx-auto max-w-2xl">
-          <p class="divider-gold justify-center mb-6">Precios transparentes</p>
-          <h1 class="font-heading text-4xl lg:text-5xl font-bold text-ivory mb-4">
-            Sin sorpresas.<br><span class="text-gold">Sin comisiones ocultas.</span>
+          <p class="divider-azure justify-center mb-6">Precios transparentes</p>
+          <h1 class="font-heading text-4xl lg:text-5xl font-bold text-frost mb-4">
+            Sin sorpresas.<br><span class="text-azure">Sin comisiones ocultas.</span>
           </h1>
-          <p class="text-lg leading-relaxed" style="color: rgba(248,246,240,0.7)">
+          <p class="text-lg leading-relaxed" style="color: rgba(244,248,251,0.7)">
             Elige el plan que mejor se adapta a tus necesidades. Todos incluyen acceso completo a la plataforma.
           </p>
         </div>
@@ -44,19 +44,19 @@ interface MarketFee {
           @for (plan of plans; track plan.name) {
             <div [class]="cardClass(plan)">
               @if (plan.highlighted) {
-                <div class="badge badge-gold self-start mb-4">Más popular</div>
+                <div class="badge badge-azure self-start mb-4">Más popular</div>
               }
-              <h2 [class]="plan.highlighted ? 'font-heading text-xl font-bold mb-1 text-ivory' : 'font-heading text-xl font-bold mb-1 text-navy'">
+              <h2 [class]="plan.highlighted ? 'font-heading text-xl font-bold mb-1 text-frost' : 'font-heading text-xl font-bold mb-1 text-navy'">
                 {{ plan.name }}
               </h2>
-              <p [class]="plan.highlighted ? 'text-sm mb-6 opacity-60 text-ivory' : 'text-sm mb-6 opacity-50 text-navy'">
+              <p [class]="plan.highlighted ? 'text-sm mb-6 opacity-60 text-frost' : 'text-sm mb-6 opacity-50 text-navy'">
                 {{ plan.description }}
               </p>
               <div class="mb-6">
-                <span [class]="plan.highlighted ? 'font-heading text-4xl font-bold text-gold' : 'font-heading text-4xl font-bold text-navy'">
+                <span [class]="plan.highlighted ? 'font-heading text-4xl font-bold text-azure' : 'font-heading text-4xl font-bold text-navy'">
                   {{ plan.price }}
                 </span>
-                <span [class]="plan.highlighted ? 'text-sm ml-1 opacity-50 text-ivory' : 'text-sm ml-1 opacity-40 text-navy'">
+                <span [class]="plan.highlighted ? 'text-sm ml-1 opacity-50 text-frost' : 'text-sm ml-1 opacity-40 text-navy'">
                   {{ plan.period }}
                 </span>
               </div>
@@ -64,11 +64,11 @@ interface MarketFee {
                 @for (feature of plan.features; track feature) {
                   <li class="flex items-start gap-2 text-sm">
                     <svg
-                      [class]="plan.highlighted ? 'w-4 h-4 shrink-0 mt-0.5 text-gold' : 'w-4 h-4 shrink-0 mt-0.5 text-gold-dark'"
+                      [class]="plan.highlighted ? 'w-4 h-4 shrink-0 mt-0.5 text-azure' : 'w-4 h-4 shrink-0 mt-0.5 text-azure-dark'"
                       fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
-                    <span [class]="plan.highlighted ? 'opacity-80 text-ivory' : 'opacity-70 text-navy'">{{ feature }}</span>
+                    <span [class]="plan.highlighted ? 'opacity-80 text-frost' : 'opacity-70 text-navy'">{{ feature }}</span>
                   </li>
                 }
               </ul>
@@ -83,15 +83,15 @@ interface MarketFee {
         <!-- Market fees -->
         <div class="mb-16">
           <h2 class="font-heading text-2xl font-bold text-navy mb-2 text-center">Tarifas de tramitación</h2>
-          <p class="text-center mb-8" style="color: rgba(11,31,58,0.6)">Servicios adicionales con precio fijo, sin sorpresas</p>
+          <p class="text-center mb-8" style="color: rgba(10,46,77,0.6)">Servicios adicionales con precio fijo, sin sorpresas</p>
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             @for (fee of fees; track fee.category) {
               <div class="bg-white rounded-xl p-6 shadow-card">
                 <div class="flex items-center justify-between mb-2">
                   <h3 class="font-semibold text-navy text-sm">{{ fee.category }}</h3>
-                  <span class="font-heading font-bold text-gold text-lg">{{ fee.fee }}</span>
+                  <span class="font-heading font-bold text-azure text-lg">{{ fee.fee }}</span>
                 </div>
-                <p class="text-xs" style="color: rgba(11,31,58,0.5)">{{ fee.description }}</p>
+                <p class="text-xs" style="color: rgba(10,46,77,0.5)">{{ fee.description }}</p>
               </div>
             }
           </div>
@@ -102,9 +102,9 @@ interface MarketFee {
           <h2 class="font-heading text-2xl font-bold text-navy mb-8">Preguntas frecuentes sobre precios</h2>
           <div class="space-y-6">
             @for (faq of faqs; track faq.q) {
-              <div class="border-b pb-6 last:border-0 last:pb-0" style="border-color: rgba(11,31,58,0.1)">
+              <div class="border-b pb-6 last:border-0 last:pb-0" style="border-color: rgba(10,46,77,0.1)">
                 <h3 class="font-semibold text-navy mb-2">{{ faq.q }}</h3>
-                <p class="text-sm leading-relaxed" style="color: rgba(11,31,58,0.6)">{{ faq.a }}</p>
+                <p class="text-sm leading-relaxed" style="color: rgba(10,46,77,0.6)">{{ faq.a }}</p>
               </div>
             }
           </div>
@@ -113,7 +113,7 @@ interface MarketFee {
         <!-- CTA -->
         <div class="text-center">
           <h2 class="font-heading text-2xl font-bold text-navy mb-3">¿Tienes dudas?</h2>
-          <p class="mb-6" style="color: rgba(11,31,58,0.6)">Habla con nuestro equipo y te ayudamos a elegir el mejor plan</p>
+          <p class="mb-6" style="color: rgba(10,46,77,0.6)">Habla con nuestro equipo y te ayudamos a elegir el mejor plan</p>
           <div class="flex flex-wrap gap-3 justify-center">
             <a routerLink="/tramitacion" class="btn-primary py-3 px-6">Ver servicios</a>
             <a routerLink="/vehiculos" class="btn-outline py-3 px-6">Buscar vehículos</a>
@@ -127,15 +127,15 @@ export class PricingPageComponent {
   cardClass(plan: PricingPlan): string {
     const base = 'rounded-2xl p-8 flex flex-col';
     return plan.highlighted
-      ? `${base} bg-navy shadow-navy ring-2 ring-gold`
+      ? `${base} bg-navy shadow-navy ring-2 ring-azure`
       : `${base} bg-white shadow-card`;
   }
 
   ctaClass(plan: PricingPlan): string {
     const base = 'text-center py-3 px-6 rounded-lg font-semibold text-sm transition-all duration-200 block';
     return plan.highlighted
-      ? `${base} bg-gold text-navy hover:bg-gold-dark`
-      : `${base} bg-navy text-ivory hover:bg-navy-light`;
+      ? `${base} bg-azure text-navy hover:bg-azure-dark`
+      : `${base} bg-navy text-frost hover:bg-navy-light`;
   }
 
   readonly plans: PricingPlan[] = [

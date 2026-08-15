@@ -1,297 +1,608 @@
-<div class="min-h-screen bg-ivory/50">
+<div class="min-h-screen bg-frost/50 pb-24 lg:pb-10">
 
-  <!-- Loading skeleton -->
   @if (isLoading()) {
-    <div class="container mx-auto px-4 lg:px-6 py-10">
-      <div class="skeleton h-96 w-full rounded-2xl mb-8"></div>
-      <div class="skeleton h-8 w-1/2 mb-4"></div>
-      <div class="skeleton h-6 w-1/4"></div>
-    </div>
-  }
-
-  <!-- Error -->
-  @if (error()) {
-    <div class="container mx-auto px-4 lg:px-6 py-20 text-center">
-      <p class="text-red-600 text-lg mb-4">{{ error() }}</p>
-      <a routerLink="/vehiculos" class="btn-primary">Ver todos los vehículos</a>
-    </div>
-  }
-
-  @if (vehicle(); as v) {
-    <!-- Breadcrumb -->
-    <div class="bg-white border-b border-navy/8">
-      <div class="container mx-auto px-4 lg:px-6 py-3">
-        <nav class="flex items-center gap-2 text-sm text-navy/50">
-          <a routerLink="/" class="hover:text-gold">Inicio</a>
-          <span>/</span>
-          <a routerLink="/vehiculos" class="hover:text-gold">Vehículos</a>
-          <span>/</span>
-          <span class="text-navy">{{ v.title }}</span>
-        </nav>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+      <div class="animate-pulse space-y-4">
+        <div class="h-80 bg-navy/10 rounded-2xl"></div>
+        <div class="h-8 bg-navy/10 rounded w-1/2"></div>
+        <div class="h-4 bg-navy/5 rounded w-1/3"></div>
       </div>
     </div>
+  } @else if (error()) {
+    <div class="container mx-auto px-4 py-20 text-center">
+      <h1 class="font-heading text-2xl text-navy mb-2">{{ error() }}</h1>
+      <a routerLink="/vehiculos" class="btn-azure mt-4 inline-block">Voir tous les véhicules</a>
+    </div>
+  } @else if (vehicle()) {
+    @let v = vehicle()!;
 
-    <div class="container mx-auto px-4 lg:px-6 py-8">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
 
-        <!-- Galería de imágenes -->
-        <div class="lg:col-span-2">
-          <div class="relative rounded-2xl overflow-hidden bg-navy/5 aspect-video">
-            @if (activeImage(); as img) {
-              <img [src]="img.url" [alt]="img.altText ?? v.title"
-                class="w-full h-full object-cover">
-            } @else {
-              <div class="w-full h-full flex items-center justify-center">
-                <svg class="w-24 h-24 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
+      <!-- Fil d'Ariane -->
+      <nav class="text-sm text-navy/50 mb-4" aria-label="Fil d'Ariane">
+        <a routerLink="/vehiculos" class="hover:text-azure-dark">Véhicules</a>
+        <span class="mx-1.5" aria-hidden="true">›</span>
+        <span class="text-navy/70">{{ headline() }}</span>
+      </nav>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- ═══ Colonne principale ═══════════════════════════════════════ -->
+        <div class="lg:col-span-2 space-y-6">
+
+          <!-- ─── 1. Galerie de photographies ────────────────────────── -->
+          <section class="card overflow-hidden" aria-label="Photographies">
+            <div class="relative bg-navy/5" style="aspect-ratio: 4/3;"
+                 (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+              @if (activeImage(); as img) {
+                <button type="button" (click)="openLightbox()"
+                  class="block w-full h-full cursor-zoom-in"
+                  aria-label="Afficher la photo en plein écran">
+                  <img [src]="img.url" [alt]="headline()" class="w-full h-full object-cover">
+                </button>
+
+                <!-- Compteur de photos -->
+                <span class="absolute bottom-3 right-3 bg-navy/80 text-frost text-xs font-medium px-2.5 py-1 rounded-full">
+                  {{ imageCounter() }}
+                </span>
+
+                @if (imageCount() > 1) {
+                  <button type="button" (click)="prevImage()"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
+                    aria-label="Photo précédente">
+                    <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                  </button>
+                  <button type="button" (click)="nextImage()"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
+                    aria-label="Photo suivante">
+                    <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </button>
+                }
+              } @else {
+                <div class="w-full h-full flex items-center justify-center">
+                  <svg class="w-20 h-20 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+              }
+
+              <!-- Statut de l'annonce -->
+              @if (isSold()) {
+                <div class="absolute inset-x-0 top-0 bg-navy text-frost text-center py-2 text-sm font-semibold">
+                  Ce véhicule a été vendu.
+                </div>
+              } @else if (isReserved()) {
+                <div class="absolute inset-x-0 top-0 bg-amber-500 text-white text-center py-2 text-sm font-semibold">
+                  Ce véhicule est réservé.
+                </div>
+              }
+            </div>
+
+            <!-- Miniatures -->
+            @if (imageCount() > 1) {
+              <div class="flex gap-2 p-3 overflow-x-auto">
+                @for (img of images(); track img.id) {
+                  <button type="button" (click)="selectImage($index)"
+                    class="shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors"
+                    [class]="$index === activeImageIndex() ? 'border-azure' : 'border-transparent opacity-60 hover:opacity-100'"
+                    [attr.aria-label]="'Photo ' + ($index + 1)"
+                    [attr.aria-current]="$index === activeImageIndex()">
+                    <img [src]="img.thumbnailUrl ?? img.url" [alt]="" class="w-full h-full object-cover">
+                  </button>
+                }
               </div>
             }
+          </section>
 
-            <!-- Badges -->
-            <div class="absolute top-3 left-3 flex gap-2">
-              @if (v.isFeatured) {
-                <span class="badge bg-gold text-white text-xs">Destacado</span>
-              }
-              @if (v.isExportReady) {
-                <span class="badge bg-navy text-white text-xs">Export Ready</span>
+          <!-- ─── 2. Informations principales ────────────────────────── -->
+          <section class="card p-6">
+            <h1 class="font-heading font-bold text-navy text-2xl lg:text-3xl leading-tight">
+              {{ headline() }}
+            </h1>
+
+            <div class="flex items-center gap-3 flex-wrap mt-3">
+              <p class="text-3xl font-bold text-navy">{{ v.price | fcfa }}</p>
+              <!-- Sans comparables suffisants, aucun indicateur n'est affiché. -->
+              @if (priceIndicatorLabel(); as indicator) {
+                <span class="text-sm font-semibold px-3 py-1 rounded-full" [class]="priceIndicatorClass()">
+                  {{ indicator }}
+                </span>
               }
             </div>
-          </div>
+            @if (v.priceNegotiable) {
+              <p class="text-sm text-navy/50 mt-0.5">Prix négociable</p>
+            }
+            @if (priceIndicatorLabel()) {
+              <p class="text-xs text-navy/50 mt-2">
+                Prix calculé à partir de {{ v.priceComparablesCount }} véhicules similaires
+                disponibles sur Yoon u Auto.
+              </p>
+            }
 
-          <!-- Miniaturas -->
-          @if (v.images.length > 1) {
-            <div class="flex gap-3 mt-3 overflow-x-auto pb-2">
-              @for (img of v.images; track img.id; let i = $index) {
-                <button
-                  (click)="selectImage(i)"
-                  class="flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-colors"
-                  [class.border-gold]="activeImageIndex() === i"
-                  [class.border-transparent]="activeImageIndex() !== i"
-                >
-                  <img [src]="img.thumbnailUrl ?? img.url" [alt]="img.altText ?? ''"
-                    class="w-full h-full object-cover">
-                </button>
-              }
-            </div>
+            <p class="text-navy/70 mt-3">{{ summaryLine() }}</p>
+            @if (v.city) {
+              <p class="flex items-center gap-1.5 text-navy/60 text-sm mt-1">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                {{ v.city }}
+              </p>
+            }
+
+            <p class="text-xs text-navy/40 mt-4">Réf. Yoon : #{{ v.publicReference }}</p>
+          </section>
+
+          <!-- ─── 3. Statut douanier ─────────────────────────────────── -->
+          @if (customsLabel(); as customs) {
+            <section class="card p-6 border-2 border-azure/30">
+              <h2 class="font-heading font-semibold text-navy text-lg mb-2">Statut douanier</h2>
+              <p class="text-2xl font-bold text-navy">{{ customs }}</p>
+              <p class="text-xs text-navy/50 mt-3">
+                Information déclarée par le vendeur. Yoon u Auto ne procède pas à sa vérification.
+              </p>
+            </section>
           }
 
-          <!-- Descripción -->
-          @if (v.descriptionEs) {
-            <div class="mt-8 card p-6">
-              <h2 class="font-heading font-semibold text-navy text-xl mb-3">Descripción</h2>
-              <p class="text-navy/70 leading-relaxed whitespace-pre-line">{{ v.descriptionEs }}</p>
-            </div>
-          }
+          <!-- ─── 4. Caractéristiques ────────────────────────────────── -->
+          <section class="card p-6">
+            <h2 class="font-heading font-semibold text-navy text-lg mb-4">Caractéristiques</h2>
 
-          <!-- Ficha técnica -->
-          <div class="mt-6 card p-6">
-            <h2 class="font-heading font-semibold text-navy text-xl mb-4">Ficha técnica</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div>
-                <p class="text-xs text-navy/50 uppercase tracking-wide">Año</p>
-                <p class="font-semibold text-navy">{{ v.year }}</p>
-              </div>
-              @if (v.mileage !== null) {
+            <h3 class="text-sm font-semibold text-navy/70 uppercase tracking-wide mb-3">
+              Informations générales
+            </h3>
+            <dl class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              @for (s of generalSpecs(); track s.label) {
                 <div>
-                  <p class="text-xs text-navy/50 uppercase tracking-wide">Kilometraje</p>
-                  <p class="font-semibold text-navy">{{ formatMileage(v.mileage) }}</p>
+                  <dt class="text-xs text-navy/50 uppercase tracking-wide">{{ s.label }}</dt>
+                  <dd class="font-semibold text-navy mt-0.5">{{ s.value }}</dd>
                 </div>
               }
-              @if (fuelLabel()) {
-                <div>
-                  <p class="text-xs text-navy/50 uppercase tracking-wide">Combustible</p>
-                  <p class="font-semibold text-navy">{{ fuelLabel() }}</p>
-                </div>
-              }
-              @if (transmissionLabel()) {
-                <div>
-                  <p class="text-xs text-navy/50 uppercase tracking-wide">Transmisión</p>
-                  <p class="font-semibold text-navy">{{ transmissionLabel() }}</p>
-                </div>
-              }
-              @if (powerLabel()) {
-                <div>
-                  <p class="text-xs text-navy/50 uppercase tracking-wide">Potencia</p>
-                  <p class="font-semibold text-navy">{{ powerLabel() }}</p>
-                </div>
-              }
-              @if (bodyTypeLabel()) {
-                <div>
-                  <p class="text-xs text-navy/50 uppercase tracking-wide">Carrocería</p>
-                  <p class="font-semibold text-navy">{{ bodyTypeLabel() }}</p>
-                </div>
-              }
-              @if (v.color) {
-                <div>
-                  <p class="text-xs text-navy/50 uppercase tracking-wide">Color</p>
-                  <p class="font-semibold text-navy">{{ v.color }}</p>
-                </div>
-              }
-              @if (v.vin) {
-                <div>
-                  <p class="text-xs text-navy/50 uppercase tracking-wide">VIN</p>
-                  <p class="font-semibold text-navy font-mono text-sm">{{ v.vin }}</p>
-                </div>
-              }
-              <div>
-                <p class="text-xs text-navy/50 uppercase tracking-wide">País de origen</p>
-                <p class="font-semibold text-navy">{{ v.flagEmoji }} {{ v.countryName ?? v.countryOrigin }}</p>
-              </div>
-              @if (v.city) {
-                <div>
-                  <p class="text-xs text-navy/50 uppercase tracking-wide">Ciudad</p>
-                  <p class="font-semibold text-navy">{{ v.city }}</p>
-                </div>
-              }
-            </div>
-          </div>
+            </dl>
 
-          <!-- Equipamiento -->
-          @if (v.features && v.features.length > 0) {
-            <div class="mt-6 card p-6">
-              <h2 class="font-heading font-semibold text-navy text-xl mb-4">Equipamiento</h2>
+            @if (engineSpecs().length > 0) {
+              <h3 class="text-sm font-semibold text-navy/70 uppercase tracking-wide mt-6 mb-3">
+                Moteur
+              </h3>
+              <dl class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                @for (s of engineSpecs(); track s.label) {
+                  <div>
+                    <dt class="text-xs text-navy/50 uppercase tracking-wide">{{ s.label }}</dt>
+                    <dd class="font-semibold text-navy mt-0.5">{{ s.value }}</dd>
+                  </div>
+                }
+              </dl>
+            }
+
+            @if (v.vin) {
+              <div class="mt-6 pt-4 border-t border-navy/10">
+                <dt class="text-xs text-navy/50 uppercase tracking-wide">VIN</dt>
+                <dd class="font-mono text-sm text-navy mt-0.5">{{ v.vin }}</dd>
+              </div>
+            }
+          </section>
+
+          <!-- ─── 5. Équipements ─────────────────────────────────────── -->
+          @if (v.equipments.length > 0) {
+            <section class="card p-6">
+              <h2 class="font-heading font-semibold text-navy text-lg mb-4">Équipements</h2>
               <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                @for (feat of v.features; track feat) {
+                @for (e of v.equipments; track e.id) {
                   <li class="flex items-center gap-2 text-sm text-navy/80">
-                    <svg class="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-azure-dark shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
-                    <span>{{ feat }}</span>
+                    <span>{{ e.name }}</span>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+
+          <!-- ─── 6. Description du vendeur ──────────────────────────── -->
+          @if (v.description) {
+            <section class="card p-6">
+              <h2 class="font-heading font-semibold text-navy text-lg mb-3">Description du vendeur</h2>
+              <p class="text-navy/70 leading-relaxed whitespace-pre-line">{{ v.description }}</p>
+            </section>
+          }
+
+          <!-- ─── 7. Évolution du prix ───────────────────────────────── -->
+          @if (priceDrop(); as drop) {
+            <section class="card p-6">
+              <h2 class="font-heading font-semibold text-navy text-lg mb-3">Évolution du prix</h2>
+              <dl class="space-y-1.5 text-sm">
+                <div class="flex justify-between">
+                  <dt class="text-navy/60">Prix actuel</dt>
+                  <dd class="font-semibold text-navy">{{ v.price | fcfa }}</dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="text-navy/60">Prix initial</dt>
+                  <dd class="text-navy/60 line-through">{{ v.initialPrice | fcfa }}</dd>
+                </div>
+                <div class="flex justify-between pt-1.5 border-t border-navy/10">
+                  <dt class="text-green-700 font-medium">Baisse</dt>
+                  <dd class="text-green-700 font-semibold">↓ {{ drop | fcfa }}</dd>
+                </div>
+              </dl>
+              @if (v.priceChangedAt) {
+                <p class="text-xs text-navy/50 mt-3">
+                  Prix réduit le {{ v.priceChangedAt | date:'d MMMM y' }}.
+                </p>
+              }
+            </section>
+          }
+
+          <!-- ─── 8. Localisation ────────────────────────────────────── -->
+          @if (v.city || v.region) {
+            <section class="card p-6">
+              <h2 class="font-heading font-semibold text-navy text-lg mb-3">Localisation</h2>
+              <p class="text-navy/80">
+                {{ v.city }}@if (v.district) {<span>, {{ v.district }}</span>}
+              </p>
+              <p class="text-xs text-navy/50 mt-2">
+                Pour des raisons de sécurité, l'adresse exacte du véhicule n'est pas communiquée.
+              </p>
+            </section>
+          }
+
+          <!-- ─── 9. Besoin de plus d'informations ? ─────────────────── -->
+          @if (acceptsContact()) {
+            <section class="card p-6">
+              <h2 class="font-heading font-semibold text-navy text-lg mb-1">
+                Besoin de plus d'informations&nbsp;?
+              </h2>
+              <p class="text-sm text-navy/50 mb-4">
+                Un message pré-rédigé sera envoyé au vendeur.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                @for (r of infoRequests; track r.label) {
+                  <button type="button" (click)="requestInfo(r)" [disabled]="contacting()"
+                    class="px-3 py-2 rounded-lg border border-navy/20 text-sm text-navy hover:border-azure hover:bg-azure/5 transition-colors disabled:opacity-50">
+                    {{ r.label }}
+                  </button>
+                }
+              </div>
+            </section>
+          }
+        </div>
+
+        <!-- ═══ Colonne latérale ═════════════════════════════════════════ -->
+        <div class="space-y-4">
+
+          <!-- ─── Actions principales ────────────────────────────────── -->
+          <section class="card p-5 lg:sticky lg:top-24">
+            <p class="text-2xl font-bold text-navy">{{ v.price | fcfa }}</p>
+
+            @if (isSold()) {
+              <p class="mt-3 p-3 rounded-lg bg-navy/5 text-sm text-navy/70 text-center">
+                Ce véhicule a été vendu.
+              </p>
+            }
+
+            <div class="mt-4 space-y-2">
+              @if (acceptsContact()) {
+                <button type="button" (click)="toggleOfferForm()"
+                  class="btn-azure w-full py-3 text-sm" [attr.aria-expanded]="offerFormOpen()">
+                  Faire une offre
+                </button>
+
+                @if (offerFormOpen()) {
+                  <div class="p-3 rounded-xl border border-navy/15 bg-frost space-y-2.5">
+                    <p class="text-xs text-navy/60">
+                      Prix affiché&nbsp;: <span class="font-semibold text-navy">{{ v.price | fcfa }}</span>
+                    </p>
+
+                    <div>
+                      <label for="offer-amount" class="block text-xs font-medium text-navy mb-1">
+                        Votre offre <span class="text-navy/40 font-normal">(facultatif)</span>
+                      </label>
+                      <div class="relative">
+                        <input id="offer-amount" type="number" min="1" [(ngModel)]="offerAmount"
+                          class="input py-2 pr-14 text-sm" placeholder="8300000">
+                        <span class="absolute inset-y-0 right-2.5 flex items-center text-xs font-medium text-navy/50 pointer-events-none">
+                          FCFA
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label for="offer-message" class="block text-xs font-medium text-navy mb-1">
+                        Message <span class="text-navy/40 font-normal">(facultatif)</span>
+                      </label>
+                      <textarea id="offer-message" [(ngModel)]="offerMessage" rows="2"
+                        class="input py-2 text-sm resize-none"></textarea>
+                    </div>
+
+                    @if (offerError()) {
+                      <p class="text-xs text-red-600" role="alert">{{ offerError() }}</p>
+                    }
+
+                    <button type="button" (click)="sendOffer()" [disabled]="sendingOffer()"
+                      class="btn-azure w-full py-2.5 text-sm disabled:opacity-50">
+                      @if (sendingOffer()) { Envoi… } @else { Envoyer l'offre }
+                    </button>
+                  </div>
+                }
+
+                <button type="button" (click)="contactSeller()" [disabled]="contacting()"
+                  class="btn-outline w-full py-2.5 text-sm">
+                  @if (contacting()) { Envoi du message… } @else { Contacter le vendeur }
+                </button>
+              }
+
+              <button type="button" (click)="toggleFavorite()"
+                class="btn-outline w-full py-2.5 text-sm flex items-center justify-center gap-2"
+                [attr.aria-pressed]="isFavorited()">
+                <svg class="w-4 h-4" [class.fill-red-500]="isFavorited()" [class.text-red-500]="isFavorited()"
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+                {{ isFavorited() ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
+              </button>
+
+              <button type="button" (click)="toggleCompare()"
+                class="btn-outline w-full py-2.5 text-sm"
+                [attr.aria-pressed]="isCompared()">
+                {{ isCompared() ? 'Retirer du comparateur' : comparator.label() }}
+              </button>
+
+              <div class="relative">
+                <button type="button" (click)="toggleShare()"
+                  class="btn-outline w-full py-2.5 text-sm" [attr.aria-expanded]="shareOpen()">
+                  Partager
+                </button>
+                @if (shareOpen()) {
+                  <div class="absolute z-20 mt-1 w-full bg-white rounded-xl shadow-lg border border-navy/10 overflow-hidden">
+                    <button type="button" (click)="shareWhatsApp()"
+                      class="w-full text-left px-3 py-2.5 text-sm text-navy hover:bg-frost">WhatsApp</button>
+                    <button type="button" (click)="shareEmail()"
+                      class="w-full text-left px-3 py-2.5 text-sm text-navy hover:bg-frost">E-mail</button>
+                    <button type="button" (click)="copyLink()"
+                      class="w-full text-left px-3 py-2.5 text-sm text-navy hover:bg-frost">Copier le lien</button>
+                    @if (supportsNativeShare) {
+                      <button type="button" (click)="shareNative()"
+                        class="w-full text-left px-3 py-2.5 text-sm text-navy hover:bg-frost border-t border-navy/10">
+                        Plus d'options…
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            @if (copied()) {
+              <p class="text-xs text-green-700 text-center mt-2" role="status">Lien copié</p>
+            }
+            @if (comparatorFull()) {
+              <p class="text-xs text-navy/70 text-center mt-2" role="status">
+                Vous pouvez comparer jusqu'à 3 véhicules.
+              </p>
+            }
+          </section>
+
+          <!-- ─── Vendu par ──────────────────────────────────────────── -->
+          <section class="card p-5">
+            <h2 class="font-heading font-semibold text-navy text-base mb-3">Vendu par</h2>
+            <a [routerLink]="['/vehiculos']" [queryParams]="{ sellerId: v.sellerId }"
+               class="flex items-start gap-3 group">
+              <div class="w-11 h-11 shrink-0 rounded-full bg-azure flex items-center justify-center text-navy font-bold">
+                {{ v.sellerName.charAt(0) }}
+              </div>
+              <div class="min-w-0">
+                <p class="font-semibold text-navy truncate group-hover:text-azure-dark transition-colors">
+                  {{ v.sellerName }}
+                </p>
+                <p class="text-sm text-navy/60">{{ v.sellerAccountType }}</p>
+                @if (v.sellerCity) {
+                  <p class="text-sm text-navy/50">{{ v.sellerCity }}</p>
+                }
+                @if (sellerMemberSince(); as year) {
+                  <p class="text-xs text-navy/50 mt-1">Membre depuis {{ year }}</p>
+                }
+              </div>
+            </a>
+
+            <div class="mt-3 pt-3 border-t border-navy/10 space-y-1.5">
+              @if (v.sellerPhoneVerified) {
+                <p class="text-xs text-green-700 font-medium">✓ Téléphone vérifié</p>
+              }
+              @if (v.sellerVerifiedSalesCount > 0) {
+                <p class="text-xs text-navy/60">
+                  {{ v.sellerVerifiedSalesCount }}
+                  {{ v.sellerVerifiedSalesCount === 1 ? 'vente vérifiée' : 'ventes vérifiées' }}
+                </p>
+              }
+              <a [routerLink]="['/vehiculos']" [queryParams]="{ sellerId: v.sellerId }"
+                 class="inline-block text-xs text-azure-dark font-medium hover:underline">
+                Voir ses autres véhicules →
+              </a>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- ─── Signaler l'annonce ───────────────────────────────────── -->
+      <section class="mt-8 text-center">
+        @if (reportSent(); as reference) {
+          <p class="text-sm text-green-700">
+            Signalement #{{ reference }} enregistré. Merci&nbsp;: notre équipe va l'examiner.
+          </p>
+        } @else {
+          <button type="button" (click)="toggleReport()"
+            class="text-sm text-navy/50 hover:text-red-600 hover:underline">
+            Signaler cette annonce
+          </button>
+        }
+
+        @if (reportOpen()) {
+          <div class="bg-white rounded-xl border border-navy/10 p-5 mt-4 text-left max-w-xl mx-auto">
+            <h2 class="font-heading font-semibold text-navy mb-3">Signaler cette annonce</h2>
+
+            <label for="r-reason" class="block text-xs text-navy/60 mb-1">Motif</label>
+            <select id="r-reason" [(ngModel)]="reportReason"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm mb-3">
+              @for (r of reportReasons; track r.value) {
+                <option [ngValue]="r.value">{{ r.label }}</option>
+              }
+            </select>
+
+            <label for="r-desc" class="block text-xs text-navy/60 mb-1">
+              Description (facultatif)
+            </label>
+            <textarea id="r-desc" rows="3" [(ngModel)]="reportDescription"
+              placeholder="Ce qui vous semble anormal…"
+              class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm mb-3"></textarea>
+
+            <div class="flex gap-2">
+              <button type="button" (click)="submitReport()" class="btn-primary text-sm"
+                [disabled]="reportBusy()">
+                Envoyer le signalement
+              </button>
+              <button type="button" (click)="toggleReport()" class="btn-outline text-sm">
+                Annuler
+              </button>
+            </div>
+
+            @if (reportError()) {
+              <p class="text-xs text-red-600 mt-3" role="alert">{{ reportError() }}</p>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- ─── Transparence du véhicule ─────────────────────────────── -->
+      @if (transparency(); as t) {
+        <section class="mt-10 bg-white rounded-xl border border-navy/10 p-5">
+          <h2 class="font-heading font-semibold text-navy text-xl mb-1">
+            Transparence du véhicule
+          </h2>
+          <p class="text-sm text-navy/60 mb-4">
+            {{ t.maintenanceCount }}
+            {{ t.maintenanceCount === 1 ? 'entretien enregistré' : 'entretiens enregistrés' }}
+            sur Yoon u Auto
+            <span class="text-green-700 font-medium">✓</span>
+          </p>
+
+          @if (t.records.length > 0) {
+            <ul class="divide-y divide-navy/10" role="list">
+              @for (r of t.records; track r.description + r.performedAt) {
+                <li class="py-2.5 flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-sm text-navy">{{ r.description }}</p>
+                    @if (r.performedAt) {
+                      <p class="text-xs text-navy/50 mt-0.5">
+                        {{ r.performedAt | date:'dd/MM/yyyy' }}
+                        @if (r.mileage !== null) { · {{ r.mileage }} km }
+                      </p>
+                    }
+                  </div>
+                  @if (r.invoiceDocumentId) {
+                    <a [href]="invoiceUrl(r.invoiceDocumentId)" target="_blank" rel="noopener"
+                      class="text-sm text-azure-dark hover:underline shrink-0">
+                      Facture
+                    </a>
+                  }
+                </li>
+              }
+            </ul>
+          }
+
+          @if (t.mileageEvolution.length > 1) {
+            <div class="border-t border-navy/10 mt-4 pt-4">
+              <p class="text-sm font-medium text-navy mb-2">Évolution du kilométrage</p>
+              <ul class="text-xs text-navy/60 space-y-1" role="list">
+                @for (p of t.mileageEvolution; track p.date) {
+                  <li class="flex justify-between gap-3">
+                    <span>{{ p.date | date:'MMMM yyyy' }}</span>
+                    <span class="text-navy">{{ p.mileage }} km</span>
                   </li>
                 }
               </ul>
             </div>
           }
-        </div>
 
-        <!-- Sidebar: precio y acciones -->
-        <div class="space-y-4">
-          <div class="card p-6 sticky top-24">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="badge bg-navy/10 text-navy text-xs">{{ conditionLabel() }}</span>
-              @if (v.isExportReady) {
-                <span class="badge bg-green-100 text-green-800 text-xs">Export Ready</span>
-              }
-            </div>
+          <p class="text-xs text-navy/40 border-t border-navy/10 mt-4 pt-3">
+            Informations partagées volontairement par le vendeur depuis son garage
+            Yoon u Auto.
+          </p>
+        </section>
+      }
 
-            <h1 class="font-heading font-bold text-navy text-2xl leading-tight mb-1">{{ v.title }}</h1>
-            <p class="text-navy/50 text-sm mb-4">{{ v.makeName }} {{ v.modelName }} · {{ v.year }}</p>
-
-            <div class="border-t border-navy/8 pt-4 mb-4">
-              <p class="text-3xl font-bold text-navy">{{ formatPrice(v.price, v.currency) }}</p>
-              @if (v.priceNegotiable) {
-                <p class="text-sm text-gold mt-1">Precio negociable</p>
-              }
-            </div>
-
-            <div class="flex gap-2 text-sm text-navy/50 mb-6">
-              <span>{{ v.viewsCount }} vistas</span>
-              <span>·</span>
-              <span>{{ v.favoritesCount }} guardados</span>
-            </div>
-
-            <div class="space-y-3">
-              @if (auth.user()?.id !== v.sellerId) {
-                <button
-                  (click)="contactSeller()"
-                  class="btn-gold w-full py-3 text-base"
-                  [disabled]="contacting()"
-                >
-                  @if (contacting()) { Enviando mensaje... } @else { Contactar al vendedor }
-                </button>
-              }
-              <a
-                [routerLink]="['/tramitacion']"
-                [queryParams]="{ vehicleId: v.id, origin: v.countryOrigin }"
-                class="btn-outline w-full py-3 text-sm text-center block"
-              >
-                Calcular costes de importación
-              </a>
-
-              <!-- Favorito + compartir -->
-              <div class="grid grid-cols-3 gap-2 pt-2">
-                <button
-                  (click)="toggleFavorite()"
-                  class="flex flex-col items-center gap-1 py-2 rounded-lg border border-navy/10 hover:border-gold hover:bg-gold/5 transition-colors"
-                  [attr.aria-label]="isFavorited() ? 'Quitar de favoritos' : 'Añadir a favoritos'"
-                >
-                  <svg class="w-5 h-5" [class.text-gold]="isFavorited()" [class.text-navy]="!isFavorited()" [attr.fill]="isFavorited() ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                  </svg>
-                  <span class="text-xs text-navy/70">{{ isFavorited() ? 'Guardado' : 'Favorito' }}</span>
-                </button>
-                <button
-                  (click)="shareWhatsApp()"
-                  class="flex flex-col items-center gap-1 py-2 rounded-lg border border-navy/10 hover:border-green-500 hover:bg-green-50 transition-colors"
-                  aria-label="Compartir por WhatsApp"
-                >
-                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                  </svg>
-                  <span class="text-xs text-navy/70">WhatsApp</span>
-                </button>
-                <button
-                  (click)="copyLink()"
-                  class="flex flex-col items-center gap-1 py-2 rounded-lg border border-navy/10 hover:border-navy hover:bg-navy/5 transition-colors"
-                  aria-label="Copiar enlace"
-                >
-                  <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-                  </svg>
-                  <span class="text-xs text-navy/70">{{ copied() ? '¡Copiado!' : 'Enlace' }}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Vendedor -->
-          <div class="card p-6">
-            <h3 class="font-heading font-semibold text-navy text-base mb-3">Vendedor</h3>
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center text-gold font-bold text-lg">
-                {{ sellerDisplay().charAt(9) }}
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center gap-1">
-                  <p class="font-semibold text-navy text-sm">{{ sellerDisplay() }}</p>
-                  <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="flex items-center gap-1 text-xs text-navy/60">
-                  <span class="text-gold">★★★★★</span>
-                  <span>4.8 · verificado</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Vehículos similares -->
-      @if (relatedVehicles().length > 0) {
-        <div class="mt-12">
-          <h2 class="font-heading font-semibold text-navy text-2xl mb-6">Vehículos similares</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            @for (rel of relatedVehicles(); track rel.id) {
-              <a [routerLink]="['/vehiculos', rel.slug]" class="card overflow-hidden hover:shadow-lg transition-shadow group">
-                <div class="aspect-video bg-navy/5 overflow-hidden">
-                  @if (rel.primaryImageUrl) {
-                    <img [src]="rel.primaryImageUrl" [alt]="rel.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
-                  }
-                </div>
-                <div class="p-4">
-                  <h3 class="font-semibold text-navy text-sm line-clamp-1">{{ rel.title }}</h3>
-                  <p class="text-xs text-navy/50 mt-1">{{ rel.year }} · {{ rel.countryOrigin }}</p>
-                  <p class="text-lg font-bold text-navy mt-2">{{ formatPrice(rel.price, rel.currency) }}</p>
-                </div>
-              </a>
+      <!-- ─── 10. Véhicules similaires ──────────────────────────────── -->
+      @if (similarVehicles().length > 0) {
+        <section class="mt-10">
+          <h2 class="font-heading font-semibold text-navy text-xl mb-4">Véhicules similaires</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            @for (s of similarVehicles(); track s.id) {
+              <lll-vehicle-card [vehicle]="s" />
             }
           </div>
-        </div>
+        </section>
       }
     </div>
+
+    <!-- ─── Barre d'actions fixe sur mobile ─────────────────────────── -->
+    <div class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-navy/10 px-4 py-3 flex items-center gap-3">
+      <div class="min-w-0 flex-1">
+        <p class="font-bold text-navy leading-tight">{{ v.price | fcfa }}</p>
+        <p class="text-xs text-navy/50 truncate">{{ headline() }}</p>
+      </div>
+      <button type="button" (click)="toggleFavorite()"
+        class="w-11 h-11 shrink-0 rounded-lg border border-navy/20 flex items-center justify-center"
+        [attr.aria-label]="isFavorited() ? 'Retirer des favoris' : 'Ajouter aux favoris'">
+        <svg class="w-5 h-5" [class.fill-red-500]="isFavorited()" [class.text-red-500]="isFavorited()"
+          fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+      </button>
+      @if (acceptsContact()) {
+        <button type="button" (click)="contactSeller()" [disabled]="contacting()"
+          class="btn-azure py-2.5 px-5 text-sm shrink-0">
+          Contacter
+        </button>
+      }
+    </div>
+
+    <!-- ─── Galerie plein écran ──────────────────────────────────────── -->
+    @if (lightboxOpen()) {
+      <div class="fixed inset-0 z-50 bg-navy-dark/95 flex flex-col"
+           role="dialog" aria-modal="true" aria-label="Galerie plein écran">
+        <div class="flex items-center justify-between p-4 text-frost">
+          <span class="text-sm">{{ imageCounter() }}</span>
+          <button type="button" (click)="closeLightbox()" class="p-2" aria-label="Fermer">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex-1 flex items-center justify-center p-4 overflow-auto"
+             (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+          @if (activeImage(); as img) {
+            <img [src]="img.url" [alt]="headline()" class="max-w-full max-h-full object-contain">
+          }
+        </div>
+
+        @if (imageCount() > 1) {
+          <div class="flex items-center justify-center gap-6 p-4">
+            <button type="button" (click)="prevImage()" class="p-3 text-frost" aria-label="Photo précédente">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <button type="button" (click)="nextImage()" class="p-3 text-frost" aria-label="Photo suivante">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        }
+      </div>
+    }
   }
 </div>

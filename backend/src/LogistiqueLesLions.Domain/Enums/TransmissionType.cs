@@ -1,9 +1,8 @@
 namespace LogistiqueLesLions.Domain.Enums;
 
+/// <summary>Caja de cambios. La especificación solo distingue manual y automática.</summary>
 public enum TransmissionType
 {
-    Manual = 1,
-    Automatic = 2,
-    SemiAutomatic = 3,
-    CVT = 4
+    Manuel = 1,
+    Automatique = 2
 }

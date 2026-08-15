@@ -10,18 +10,18 @@ public class GetMessagesQueryHandler(IApplicationDbContext db)
 {
     public async Task<Result<PagedResult<MessageDto>>> Handle(GetMessagesQuery request, CancellationToken ct)
     {
-        var conversation = await db.Conversations
+        var negotiation = await db.Negotiations
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == request.ConversationId, ct);
+            .FirstOrDefaultAsync(c => c.Id == request.NegotiationId, ct);
 
-        if (conversation is null)
-            return Result<PagedResult<MessageDto>>.Failure("Conversation.NotFound");
+        if (negotiation is null)
+            return Result<PagedResult<MessageDto>>.Failure("Negotiation.NotFound");
 
-        if (conversation.BuyerId != request.RequesterId && conversation.SellerId != request.RequesterId)
-            return Result<PagedResult<MessageDto>>.Failure("Conversation.AccessDenied");
+        if (negotiation.BuyerId != request.RequesterId && negotiation.SellerId != request.RequesterId)
+            return Result<PagedResult<MessageDto>>.Failure("Negotiation.AccessDenied");
 
         var query = db.Messages
-            .Where(m => m.ConversationId == request.ConversationId)
+            .Where(m => m.NegotiationId == request.NegotiationId)
             .Include(m => m.Sender);
 
         var total = await query.CountAsync(ct);
@@ -33,7 +33,7 @@ public class GetMessagesQueryHandler(IApplicationDbContext db)
             .Select(m => new MessageDto(
                 m.Id,
                 m.SenderId,
-                $"{m.Sender.FirstName} {m.Sender.LastName}",
+                m.Sender.DisplayName,
                 m.Sender.AvatarUrl,
                 m.Body,
                 m.IsRead,
@@ -42,7 +42,7 @@ public class GetMessagesQueryHandler(IApplicationDbContext db)
 
         // Mark as read
         var unread = await db.Messages
-            .Where(m => m.ConversationId == request.ConversationId
+            .Where(m => m.NegotiationId == request.NegotiationId
                      && m.SenderId != request.RequesterId
                      && !m.IsRead)
             .ToListAsync(ct);

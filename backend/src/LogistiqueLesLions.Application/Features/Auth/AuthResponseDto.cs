@@ -1,3 +1,5 @@
+using LogistiqueLesLions.Domain.Entities;
+
 namespace LogistiqueLesLions.Application.Features.Auth;
 
 public record AuthResponseDto(
@@ -7,12 +9,25 @@ public record AuthResponseDto(
     UserDto User
 );
 
+/// <summary>Identidad mínima del usuario que el frontend guarda en sesión.</summary>
 public record UserDto(
     Guid Id,
-    string Email,
-    string FirstName,
-    string LastName,
+    string DisplayName,
+    string? Phone,
+    string? Email,
     string Role,
+    string AccountType,
     string? AvatarUrl,
-    bool IsVerified
-);
+    bool PhoneVerified
+)
+{
+    public static UserDto From(UserProfile user) => new(
+        user.Id,
+        user.DisplayName,
+        user.Phone,
+        user.Email,
+        user.Role.ToString(),
+        user.AccountType.ToString(),
+        user.AvatarUrl,
+        user.PhoneVerified);
+}

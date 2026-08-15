@@ -1,3 +1,8 @@
+using LogistiqueLesLions.Application.Common.Interfaces;
+using LogistiqueLesLions.Application.Features.Garage;
+using LogistiqueLesLions.Application.Features.Moderation;
+using LogistiqueLesLions.Domain.Enums;
+using System.Security.Claims;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetFeaturedVehicles;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleMakes;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleStats;
@@ -108,6 +113,72 @@ public static class VehicleEndpoints
         .Produces<IEnumerable<VehicleMakeDto>>()
         .AllowAnonymous();
 
+        // ─── GET /api/v1/vehicles/{id}/transparency ──────────────────────────
+        // «Transparence du véhicule»: solo lo que quien vende ha compartido a propósito.
+        group.MapGet("/{id:guid}/transparency", async (
+            Guid id, IMediator mediator, CancellationToken ct) =>
+        {
+            var result = await mediator.Send(new GetVehicleTransparencyQuery(id), ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.NotFound(result.Error);
+        })
+        .WithName("GetVehicleTransparency")
+        .WithSummary("Historial que quien vende ha decidido enseñar en el anuncio")
+        .AllowAnonymous();
+
+        // ─── GET /api/v1/vehicles/{id}/transparency/invoices/{documentId} ────
+        // La factura sigue siendo privada: solo se sirve si se compartió expresamente.
+        group.MapGet("/{id:guid}/transparency/invoices/{documentId:guid}", async (
+            Guid id,
+            Guid documentId,
+            IMediator mediator,
+            IStorageService storage,
+            CancellationToken ct) =>
+        {
+            var result = await mediator.Send(new GetSharedInvoiceQuery(id, documentId), ct);
+            if (!result.IsSuccess) return Results.NotFound(result.Error);
+
+            var file = result.Value!;
+            var stream = await storage.OpenPrivateAsync(file.StorageKey, ct);
+            if (stream is null) return Results.NotFound("GarageDocument.FileMissing");
+
+            return Results.File(stream, file.ContentType, fileDownloadName: file.FileName);
+        })
+        .WithName("GetSharedInvoice")
+        .WithSummary("Descargar una factura compartida en el anuncio")
+        .AllowAnonymous();
+
+        // ─── POST /api/v1/vehicles/reports ───────────────────────────────────
+        // «Signaler» un anuncio, a una persona o una conversación.
+        group.MapPost("/reports", async (
+            [FromBody] CreateReportBody body,
+            ClaimsPrincipal user,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            var sub = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                   ?? user.FindFirst("sub")?.Value;
+            if (!Guid.TryParse(sub, out var reporterId)) return Results.Unauthorized();
+
+            var result = await mediator.Send(new CreateReportCommand(
+                reporterId, body.TargetType, body.TargetId, body.Reason,
+                body.Description, body.Evidence), ct);
+
+            return result.IsSuccess
+                ? Results.Ok(new { reference = result.Value })
+                : Results.BadRequest(result.Error);
+        })
+        .WithName("CreateReport")
+        .WithSummary("Signaler une annonce, un utilisateur ou une négociation")
+        .RequireAuthorization();
+
         return group;
     }
 }
+
+/// <summary>Cuerpo de un signalement. Quien reporta sale del token.</summary>
+public record CreateReportBody(
+    ReportTargetType TargetType,
+    Guid TargetId,
+    ReportReason Reason,
+    string? Description,
+    IReadOnlyList<string>? Evidence);

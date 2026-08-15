@@ -28,7 +28,7 @@ public class GetVehiclesAdminQueryHandler(IApplicationDbContext db)
             .Select(v => new VehicleAdminDto(
                 v.Id, v.Title, v.Slug, v.Status.ToString(),
                 v.Price, v.Currency,
-                v.Seller != null ? v.Seller.Email : "—",
+                v.Seller != null ? v.Seller.DisplayName : "—",
                 v.Make.Name, v.Year, v.CreatedAt, v.ExpiresAt))
             .ToListAsync(ct);
 

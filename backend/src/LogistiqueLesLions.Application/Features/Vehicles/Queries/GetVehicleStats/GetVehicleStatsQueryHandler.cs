@@ -14,13 +14,13 @@ public class GetVehicleStatsQueryHandler(IApplicationDbContext context)
         CancellationToken cancellationToken)
     {
         var activeVehicles = await context.Vehicles
-            .CountAsync(v => v.Status == VehicleStatus.Active, cancellationToken);
+            .CountAsync(v => v.Status == VehicleStatus.Actif, cancellationToken);
 
         var supportedCountries = await context.Countries
             .CountAsync(c => c.IsActive, cancellationToken);
 
         var completedTransactions = await context.Vehicles
-            .CountAsync(v => v.Status == VehicleStatus.Sold, cancellationToken);
+            .CountAsync(v => v.Status == VehicleStatus.Vendu, cancellationToken);
 
         var totalMakes = await context.VehicleMakes
             .CountAsync(cancellationToken);

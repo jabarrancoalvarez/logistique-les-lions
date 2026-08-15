@@ -27,9 +27,7 @@ public class RefreshTokenCommandHandler(
         var access    = jwt.GenerateAccessToken(user);
         var expiresAt = DateTimeOffset.UtcNow.AddMinutes(15);
 
-        return Result<AuthResponseDto>.Success(new AuthResponseDto(
-            access, newRefresh, expiresAt,
-            new UserDto(user.Id, user.Email, user.FirstName, user.LastName,
-                        user.Role.ToString(), user.AvatarUrl, user.IsVerified)));
+        return Result<AuthResponseDto>.Success(
+            new AuthResponseDto(access, newRefresh, expiresAt, UserDto.From(user)));
     }
 }

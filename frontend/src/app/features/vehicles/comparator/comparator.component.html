@@ -1,0 +1,225 @@
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <h1 class="font-heading text-2xl font-bold text-navy">
+      Comparateur
+      @if (vehicles().length > 0) {
+        <span class="text-navy/50 font-normal text-lg">
+          ({{ vehicles().length }}/{{ maxVehicles() }})
+        </span>
+      }
+    </h1>
+    @if (vehicles().length > 0) {
+      <button type="button" (click)="clearAll()" class="text-sm text-navy/60 hover:text-red-600">
+        Vider le comparateur
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="animate-pulse grid grid-cols-3 gap-4">
+      @for (i of [1,2,3]; track i) {
+        <div class="h-64 bg-navy/5 rounded-2xl"></div>
+      }
+    </div>
+  } @else if (hasError()) {
+    <div class="text-center py-20 bg-white rounded-2xl border border-red-200">
+      <p class="text-red-600">Impossible de charger la comparaison. Veuillez réessayer.</p>
+    </div>
+  } @else if (vehicles().length === 0) {
+    <div class="text-center py-20 bg-white rounded-2xl border border-navy/10">
+      <svg class="w-16 h-16 mx-auto mb-4 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"/>
+      </svg>
+      <p class="text-lg font-medium text-navy mb-2">Aucun véhicule à comparer</p>
+      <p class="text-navy/50 text-sm mb-6 max-w-md mx-auto">
+        Ajoutez jusqu'à {{ maxVehicles() }} véhicules depuis le Marketplace, une annonce
+        ou vos favoris pour les comparer côte à côte.
+      </p>
+      <a routerLink="/vehiculos" class="btn-azure">Explorer les véhicules</a>
+    </div>
+  } @else {
+
+    <!--
+      En móvil no se comprimen tres columnas: la primera (el nombre de la
+      característica) queda fija y los vehículos se recorren en horizontal.
+    -->
+    <div class="overflow-x-auto -mx-4 px-4">
+      <table class="w-full border-separate border-spacing-0 min-w-[640px]">
+
+        <!-- ─── Cabecera: tarjetas de los vehículos ────────────────────── -->
+        <thead>
+          <tr>
+            <th class="sticky left-0 z-20 bg-frost/50 w-40 min-w-40 text-left align-bottom p-2"></th>
+            @for (v of vehicles(); track v.id) {
+              <th class="p-2 align-top text-left" [style.width.%]="(100 - 25) / vehicles().length">
+                <div class="bg-white rounded-2xl border border-navy/10 overflow-hidden h-full"
+                     [class.opacity-75]="isSold(v)">
+
+                  <a [routerLink]="['/vehiculos', v.slug]" class="block bg-navy/5" style="aspect-ratio: 4/3;">
+                    @if (v.primaryImageUrl) {
+                      <img [src]="v.primaryImageUrl" [alt]="headline(v)" class="w-full h-full object-cover">
+                    } @else {
+                      <div class="w-full h-full flex items-center justify-center">
+                        <svg class="w-10 h-10 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                      </div>
+                    }
+                  </a>
+
+                  <div class="p-3">
+                    <p class="font-heading font-semibold text-navy text-sm leading-snug line-clamp-2">
+                      {{ headline(v) }}
+                    </p>
+
+                    <p class="text-lg font-bold text-navy mt-1.5">{{ v.price | fcfa }}</p>
+
+                    @if (priceIndicatorLabel(v); as indicator) {
+                      <span class="inline-block text-xs font-medium px-2 py-0.5 rounded-full mt-1"
+                            [class]="priceIndicatorClass(v)">
+                        {{ indicator }}
+                      </span>
+                    }
+
+                    @if (v.city) {
+                      <p class="text-xs text-navy/50 mt-1.5 font-normal">{{ v.city }}</p>
+                    }
+
+                    <p class="mt-1.5">
+                      <span class="badge text-xs"
+                            [class]="isSold(v) ? 'bg-navy text-white' : 'bg-navy/10 text-navy'">
+                        {{ statusLabel(v) }}
+                      </span>
+                    </p>
+
+                    <!-- ─── Actions ──────────────────────────────────── -->
+                    <div class="mt-3 pt-3 border-t border-navy/10 space-y-1.5 font-normal">
+                      <a [routerLink]="['/vehiculos', v.slug]"
+                         class="block text-xs font-semibold text-azure-dark hover:underline">
+                        Voir l'annonce
+                      </a>
+                      <button type="button" (click)="toggleFavorite(v)"
+                        class="block text-xs text-navy/60 hover:text-navy">
+                        Ajouter aux favoris
+                      </button>
+                      @if (!isSold(v)) {
+                        <button type="button" (click)="contact(v)"
+                          class="block text-xs text-navy/60 hover:text-navy">
+                          Contacter
+                        </button>
+                      }
+                      <button type="button" (click)="shareVehicle(v)"
+                        class="block text-xs text-navy/60 hover:text-navy">
+                        Partager
+                      </button>
+                      <button type="button" (click)="removeFromComparator(v.id)"
+                        class="block text-xs text-navy/60 hover:text-red-600">
+                        Retirer du comparateur
+                      </button>
+
+                      @if (copiedId() === v.id) {
+                        <p class="text-xs text-green-700" role="status">Lien copié</p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </th>
+            }
+          </tr>
+        </thead>
+
+        <!-- ─── Tableau comparatif ─────────────────────────────────────── -->
+        @for (block of blocks(); track block.title) {
+          <tbody>
+            <tr>
+              <td [attr.colspan]="vehicles().length + 1"
+                  class="sticky left-0 pt-6 pb-2 text-sm font-semibold text-navy/70 uppercase tracking-wide">
+                {{ block.title }}
+              </td>
+            </tr>
+
+            @for (row of block.rows; track row.label) {
+              <tr [class.bg-azure]="row.differs" [class.bg-opacity-5]="row.differs">
+                <th scope="row"
+                    class="sticky left-0 z-10 bg-frost/50 text-left text-xs text-navy/60 font-medium p-2 align-top">
+                  {{ row.label }}
+                </th>
+                @for (value of row.values; track $index) {
+                  <td class="p-2 text-sm align-top"
+                      [class]="value ? 'text-navy font-medium' : 'text-navy/35 italic font-normal'">
+                    {{ value ?? 'Non renseigné' }}
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        }
+      </table>
+    </div>
+
+    <p class="text-xs text-navy/50 mt-4">
+      Les différences sont mises en évidence pour faciliter la lecture. Yoon u Auto ne
+      désigne pas de meilleur véhicule&nbsp;: la décision vous appartient.
+    </p>
+
+    <!-- ─── Remplacer / ajouter un véhicule ──────────────────────────────── -->
+    @if (hasFreeSlot()) {
+      <div class="mt-6">
+        @if (!searchOpen()) {
+          <button type="button" (click)="openSearch()" class="btn-outline py-2.5 px-5 text-sm">
+            + Ajouter un véhicule
+          </button>
+        } @else {
+          <div class="bg-white rounded-2xl border border-navy/10 p-4 max-w-lg">
+            <div class="flex items-center justify-between mb-3">
+              <label for="cmp-search" class="text-sm font-medium text-navy">
+                Ajouter un véhicule à la comparaison
+              </label>
+              <button type="button" (click)="closeSearch()"
+                class="text-navy/40 hover:text-navy" aria-label="Fermer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+
+            <input id="cmp-search" type="search" [(ngModel)]="searchTerm"
+              (ngModelChange)="onSearchTermChange()" class="input"
+              placeholder="Toyota RAV4, Hilux…" autocomplete="off">
+
+            @if (searching()) {
+              <p class="text-xs text-navy/50 mt-2">Recherche…</p>
+            } @else if (searchResults().length > 0) {
+              <ul class="mt-3 space-y-1">
+                @for (r of searchResults(); track r.id) {
+                  <li>
+                    <button type="button" (click)="addToComparison(r.id)"
+                      class="w-full text-left px-3 py-2 rounded-lg hover:bg-frost transition-colors flex items-center gap-3">
+                      <span class="flex-1 min-w-0">
+                        <span class="block text-sm text-navy truncate">
+                          {{ r.makeName }} {{ r.modelName }}
+                        </span>
+                        <span class="block text-xs text-navy/50">
+                          {{ r.year }}@if (r.city) {<span> · {{ r.city }}</span>}
+                        </span>
+                      </span>
+                      <span class="text-sm font-semibold text-navy shrink-0">{{ r.price | fcfa }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            } @else if (searchTerm.trim().length >= 2) {
+              <p class="text-xs text-navy/50 mt-2">Aucun véhicule trouvé.</p>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="text-sm text-navy/60 mt-6">
+        Vous pouvez comparer jusqu'à {{ maxVehicles() }} véhicules. Retirez-en un pour en
+        ajouter un autre.
+      </p>
+    }
+  }
+</div>

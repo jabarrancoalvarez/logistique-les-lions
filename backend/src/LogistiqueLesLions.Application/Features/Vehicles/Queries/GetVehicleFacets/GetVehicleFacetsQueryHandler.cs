@@ -14,7 +14,7 @@ public class GetVehicleFacetsQueryHandler(IApplicationDbContext context)
     {
         var baseQuery = context.Vehicles
             .AsNoTracking()
-            .Where(v => v.Status == VehicleStatus.Active);
+            .Where(v => v.Status == VehicleStatus.Actif);
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {

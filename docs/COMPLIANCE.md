@@ -2,7 +2,7 @@
 
 ## Introducción
 
-El módulo de Compliance es el **diferenciador principal** de la plataforma. Mientras competidores como coches.net o AutoScout24 solo facilitan el contacto entre compradores y vendedores, Logistique Les Lions gestiona todo el papeleo transfronterizo.
+El módulo de Compliance es el **diferenciador principal** de la plataforma. Mientras competidores como coches.net o AutoScout24 solo facilitan el contacto entre compradores y vendedores, Yoon U Auto gestiona todo el papeleo transfronterizo.
 
 ---
 

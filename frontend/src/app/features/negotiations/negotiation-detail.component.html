@@ -1,0 +1,646 @@
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+
+  <a routerLink="/mis-negociaciones" class="inline-flex items-center gap-1.5 text-sm text-navy/60 hover:text-navy mb-4">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Mes négociations
+  </a>
+
+  @if (loading()) {
+    <div class="animate-pulse space-y-4">
+      <div class="h-24 bg-navy/5 rounded-xl"></div>
+      <div class="h-64 bg-navy/5 rounded-xl"></div>
+    </div>
+  } @else if (error()) {
+    <div class="text-center py-20 bg-white rounded-2xl border border-navy/10">
+      <p class="text-navy/70">{{ error() }}</p>
+    </div>
+  } @else if (negotiation()) {
+    @let n = negotiation()!;
+
+    <!-- ─── En-tête : véhicule et parties ─────────────────────────────── -->
+    <div class="bg-white rounded-xl border border-navy/10 p-4 mb-5">
+      <div class="flex items-start gap-4">
+        <a [routerLink]="['/vehiculos', n.vehicleSlug]"
+           class="w-24 h-16 rounded-lg overflow-hidden bg-navy/5 shrink-0">
+          @if (n.vehicleThumbnailUrl) {
+            <img [src]="n.vehicleThumbnailUrl" [alt]="n.vehicleTitle" class="w-full h-full object-cover">
+          }
+        </a>
+
+        <div class="min-w-0 flex-1">
+          <a [routerLink]="['/vehiculos', n.vehicleSlug]"
+             class="font-heading font-semibold text-navy hover:text-azure-dark transition-colors block truncate">
+            {{ n.vehicleTitle }}
+          </a>
+          <p class="text-lg font-bold text-navy mt-0.5">{{ n.vehiclePrice | fcfa }}</p>
+          <p class="text-sm text-navy/60 mt-0.5">
+            {{ n.isBuyer ? 'Vous ↔ ' + n.otherUserName : n.otherUserName + ' ↔ Vous' }}
+          </p>
+        </div>
+
+        <div class="text-right shrink-0 space-y-1">
+          <span class="badge bg-navy/10 text-navy text-xs">{{ statusLabel() }}</span>
+          @if (vehicleNotice(); as notice) {
+            <p><span class="badge bg-navy text-white text-xs">{{ notice }}</span></p>
+          }
+        </div>
+      </div>
+
+      <p class="text-xs text-navy/50 mt-3 pt-3 border-t border-navy/10">
+        Réf. #{{ n.vehiclePublicReference }}
+      </p>
+    </div>
+
+    <!-- ─── Onglets ───────────────────────────────────────────────────── -->
+    <div class="flex gap-1 mb-4 border-b border-navy/10" role="tablist">
+      <button type="button" (click)="selectTab('conversation')" role="tab"
+        class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors"
+        [class]="activeTab() === 'conversation'
+          ? 'border-azure text-navy' : 'border-transparent text-navy/50 hover:text-navy'"
+        [attr.aria-selected]="activeTab() === 'conversation'">
+        Conversation
+      </button>
+      <button type="button" (click)="selectTab('inspection')" role="tab"
+        class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors"
+        [class]="activeTab() === 'inspection'
+          ? 'border-azure text-navy' : 'border-transparent text-navy/50 hover:text-navy'"
+        [attr.aria-selected]="activeTab() === 'inspection'">
+        Inspection
+      </button>
+      <button type="button" (click)="selectTab('contract')" role="tab"
+        class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors"
+        [class]="activeTab() === 'contract'
+          ? 'border-azure text-navy' : 'border-transparent text-navy/50 hover:text-navy'"
+        [attr.aria-selected]="activeTab() === 'contract'">
+        Contrat
+      </button>
+      <button type="button" (click)="selectTab('timeline')" role="tab"
+        class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors"
+        [class]="activeTab() === 'timeline'
+          ? 'border-azure text-navy' : 'border-transparent text-navy/50 hover:text-navy'"
+        [attr.aria-selected]="activeTab() === 'timeline'">
+        Chronologie
+      </button>
+    </div>
+
+    <!-- ─── Contrat de vente ──────────────────────────────────────────── -->
+    @if (activeTab() === 'contract') {
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        @if (contractLoading()) {
+          <p class="text-sm text-navy/50 py-4">Chargement…</p>
+        } @else if (contractTab()) {
+          @let tab = contractTab()!;
+
+          <!-- ── Aucun contrat : présentation et création ── -->
+          @if (!tab.contract) {
+            <h2 class="font-heading font-semibold text-navy text-lg mb-1">Contrat de vente</h2>
+            <p class="text-sm text-navy/60 mb-5">
+              Une fois le prix convenu, rédigez le contrat. L'autre partie devra le valider&nbsp;:
+              la vente sera alors enregistrée comme <strong>vente vérifiée</strong>.
+            </p>
+
+            @if (!tab.canCreate) {
+              <p class="text-sm text-navy/50 py-4">
+                Cette négociation est terminée&nbsp;: aucun contrat ne peut être créé.
+              </p>
+            } @else if (!contractFormOpen()) {
+              <button type="button" (click)="openContractForm()" class="btn-primary">
+                Créer le contrat de vente
+              </button>
+            }
+          }
+
+          <!-- ── Contrat existant ── -->
+          @if (tab.contract) {
+            @let c = tab.contract!;
+            <div class="flex items-start justify-between gap-3 mb-5">
+              <div>
+                <h2 class="font-heading font-semibold text-navy text-lg">
+                  Contrat #{{ c.publicReference }}
+                </h2>
+                <p class="text-xs text-navy/50 mt-0.5">
+                  Rédigé par {{ c.createdByMe ? 'vous' : n.otherUserName }} ·
+                  {{ c.createdAt | date:'dd/MM/yyyy' }}
+                </p>
+              </div>
+              <span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap"
+                [class]="contractStatusClass(c.status)">
+                {{ contractStatusLabel(c.status) }}
+              </span>
+            </div>
+
+            @if (c.status === 'Valide') {
+              <div class="bg-green-50 border border-green-200 rounded-lg px-3 py-3 mb-5">
+                <p class="text-sm text-green-800">
+                  ✓ Vente vérifiée le {{ c.validatedAt | date:'dd/MM/yyyy' }}.
+                </p>
+                @if (c.verificationCode) {
+                  <p class="text-xs text-green-900/70 mt-1">
+                    Code de vérification&nbsp;:
+                    <span class="font-mono">{{ c.verificationCode }}</span> —
+                    figure sur le QR du contrat.
+                  </p>
+                }
+              </div>
+
+              <!-- Le véhicule entre dans le garage de l'acheteur, pas du vendeur. -->
+              @if (!tab.isSeller) {
+                <div class="bg-white border border-azure/40 rounded-lg px-4 py-3 mb-5">
+                  <p class="text-sm text-navy font-medium">Et maintenant&nbsp;?</p>
+                  <p class="text-xs text-navy/60 mt-1 mb-3">
+                    Conservez ce véhicule dans Mon Garage&nbsp;: documents, entretien,
+                    rappels et valeur estimée, au même endroit.
+                  </p>
+                  <a [routerLink]="['/mi-garaje/nuevo']" [queryParams]="{ contrat: c.id }"
+                    class="btn-azure text-sm inline-block">
+                    Ajouter ce véhicule à Mon Garage
+                  </a>
+                </div>
+              }
+            }
+
+            @if (c.status === 'ModificationDemandee' && c.changeRequestNotes) {
+              <div class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 mb-5">
+                <p class="text-xs font-medium text-orange-800 mb-0.5">Modification demandée</p>
+                <p class="text-sm text-orange-900">{{ c.changeRequestNotes }}</p>
+              </div>
+            }
+
+            @if (c.status === 'AValider' && !c.createdByMe) {
+              <p class="text-sm bg-amber-50 text-amber-900 rounded-lg px-3 py-2 mb-5">
+                Vérifiez attentivement les informations avant de valider.
+              </p>
+            }
+
+            <!-- Récapitulatif -->
+            @if (!contractFormOpen()) {
+              <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm mb-5">
+                <div class="sm:col-span-2">
+                  <dt class="text-xs text-navy/50">Véhicule</dt>
+                  <dd class="text-navy font-medium">
+                    {{ c.vehicleMake }} {{ c.vehicleModel }} {{ c.vehicleVersion }} · {{ c.vehicleYear }}
+                    <span class="text-navy/50 font-normal">(Réf. #{{ c.vehicleReference }})</span>
+                  </dd>
+                </div>
+                @if (c.vehicleMileage !== null) {
+                  <div>
+                    <dt class="text-xs text-navy/50">Kilométrage</dt>
+                    <dd class="text-navy">{{ c.vehicleMileage }} km</dd>
+                  </div>
+                }
+                @if (c.vehicleVin) {
+                  <div>
+                    <dt class="text-xs text-navy/50">VIN</dt>
+                    <dd class="text-navy font-mono text-xs">{{ c.vehicleVin }}</dd>
+                  </div>
+                }
+                @if (c.registrationPlate) {
+                  <div>
+                    <dt class="text-xs text-navy/50">Immatriculation</dt>
+                    <dd class="text-navy">{{ c.registrationPlate }}</dd>
+                  </div>
+                }
+                <div>
+                  <dt class="text-xs text-navy/50">Prix convenu</dt>
+                  <dd class="text-navy font-heading font-semibold">{{ c.agreedPrice | fcfa }}</dd>
+                </div>
+
+                <div class="sm:col-span-2 border-t border-navy/10 pt-3">
+                  <dt class="text-xs text-navy/50">Vendeur</dt>
+                  <dd class="text-navy">{{ c.sellerLegalName }}</dd>
+                  @if (c.sellerIdDocument) {
+                    <dd class="text-xs text-navy/50">Pièce d'identité&nbsp;: {{ c.sellerIdDocument }}</dd>
+                  }
+                  @if (c.sellerAddress) {
+                    <dd class="text-xs text-navy/50">{{ c.sellerAddress }}</dd>
+                  }
+                </div>
+                <div class="sm:col-span-2">
+                  <dt class="text-xs text-navy/50">Acheteur</dt>
+                  <dd class="text-navy">{{ c.buyerLegalName }}</dd>
+                  @if (c.buyerIdDocument) {
+                    <dd class="text-xs text-navy/50">Pièce d'identité&nbsp;: {{ c.buyerIdDocument }}</dd>
+                  }
+                  @if (c.buyerAddress) {
+                    <dd class="text-xs text-navy/50">{{ c.buyerAddress }}</dd>
+                  }
+                </div>
+              </dl>
+
+              <!-- Actions : chacune n'apparaît que pour la partie concernée -->
+              <div class="flex flex-wrap gap-2">
+                @if (c.canDownloadPdf) {
+                  <button type="button" (click)="downloadPdf()" class="btn-primary text-sm"
+                    [disabled]="downloadingPdf()">
+                    {{ downloadingPdf() ? 'Préparation…' : 'Télécharger le PDF' }}
+                  </button>
+                }
+                @if (c.canEdit) {
+                  <button type="button" (click)="openContractForm()" class="btn-outline text-sm"
+                    [disabled]="contractBusy()">
+                    Modifier
+                  </button>
+                }
+                @if (c.canSend) {
+                  <button type="button" (click)="sendContract()" class="btn-primary text-sm"
+                    [disabled]="contractBusy()">
+                    Envoyer à {{ n.otherUserName }}
+                  </button>
+                }
+                @if (c.canValidate) {
+                  <button type="button" (click)="validateContract()" class="btn-primary text-sm"
+                    [disabled]="contractBusy()">
+                    Valider le contrat
+                  </button>
+                }
+                @if (c.canRequestChanges) {
+                  <button type="button" (click)="toggleChangeForm()" class="btn-outline text-sm"
+                    [disabled]="contractBusy()">
+                    Demander une modification
+                  </button>
+                }
+                @if (c.canCancel) {
+                  <button type="button" (click)="cancelContract()"
+                    class="text-sm text-red-600 hover:underline px-2"
+                    [disabled]="contractBusy()">
+                    Annuler le contrat
+                  </button>
+                }
+              </div>
+
+              @if (changeFormOpen()) {
+                <div class="mt-4 pt-4 border-t border-navy/10">
+                  <label for="change-notes" class="block text-sm font-medium text-navy mb-1">
+                    Que faut-il corriger&nbsp;?
+                  </label>
+                  <textarea id="change-notes" rows="3" [(ngModel)]="changeNotes"
+                    class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm"
+                    placeholder="Ex.&nbsp;: le kilométrage indiqué n'est pas correct."></textarea>
+                  <button type="button" (click)="requestChanges()" class="btn-primary text-sm mt-2"
+                    [disabled]="contractBusy()">
+                    Envoyer la demande
+                  </button>
+                </div>
+              }
+            }
+          }
+
+          <!-- ── Formulaire ── -->
+          @if (contractFormOpen()) {
+            <div class="border-t border-navy/10 pt-5 mt-5 space-y-4">
+              <p class="text-xs text-navy/50">
+                Les données du véhicule sont reprises de l'annonce et figées dans le contrat.
+              </p>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="agreed-price" class="block text-sm font-medium text-navy mb-1">
+                    Prix convenu (FCFA)
+                  </label>
+                  <input id="agreed-price" type="number" min="1"
+                    [(ngModel)]="contractForm.agreedPrice"
+                    class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                </div>
+                <div>
+                  <label for="plate" class="block text-sm font-medium text-navy mb-1">
+                    Immatriculation
+                  </label>
+                  <input id="plate" type="text" [(ngModel)]="contractForm.registrationPlate"
+                    placeholder="DK-1234-AB"
+                    class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                </div>
+              </div>
+
+              <fieldset class="border-t border-navy/10 pt-4">
+                <legend class="text-sm font-medium text-navy mb-2">Vendeur</legend>
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="seller-name" class="block text-xs text-navy/60 mb-1">Nom complet</label>
+                    <input id="seller-name" type="text" [(ngModel)]="contractForm.sellerLegalName"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label for="seller-id" class="block text-xs text-navy/60 mb-1">CNI / Passeport</label>
+                    <input id="seller-id" type="text" [(ngModel)]="contractForm.sellerIdDocument"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label for="seller-address" class="block text-xs text-navy/60 mb-1">Adresse</label>
+                    <input id="seller-address" type="text" [(ngModel)]="contractForm.sellerAddress"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="border-t border-navy/10 pt-4">
+                <legend class="text-sm font-medium text-navy mb-2">Acheteur</legend>
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="buyer-name" class="block text-xs text-navy/60 mb-1">Nom complet</label>
+                    <input id="buyer-name" type="text" [(ngModel)]="contractForm.buyerLegalName"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label for="buyer-id" class="block text-xs text-navy/60 mb-1">CNI / Passeport</label>
+                    <input id="buyer-id" type="text" [(ngModel)]="contractForm.buyerIdDocument"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label for="buyer-address" class="block text-xs text-navy/60 mb-1">Adresse</label>
+                    <input id="buyer-address" type="text" [(ngModel)]="contractForm.buyerAddress"
+                      class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+                  </div>
+                </div>
+              </fieldset>
+
+              <div class="flex gap-2">
+                <button type="button" (click)="saveContract()" class="btn-primary text-sm"
+                  [disabled]="contractBusy()">
+                  {{ tab.contract ? 'Enregistrer' : 'Créer le contrat' }}
+                </button>
+                <button type="button" (click)="closeContractForm()" class="btn-outline text-sm">
+                  Annuler
+                </button>
+              </div>
+            </div>
+          }
+
+          @if (contractError()) {
+            <p class="text-xs text-red-600 mt-3" role="alert">{{ contractError() }}</p>
+          }
+        } @else {
+          <p class="text-sm text-navy/50 py-4">Contrat indisponible.</p>
+        }
+      </div>
+    }
+
+    <!-- ─── Inspection privée ─────────────────────────────────────────── -->
+    @if (activeTab() === 'inspection') {
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        <h2 class="font-heading font-semibold text-navy text-lg mb-1">Inspection du véhicule</h2>
+        <p class="text-xs text-navy/50 mb-5">
+          Cette checklist est <strong>strictement privée</strong>&nbsp;: {{ n.otherUserName }}
+          n'y a pas accès. Il ne s'agit pas d'une certification de Yoon u Auto, mais de
+          vos propres notes lors de la visite.
+        </p>
+
+        @if (inspection(); as insp) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+            <div>
+              <label for="insp-km" class="block text-xs font-medium text-navy mb-1">
+                Kilométrage constaté
+              </label>
+              <input id="insp-km" type="number" min="0" class="input py-2 text-sm"
+                [value]="insp.observedMileage ?? ''"
+                (input)="setObservedMileage($any($event.target).value)">
+            </div>
+          </div>
+
+          <ul class="space-y-3" role="list">
+            @for (item of insp.items; track item.type) {
+              <li class="pb-3 border-b border-navy/5 last:border-0">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-sm font-medium text-navy">{{ itemLabel(item) }}</span>
+                  <div class="flex gap-1" role="group" [attr.aria-label]="itemLabel(item)">
+                    @for (r of inspectionResults; track r) {
+                      <button type="button" (click)="setItemResult(item, r)"
+                        class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors"
+                        [class]="item.result === r
+                          ? (r === 'Bon' ? 'border-green-500 bg-green-50 text-green-800'
+                            : r === 'Moyen' ? 'border-amber-500 bg-amber-50 text-amber-800'
+                            : 'border-red-500 bg-red-50 text-red-800')
+                          : 'border-navy/20 text-navy/50 hover:border-navy/40'"
+                        [attr.aria-pressed]="item.result === r">
+                        {{ resultLabel(r) }}
+                      </button>
+                    }
+                  </div>
+                </div>
+                <input type="text" class="input py-1.5 text-sm mt-2"
+                  placeholder="Note (facultatif)"
+                  [value]="item.notes ?? ''"
+                  (input)="setItemNotes(item, $any($event.target).value)"
+                  [attr.aria-label]="'Note pour ' + itemLabel(item)">
+              </li>
+            }
+          </ul>
+
+          <div class="mt-5">
+            <label for="insp-notes" class="block text-sm font-medium text-navy mb-1.5">
+              Observations personnelles
+            </label>
+            <textarea id="insp-notes" rows="4" class="input resize-none text-sm"
+              [value]="insp.notes ?? ''"
+              (input)="setInspectionNotes($any($event.target).value)"></textarea>
+          </div>
+
+          <div class="flex items-center gap-3 mt-4">
+            <button type="button" (click)="saveInspection()" [disabled]="savingInspection()"
+              class="btn-azure py-2.5 px-5 text-sm disabled:opacity-50">
+              @if (savingInspection()) { Enregistrement… } @else { Enregistrer }
+            </button>
+            @if (inspectionSaved()) {
+              <span class="text-sm text-green-700" role="status">Enregistré.</span>
+            }
+            @if (insp.updatedAt) {
+              <span class="text-xs text-navy/40">
+                Dernière modification&nbsp;: {{ insp.updatedAt | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+            }
+          </div>
+        } @else {
+          <p class="text-sm text-navy/50 py-4">Chargement…</p>
+        }
+      </div>
+    }
+
+    <!-- ─── Offre en cours ────────────────────────────────────────────── -->
+    @if (activeTab() === 'conversation' && n.pendingOffer) {
+      @let offer = n.pendingOffer!;
+      <div class="bg-white rounded-xl border-2 border-azure/40 p-4 mb-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs text-navy/50">
+              {{ offer.byMe ? 'Votre offre' : 'Offre reçue' }} · Prix affiché
+              {{ offer.listedPrice | fcfa }}
+            </p>
+            <p class="text-2xl font-bold text-navy mt-0.5">{{ offer.amount | fcfa }}</p>
+            @if (offerGap(offer); as gap) {
+              <p class="text-xs text-navy/50">↓ {{ gap | fcfa }} sous le prix affiché</p>
+            }
+            @if (offer.message) {
+              <p class="text-sm text-navy/70 mt-2 whitespace-pre-line">{{ offer.message }}</p>
+            }
+          </div>
+          <span class="badge text-xs shrink-0" [class]="offerStatusClass(offer)">
+            {{ offerStatusLabel(offer) }}
+          </span>
+        </div>
+
+        @if (offer.canRespond) {
+          <div class="flex flex-wrap gap-2 mt-4 pt-3 border-t border-navy/10">
+            <button type="button" (click)="accept(offer)" [disabled]="responding()"
+              class="btn-azure py-2 px-4 text-sm disabled:opacity-50">
+              Accepter
+            </button>
+            <button type="button" (click)="reject(offer)" [disabled]="responding()"
+              class="btn-outline py-2 px-4 text-sm disabled:opacity-50">
+              Refuser
+            </button>
+            <button type="button" (click)="toggleCounterForm()" [disabled]="responding()"
+              class="btn-outline py-2 px-4 text-sm disabled:opacity-50">
+              Faire une contre-offre
+            </button>
+          </div>
+        } @else if (offer.byMe) {
+          <p class="text-xs text-navy/50 mt-3 pt-3 border-t border-navy/10">
+            En attente de la réponse de {{ n.otherUserName }}.
+          </p>
+        }
+
+        @if (counterFormOpen()) {
+          <div class="mt-3 pt-3 border-t border-navy/10 space-y-2.5">
+            <div>
+              <label for="counter-amount" class="block text-xs font-medium text-navy mb-1">
+                Votre contre-offre
+              </label>
+              <div class="relative">
+                <input id="counter-amount" type="number" min="1" [(ngModel)]="counterAmount"
+                  class="input py-2 pr-14 text-sm" placeholder="8600000">
+                <span class="absolute inset-y-0 right-2.5 flex items-center text-xs font-medium text-navy/50 pointer-events-none">
+                  FCFA
+                </span>
+              </div>
+            </div>
+            <textarea [(ngModel)]="counterMessage" rows="2" class="input py-2 text-sm resize-none"
+              placeholder="Message (facultatif)" aria-label="Message de la contre-offre"></textarea>
+            <button type="button" (click)="sendCounterOffer()" [disabled]="responding()"
+              class="btn-azure w-full py-2.5 text-sm disabled:opacity-50">
+              Envoyer la contre-offre
+            </button>
+          </div>
+        }
+
+        @if (offerError()) {
+          <p class="text-xs text-red-600 mt-2" role="alert">{{ offerError() }}</p>
+        }
+      </div>
+    }
+
+    <!-- ─── Historique des offres ─────────────────────────────────────── -->
+    @if (activeTab() === 'conversation' && n.offers.length > 1) {
+      <details class="bg-white rounded-xl border border-navy/10 p-4 mb-4">
+        <summary class="text-sm font-medium text-navy cursor-pointer">
+          Historique des offres ({{ n.offers.length }})
+        </summary>
+        <ul class="mt-3 space-y-2" role="list">
+          @for (o of n.offers; track o.id) {
+            <li class="flex items-center justify-between gap-3 text-sm">
+              <span class="text-navy/60">
+                {{ o.byMe ? 'Vous' : n.otherUserName }} · {{ o.createdAt | date:'dd/MM HH:mm' }}
+              </span>
+              <span class="flex items-center gap-2 shrink-0">
+                <span class="font-semibold text-navy">{{ o.amount | fcfa }}</span>
+                <span class="badge text-xs" [class]="offerStatusClass(o)">{{ offerStatusLabel(o) }}</span>
+              </span>
+            </li>
+          }
+        </ul>
+      </details>
+    }
+
+    <!-- ─── Conversation ──────────────────────────────────────────────── -->
+    @if (activeTab() === 'conversation') {
+      <div class="bg-white rounded-xl border border-navy/10 p-4">
+        @if (messages().length === 0) {
+          <p class="text-sm text-navy/50 py-6 text-center">Aucun message pour le moment.</p>
+        } @else {
+          <ul class="space-y-3 mb-4 max-h-[26rem] overflow-y-auto" role="list">
+            @for (m of messages(); track m.id) {
+              <li class="flex" [class.justify-end]="isMine(m)">
+                <div class="max-w-[80%] rounded-2xl px-4 py-2.5"
+                     [class]="isMine(m) ? 'bg-navy text-frost' : 'bg-frost text-navy'">
+                  <p class="text-sm whitespace-pre-line">{{ m.body }}</p>
+                  <p class="text-xs mt-1" [class]="isMine(m) ? 'text-frost/50' : 'text-navy/40'">
+                    {{ m.createdAt | date:'dd/MM HH:mm' }}
+                  </p>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (n.acceptsNegotiation) {
+          <div class="flex gap-2">
+            <textarea [(ngModel)]="messageBody" rows="2" class="input resize-none flex-1"
+              placeholder="Écrire un message…" aria-label="Votre message"></textarea>
+            <button type="button" (click)="sendMessage()"
+              [disabled]="sending() || !messageBody.trim()"
+              class="btn-azure px-5 shrink-0 disabled:opacity-50">
+              @if (sending()) { … } @else { Envoyer }
+            </button>
+          </div>
+          @if (!n.pendingOffer) {
+            <button type="button" (click)="toggleCounterForm()"
+              class="btn-outline w-full py-2.5 text-sm mt-2">
+              Faire une offre
+            </button>
+
+            @if (counterFormOpen()) {
+              <div class="mt-2 space-y-2.5">
+                <div class="relative">
+                  <input type="number" min="1" [(ngModel)]="counterAmount"
+                    class="input py-2 pr-14 text-sm" placeholder="8300000"
+                    aria-label="Montant de l'offre">
+                  <span class="absolute inset-y-0 right-2.5 flex items-center text-xs font-medium text-navy/50 pointer-events-none">
+                    FCFA
+                  </span>
+                </div>
+                <button type="button" (click)="sendCounterOffer()" [disabled]="responding()"
+                  class="btn-azure w-full py-2.5 text-sm disabled:opacity-50">
+                  Envoyer l'offre
+                </button>
+                @if (offerError()) {
+                  <p class="text-xs text-red-600" role="alert">{{ offerError() }}</p>
+                }
+              </div>
+            }
+          }
+        } @else {
+          <p class="text-sm text-navy/60 text-center py-3 bg-navy/5 rounded-lg">
+            Ce véhicule a été vendu. La conversation reste consultable.
+          </p>
+        }
+      </div>
+    }
+
+    <!-- ─── Chronologie ───────────────────────────────────────────────── -->
+    @if (activeTab() === 'timeline') {
+      <div class="bg-white rounded-xl border border-navy/10 p-5">
+        @if (n.timeline.length === 0) {
+          <p class="text-sm text-navy/50 text-center py-4">Aucun événement enregistré.</p>
+        } @else {
+          <ol class="relative border-l-2 border-navy/10 ml-2 space-y-5">
+            @for (e of n.timeline; track e.id) {
+              <li class="ml-5">
+                <span class="absolute -left-[0.4rem] w-3 h-3 rounded-full bg-azure" aria-hidden="true"></span>
+                <p class="text-xs text-navy/50">{{ e.createdAt | date:'d MMMM y — HH:mm' }}</p>
+                <p class="text-sm font-medium text-navy mt-0.5">
+                  {{ eventLabel(e) }}
+                  @if (e.amount !== null) {
+                    <span class="font-bold">{{ e.amount | fcfa }}</span>
+                  }
+                </p>
+                @if (eventActor(e); as actor) {
+                  <p class="text-xs text-navy/50">{{ actor }}</p>
+                }
+              </li>
+            }
+          </ol>
+        }
+      </div>
+    }
+  }
+</div>

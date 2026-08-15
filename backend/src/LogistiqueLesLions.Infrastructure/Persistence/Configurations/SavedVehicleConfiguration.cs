@@ -12,9 +12,14 @@ public class SavedVehicleConfiguration : IEntityTypeConfiguration<SavedVehicle>
         builder.HasKey(s => s.Id);
         builder.Property(s => s.Id).ValueGeneratedNever();
 
+        builder.Property(s => s.PriceWhenSaved).HasPrecision(12, 2);
+        builder.Property(s => s.LastAlertedPrice).HasPrecision(12, 2);
+
         // Un usuario no puede guardar el mismo vehículo dos veces
         builder.HasIndex(s => new { s.UserId, s.VehicleId }).IsUnique();
         builder.HasIndex(s => s.UserId);
+        // Al bajar el precio de un anuncio hay que localizar a quienes lo siguen.
+        builder.HasIndex(s => s.VehicleId);
         builder.HasQueryFilter(s => s.DeletedAt == null);
 
         builder.HasOne(s => s.Vehicle)

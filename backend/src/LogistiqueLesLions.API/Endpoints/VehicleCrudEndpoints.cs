@@ -5,8 +5,15 @@ using LogistiqueLesLions.Application.Features.Vehicles.Commands.GenerateVehicleD
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.DeleteVehicle;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.ToggleFavorite;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.UpdateVehicle;
+using LogistiqueLesLions.Application.Features.Vehicles.Commands.RegisterVehicleView;
+using LogistiqueLesLions.Application.Features.Vehicles.Commands.SetFavoriteAlert;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.UploadVehicleImage;
+using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetSimilarVehicles;
+using LogistiqueLesLions.Application.Features.Vehicles.Queries.CompareVehicles;
+using LogistiqueLesLions.Application.Features.Vehicles.Queries.CountVehicles;
+using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetFilterOptions;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetMyFavorites;
+using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleModels;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleBySlug;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleFacets;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleHistory;
@@ -25,41 +32,88 @@ public static class VehicleCrudEndpoints
     {
         // ─── GET /api/v1/vehicles ─────────────────────────────────────────────
         group.MapGet("/", async (
-            [FromQuery] string? search,
-            [FromQuery] Guid? makeId,
-            [FromQuery] Guid? modelId,
-            [FromQuery] int? yearFrom,
-            [FromQuery] int? yearTo,
-            [FromQuery] decimal? priceFrom,
-            [FromQuery] decimal? priceTo,
-            [FromQuery] string? countryOrigin,
-            [FromQuery] VehicleCondition? condition,
-            [FromQuery] FuelType? fuelType,
-            [FromQuery] TransmissionType? transmission,
-            [FromQuery] BodyType? bodyType,
-            [FromQuery] bool? isExportReady,
-            [FromQuery] bool? isFeatured,
-            [FromQuery] Guid? sellerId,
-            [FromQuery] VehicleStatus? status,
+            [AsParameters] VehicleSearchRequest req,
+            ClaimsPrincipal user,
             IMediator mediator,
-            CancellationToken ct,
-            [FromQuery] string? sortBy = null,
-            [FromQuery] bool sortDesc = false,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20) =>
+            CancellationToken ct) =>
         {
-            var result = await mediator.Send(new GetVehiclesQuery(
-                search, makeId, modelId, yearFrom, yearTo,
-                priceFrom, priceTo, countryOrigin,
-                condition, fuelType, transmission, bodyType,
-                isExportReady, isFeatured,
-                sortBy ?? "createdAt", sortDesc, page, pageSize,
-                sellerId, status
-            ), ct);
+            var result = await mediator.Send(req.ToQuery(CanSeeNonPublic(user, req.SellerId)), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         })
         .WithName("GetVehicles")
         .WithSummary("Listado paginado de vehículos con filtros")
+        .AllowAnonymous();
+
+        // ─── GET /api/v1/vehicles/count ──────────────────────────────────────
+        // Cuántos resultados producen unos filtros, sin traer los anuncios.
+        group.MapGet("/count", async (
+            [AsParameters] VehicleSearchRequest req,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            var result = await mediator.Send(new CountVehiclesQuery(req.ToQuery()), ct);
+            return result.IsSuccess
+                ? Results.Ok(new { count = result.Value })
+                : Results.BadRequest(result.Error);
+        })
+        .WithName("CountVehicles")
+        .WithSummary("Número de resultados para unos filtros dados")
+        .AllowAnonymous();
+
+        // ─── GET /api/v1/vehicles/compare ────────────────────────────────────
+        // Los datos se consultan siempre en vivo: el comparador solo guarda los ids.
+        group.MapGet("/compare", async (
+            [FromQuery] Guid[] ids, IMediator mediator, CancellationToken ct) =>
+        {
+            var result = await mediator.Send(new CompareVehiclesQuery(ids ?? []), ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        })
+        .WithName("CompareVehicles")
+        .WithSummary("Datos actuales de los vehículos del comparador")
+        .AllowAnonymous();
+
+        // ─── GET /api/v1/vehicles/filter-options ─────────────────────────────
+        group.MapGet("/filter-options", async (IMediator mediator, CancellationToken ct) =>
+        {
+            var result = await mediator.Send(new GetFilterOptionsQuery(), ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        })
+        .WithName("GetFilterOptions")
+        .WithSummary("Catálogo de equipamiento y colores disponibles para los filtros")
+        .AllowAnonymous();
+
+        // ─── GET /api/v1/vehicles/makes/{makeId}/models ──────────────────────
+        group.MapGet("/makes/{makeId:guid}/models", async (
+            Guid makeId, IMediator mediator, CancellationToken ct) =>
+        {
+            var result = await mediator.Send(new GetVehicleModelsQuery(makeId), ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        })
+        .WithName("GetVehicleModels")
+        .WithSummary("Modelos de una marca, para el desplegable dependiente")
+        .AllowAnonymous();
+
+        // ─── GET /api/v1/vehicles/{id}/similar ───────────────────────────────
+        group.MapGet("/{id:guid}/similar", async (
+            Guid id, IMediator mediator, CancellationToken ct, [FromQuery] int take = 8) =>
+        {
+            var result = await mediator.Send(new GetSimilarVehiclesQuery(id, take), ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.NotFound(result.Error);
+        })
+        .WithName("GetSimilarVehicles")
+        .WithSummary("Véhicules similaires del final de la ficha")
+        .AllowAnonymous();
+
+        // ─── POST /api/v1/vehicles/{id}/view ─────────────────────────────────
+        group.MapPost("/{id:guid}/view", async (
+            Guid id, IMediator mediator, CancellationToken ct) =>
+        {
+            await mediator.Send(new RegisterVehicleViewCommand(id), ct);
+            // El contador es informativo: nunca debe hacer fallar la carga de la ficha.
+            return Results.NoContent();
+        })
+        .WithName("RegisterVehicleView")
+        .WithSummary("Registra una visualización del anuncio")
         .AllowAnonymous();
 
         // ─── GET /api/v1/vehicles/facets ─────────────────────────────────────
@@ -112,10 +166,16 @@ public static class VehicleCrudEndpoints
         // ─── POST /api/v1/vehicles ────────────────────────────────────────────
         group.MapPost("/", async (
             CreateVehicleCommand command,
+            ClaimsPrincipal user,
             IMediator mediator,
             CancellationToken ct) =>
         {
-            var result = await mediator.Send(command, ct);
+            // El vendedor sale siempre del token: nunca se acepta del cuerpo, o cualquiera
+            // podría publicar anuncios en nombre de otro usuario.
+            if (!TryGetUserId(user, out var sellerId))
+                return Results.Unauthorized();
+
+            var result = await mediator.Send(command with { SellerId = sellerId }, ct);
             return result.IsSuccess
                 ? Results.Created($"/api/v1/vehicles/{result.Value}", new { id = result.Value })
                 : Results.BadRequest(result.Errors);
@@ -128,14 +188,23 @@ public static class VehicleCrudEndpoints
         group.MapPut("/{id:guid}", async (
             Guid id,
             UpdateVehicleCommand command,
+            ClaimsPrincipal user,
             IMediator mediator,
             CancellationToken ct) =>
         {
             if (id != command.Id)
-                return Results.BadRequest("El ID de la ruta no coincide con el cuerpo.");
+                return Results.BadRequest("L'identifiant de l'URL ne correspond pas au corps de la requête.");
 
-            var result = await mediator.Send(command, ct);
-            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
+            if (!TryGetUserId(user, out var requesterId))
+                return Results.Unauthorized();
+
+            // El handler comprueba que quien edita sea el propietario del anuncio.
+            var result = await mediator.Send(command with { RequesterId = requesterId }, ct);
+
+            if (result.IsSuccess) return Results.NoContent();
+            return result.Error == "Vehicle.NotOwner"
+                ? Results.Forbid()
+                : Results.BadRequest(result.Error);
         })
         .WithName("UpdateVehicle")
         .WithSummary("Actualizar datos de un vehículo")
@@ -198,32 +267,71 @@ public static class VehicleCrudEndpoints
         .RequireAuthorization();
 
         // ─── POST /api/v1/vehicles/{id}/favorite ─────────────────────────────
+        // El usuario sale siempre del token: aceptarlo por query string permitiría
+        // manipular los favoritos de cualquier otra cuenta.
         group.MapPost("/{id:guid}/favorite", async (
             Guid id,
-            [FromQuery] Guid userId,
+            ClaimsPrincipal user,
             IMediator mediator,
             CancellationToken ct) =>
         {
+            if (!TryGetUserId(user, out var userId)) return Results.Unauthorized();
+
             var result = await mediator.Send(new ToggleFavoriteCommand(userId, id), ct);
             return result.IsSuccess
                 ? Results.Ok(new { isSaved = result.Value })
                 : Results.BadRequest(result.Error);
         })
         .WithName("ToggleFavorite")
-        .WithSummary("Añadir/quitar vehículo de guardados")
+        .WithSummary("Añadir/quitar vehículo de Favoris")
         .RequireAuthorization();
 
         // ─── GET /api/v1/vehicles/favorites ──────────────────────────────────
         group.MapGet("/favorites", async (
-            [FromQuery] Guid userId,
+            ClaimsPrincipal user,
             IMediator mediator,
             CancellationToken ct) =>
         {
+            if (!TryGetUserId(user, out var userId)) return Results.Unauthorized();
+
             var result = await mediator.Send(new GetMyFavoritesQuery(userId), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         })
         .WithName("GetMyFavorites")
-        .WithSummary("Listar vehículos guardados como favoritos por el usuario")
+        .WithSummary("Mes recherches → Favoris")
+        .RequireAuthorization();
+
+        // ─── PUT /api/v1/vehicles/{id}/favorite/alert ────────────────────────
+        group.MapPut("/{id:guid}/favorite/alert", async (
+            Guid id,
+            [FromBody] SetAlertRequest body,
+            ClaimsPrincipal user,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            if (!TryGetUserId(user, out var userId)) return Results.Unauthorized();
+
+            var result = await mediator.Send(new SetFavoriteAlertCommand(userId, id, body.Enabled), ct);
+            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
+        })
+        .WithName("SetFavoriteAlert")
+        .WithSummary("Alerta de bajada de precio de un favorito concreto")
+        .RequireAuthorization();
+
+        // ─── PUT /api/v1/vehicles/favorites/alerts ───────────────────────────
+        group.MapPut("/favorites/alerts", async (
+            [FromBody] SetAlertRequest body,
+            ClaimsPrincipal user,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            if (!TryGetUserId(user, out var userId)) return Results.Unauthorized();
+
+            var result = await mediator.Send(new SetAllFavoriteAlertsCommand(userId, body.Enabled), ct);
+            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
+        })
+        .WithName("SetAllFavoriteAlerts")
+        .WithSummary("Interruptor general de alertas de Favoris")
         .RequireAuthorization();
 
         // ─── POST /api/v1/vehicles/{id}/ai/description ───────────────────────
@@ -303,4 +411,27 @@ public static class VehicleCrudEndpoints
 
         return group;
     }
+
+    /// <summary>Identificador del usuario autenticado a partir del JWT.</summary>
+    private static bool TryGetUserId(ClaimsPrincipal user, out Guid userId)
+    {
+        var sub = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+               ?? user.FindFirst("sub")?.Value;
+        return Guid.TryParse(sub, out userId);
+    }
+
+    /// <summary>
+    /// Los borradores, pausados y archivados solo los ve su propietario o un
+    /// administrador. Nunca se deduce del <c>sellerId</c> recibido, o bastaría con
+    /// pasar el identificador de otro usuario para ver sus anuncios sin publicar.
+    /// </summary>
+    private static bool CanSeeNonPublic(ClaimsPrincipal user, Guid? requestedSellerId)
+    {
+        if (user.IsInRole("Admin")) return true;
+        if (requestedSellerId is null) return false;
+        return TryGetUserId(user, out var userId) && userId == requestedSellerId.Value;
+    }
 }
+
+/// <summary>Cuerpo de los dos endpoints de alertas de Favoris.</summary>
+public record SetAlertRequest(bool Enabled);

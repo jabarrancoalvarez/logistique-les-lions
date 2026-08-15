@@ -1,7 +1,7 @@
-<footer class="bg-navy text-ivory" role="contentinfo">
+<footer class="bg-navy text-frost" role="contentinfo">
 
-  <!-- ─── Franja gold decorativa ────────────────────────────────────────── -->
-  <div class="h-0.5 bg-gradient-to-r from-transparent via-gold to-transparent opacity-40"></div>
+  <!-- ─── Franja azure decorativa ────────────────────────────────────────── -->
+  <div class="h-0.5 bg-gradient-to-r from-transparent via-azure to-transparent opacity-40"></div>
 
   <!-- ─── Contenido principal ──────────────────────────────────────────── -->
   <div class="container mx-auto px-4 lg:px-6 py-16">
@@ -9,11 +9,11 @@
 
       <!-- Columna 1: Marca y descripción -->
       <div class="lg:col-span-2">
-        <a routerLink="/" class="inline-block mb-5">
-          <img src="assets/logo.jpeg" alt="Logistique Les Lions" class="h-14 w-auto" loading="lazy">
+        <a routerLink="/" class="inline-block logo-chip px-4 py-2.5 mb-5">
+          <img src="assets/logo.png" alt="Yoon U Auto — Services Automobiles" class="h-12 w-auto" loading="lazy">
         </a>
-        <p class="text-ivory/60 text-sm leading-relaxed mb-6 max-w-xs">
-          Plataforma líder en compraventa internacional de vehículos con gestión completa de documentación transfronteriza, aduanas y homologaciones.
+        <p class="text-frost/60 text-sm leading-relaxed mb-6 max-w-xs">
+          La plateforme sénégalaise pour acheter, vendre et suivre sa voiture. Gratuite, en FCFA, avec contrat vérifié et Mon Garage.
         </p>
         <!-- Redes sociales -->
         <div class="flex items-center gap-3">
@@ -23,7 +23,7 @@
               [attr.aria-label]="social.name"
               target="_blank"
               rel="noopener noreferrer"
-              class="w-9 h-9 border border-white/20 rounded-lg flex items-center justify-center text-ivory/60 hover:text-gold hover:border-gold/50 transition-all duration-200"
+              class="w-9 h-9 border border-white/20 rounded-lg flex items-center justify-center text-frost/60 hover:text-azure-light hover:border-azure/50 transition-all duration-200"
             >
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path [attr.d]="social.icon"/>
@@ -35,11 +35,11 @@
 
       <!-- Columna 2: Plataforma -->
       <div>
-        <h3 class="text-xs font-bold uppercase tracking-widest text-gold mb-5">Plataforma</h3>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-azure-light mb-5">Plateforme</h3>
         <ul class="space-y-3" role="list">
           @for (link of platformLinks; track link.label) {
             <li>
-              <a [routerLink]="link.path" class="text-sm text-ivory/60 hover:text-gold transition-colors duration-200">
+              <a [routerLink]="link.path" class="text-sm text-frost/60 hover:text-azure-light transition-colors duration-200">
                 {{ link.label }}
               </a>
             </li>
@@ -49,11 +49,11 @@
 
       <!-- Columna 3: Servicios -->
       <div>
-        <h3 class="text-xs font-bold uppercase tracking-widest text-gold mb-5">Servicios</h3>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-azure-light mb-5">Mon espace</h3>
         <ul class="space-y-3" role="list">
           @for (link of serviceLinks; track link.label) {
             <li>
-              <a [routerLink]="link.path" class="text-sm text-ivory/60 hover:text-gold transition-colors duration-200">
+              <a [routerLink]="link.path" class="text-sm text-frost/60 hover:text-azure-light transition-colors duration-200">
                 {{ link.label }}
               </a>
             </li>
@@ -63,22 +63,22 @@
 
       <!-- Columna 4: Legal -->
       <div>
-        <h3 class="text-xs font-bold uppercase tracking-widest text-gold mb-5">Legal</h3>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-azure-light mb-5">Legal</h3>
         <ul class="space-y-3" role="list">
           @for (link of legalLinks; track link.label) {
             <li>
-              <a [routerLink]="link.path" class="text-sm text-ivory/60 hover:text-gold transition-colors duration-200">
+              <a [routerLink]="link.path" class="text-sm text-frost/60 hover:text-azure-light transition-colors duration-200">
                 {{ link.label }}
               </a>
             </li>
           }
         </ul>
         <!-- Badge RGPD -->
-        <div class="mt-6 flex items-center gap-2 text-xs text-ivory/40">
+        <div class="mt-6 flex items-center gap-2 text-xs text-frost/40">
           <svg class="w-4 h-4 text-success flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
           </svg>
-          Conforme al RGPD
+          Conforme au RGPD
         </div>
       </div>
     </div>
@@ -86,21 +86,13 @@
     <!-- ─── Newsletter ─────────────────────────────────────────────────── -->
     <div class="mt-12 pt-10 border-t border-white/10">
       <div class="max-w-xl">
-        <h3 class="font-heading font-semibold text-lg text-ivory mb-1">
-          Recibe alertas de vehículos importados
+        <h3 class="font-heading font-semibold text-lg text-frost mb-1">
+          Une voiture précise en tête&nbsp;?
         </h3>
-        <p class="text-sm text-ivory/50 mb-4">Nuevos anuncios, guías de tramitación y ofertas exclusivas.</p>
-        <form class="flex gap-2 max-w-md" (submit)="$event.preventDefault()">
-          <input
-            type="email"
-            placeholder="tu@email.com"
-            class="flex-1 px-4 py-2.5 bg-white/5 border border-white/20 rounded-lg text-sm text-ivory placeholder-ivory/30 focus:outline-none focus:border-gold transition-colors"
-            aria-label="Email para newsletter"
-          >
-          <button type="submit" class="btn-gold text-sm py-2.5 px-5 whitespace-nowrap">
-            Suscribirme
-          </button>
-        </form>
+        <p class="text-sm text-frost/50 mb-4">Enregistrez votre recherche et recevez une alerte dès qu’elle est publiée.</p>
+        <a routerLink="/mis-busquedas" class="btn-azure text-sm py-2.5 px-5 inline-block">
+          Mes recherches enregistrées
+        </a>
       </div>
     </div>
   </div>
@@ -108,11 +100,11 @@
   <!-- ─── Bottom bar ────────────────────────────────────────────────────── -->
   <div class="border-t border-white/10">
     <div class="container mx-auto px-4 lg:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <p class="text-xs text-ivory/40">
-        © {{ currentYear }} Logistique Les Lions. Todos los derechos reservados.
+      <p class="text-xs text-frost/40">
+        © {{ currentYear }} Yoon u Auto. Tous droits réservés.
       </p>
-      <div class="flex items-center gap-6 text-xs text-ivory/40">
-        <span>España · Francia · Alemania · Marruecos · +8 países</span>
+      <div class="flex items-center gap-6 text-xs text-frost/40">
+        <span>Sénégal · Prix en FCFA</span>
       </div>
     </div>
   </div>

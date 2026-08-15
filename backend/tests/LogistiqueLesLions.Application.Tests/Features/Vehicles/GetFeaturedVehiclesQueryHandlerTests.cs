@@ -102,7 +102,7 @@ public class GetFeaturedVehiclesQueryHandlerTests : IDisposable
             Id = Guid.NewGuid(), Slug = "bmw-test-1", Title = "BMW Test 1",
             MakeId = make.Id, Year = 2022, Price = 30000, Currency = "EUR",
             CountryOrigin = "DE", Condition = VehicleCondition.Used,
-            Status = VehicleStatus.Active, IsFeatured = true,
+            Status = VehicleStatus.Actif, IsFeatured = true,
             CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
         });
 
@@ -112,7 +112,7 @@ public class GetFeaturedVehiclesQueryHandlerTests : IDisposable
             Id = Guid.NewGuid(), Slug = "bmw-test-2", Title = "BMW Test 2",
             MakeId = make.Id, Year = 2021, Price = 25000, Currency = "EUR",
             CountryOrigin = "FR", Condition = VehicleCondition.Used,
-            Status = VehicleStatus.Active, IsFeatured = true,
+            Status = VehicleStatus.Actif, IsFeatured = true,
             CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
         });
 
@@ -122,7 +122,7 @@ public class GetFeaturedVehiclesQueryHandlerTests : IDisposable
             Id = Guid.NewGuid(), Slug = "bmw-test-3", Title = "BMW Test 3",
             MakeId = make.Id, Year = 2020, Price = 20000, Currency = "EUR",
             CountryOrigin = "ES", Condition = VehicleCondition.Used,
-            Status = VehicleStatus.Active, IsFeatured = false,
+            Status = VehicleStatus.Actif, IsFeatured = false,
             CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
         });
 
@@ -132,7 +132,7 @@ public class GetFeaturedVehiclesQueryHandlerTests : IDisposable
             Id = Guid.NewGuid(), Slug = "bmw-test-4", Title = "BMW Test Deleted",
             MakeId = make.Id, Year = 2019, Price = 15000, Currency = "EUR",
             CountryOrigin = "IT", Condition = VehicleCondition.Used,
-            Status = VehicleStatus.Active, IsFeatured = true,
+            Status = VehicleStatus.Actif, IsFeatured = true,
             DeletedAt = DateTimeOffset.UtcNow.AddDays(-1),
             CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
         });

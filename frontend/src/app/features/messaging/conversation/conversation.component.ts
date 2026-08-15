@@ -127,7 +127,7 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
         const optimistic: MessageItem = {
           id:         crypto.randomUUID(),
           senderId:   this.auth.user()!.id,
-          senderName: `${this.auth.user()!.firstName} ${this.auth.user()!.lastName}`,
+          senderName: this.auth.user()!.displayName,
           body,
           isRead:     false,
           createdAt:  new Date().toISOString()

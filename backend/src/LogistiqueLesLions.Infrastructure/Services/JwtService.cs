@@ -16,14 +16,20 @@ public class JwtService(IConfiguration configuration) : IJwtService
         var key         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        // El teléfono es el identificador principal de la cuenta; el correo es opcional.
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub,   user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(ClaimTypes.Role,               user.Role.ToString()),
-            new Claim("firstName",                   user.FirstName),
-            new Claim(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString())
+            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new(ClaimTypes.Role,             user.Role.ToString()),
+            new("displayName",               user.DisplayName),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        if (!string.IsNullOrEmpty(user.Phone))
+            claims.Add(new Claim("phone", user.Phone));
+
+        if (!string.IsNullOrEmpty(user.Email))
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
 
         var token = new JwtSecurityToken(
             issuer:             configuration["Jwt:Issuer"],

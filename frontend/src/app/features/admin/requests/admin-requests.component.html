@@ -1,0 +1,477 @@
+<section class="p-6 lg:p-8 max-w-6xl">
+
+  <header class="mb-5">
+    <h1 class="font-heading text-2xl font-bold text-navy">Demandes de véhicules</h1>
+    <p class="text-sm text-navy/60 mt-1">
+      Les demandes «&nbsp;Trouvez-moi cette voiture&nbsp;». Ici, Yoon u Auto rend un
+      service&nbsp;: on cherche le véhicule pour la personne qui l'a demandé.
+    </p>
+  </header>
+
+  <!-- ─── Filtres ───────────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-xl border border-navy/10 p-4 mb-5">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="lg:col-span-2">
+        <label for="r-search" class="block text-xs text-navy/60 mb-1">
+          Référence, marque ou modèle
+        </label>
+        <input id="r-search" type="text" [(ngModel)]="filters.search" (keyup.enter)="search()"
+          placeholder="YD00001" class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label for="r-status" class="block text-xs text-navy/60 mb-1">Statut</label>
+        <select id="r-status" [(ngModel)]="filters.status"
+          class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+          <option [ngValue]="undefined">Tous</option>
+          @for (s of statuses; track s) {
+            <option [ngValue]="s">{{ statusLabel(s) }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4 mt-3">
+      <button type="button" (click)="search()" class="btn-primary text-sm">Rechercher</button>
+      <button type="button" (click)="resetFilters()" class="text-sm text-navy/60 hover:underline">
+        Réinitialiser
+      </button>
+      <label class="flex items-center gap-2 text-sm text-navy/70 cursor-pointer">
+        <input type="checkbox" [(ngModel)]="filters.unassigned" (change)="search()" />
+        Sans responsable
+      </label>
+    </div>
+  </div>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 mb-4" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="text-sm text-navy/50 py-10">Chargement…</p>
+  }
+
+  <!-- ─── Liste ─────────────────────────────────────────────────────────── -->
+  @if (data(); as d) {
+    <p class="text-xs text-navy/50 mb-2">
+      {{ d.totalCount }} {{ d.totalCount === 1 ? 'demande' : 'demandes' }}
+    </p>
+
+    <div class="bg-white rounded-xl border border-navy/10 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-frost text-navy/60 text-xs uppercase">
+            <tr>
+              <th class="px-4 py-3 text-left">Demande</th>
+              <th class="px-4 py-3 text-left">Utilisateur</th>
+              <th class="px-4 py-3 text-right">Budget</th>
+              <th class="px-4 py-3 text-right">Propositions</th>
+              <th class="px-4 py-3 text-left">Responsable</th>
+              <th class="px-4 py-3 text-left">Statut</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-navy/10">
+            @for (r of d.items; track r.id) {
+              <tr class="hover:bg-frost/60 cursor-pointer" (click)="openDetail(r)">
+                <td class="px-4 py-3">
+                  <p class="text-navy font-medium">{{ r.makeName }} {{ r.modelName }}</p>
+                  <p class="text-xs text-navy/50 font-mono">
+                    #{{ r.publicReference }} · {{ r.createdAt | date:'dd/MM/yyyy' }}
+                  </p>
+                </td>
+                <td class="px-4 py-3">
+                  <p class="text-navy/70">{{ r.userName }}</p>
+                  <p class="text-xs text-navy/40 font-mono">{{ r.userPhone }}</p>
+                </td>
+                <td class="px-4 py-3 text-right text-navy/70">
+                  @if (r.maxBudget !== null) { {{ r.maxBudget | fcfa }} } @else { — }
+                </td>
+                <td class="px-4 py-3 text-right text-navy/70">{{ r.proposalsCount }}</td>
+                <td class="px-4 py-3 text-navy/70">
+                  {{ r.assignedAdminName ?? '—' }}
+                </td>
+                <td class="px-4 py-3">
+                  <span class="text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap"
+                    [class]="statusClass(r.status)">
+                    {{ statusLabel(r.status) }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (d.items.length === 0) {
+        <p class="text-sm text-navy/50 p-6 text-center">Aucune demande.</p>
+      }
+    </div>
+
+    @if (lastPage > 1) {
+      <div class="flex items-center justify-center gap-4 mt-4 text-sm">
+        <button type="button" (click)="changePage(-1)" [disabled]="d.page <= 1"
+          class="text-navy/60 hover:underline disabled:opacity-30">← Précédent</button>
+        <span class="text-navy/50">{{ d.page }} / {{ lastPage }}</span>
+        <button type="button" (click)="changePage(1)" [disabled]="d.page >= lastPage"
+          class="text-navy/60 hover:underline disabled:opacity-30">Suivant →</button>
+      </div>
+    }
+  }
+
+  <!-- ─── Fiche ─────────────────────────────────────────────────────────── -->
+  @if (detailLoading()) {
+    <p class="text-sm text-navy/50 mt-6">Chargement de la fiche…</p>
+  }
+
+  @if (detail(); as d) {
+    <div class="bg-white rounded-xl border-2 border-azure/40 p-5 mt-6">
+      <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+          <h2 class="font-heading font-semibold text-navy text-lg">
+            {{ d.request.makeName }} {{ d.request.modelName }}
+          </h2>
+          <p class="text-xs text-navy/50 font-mono mt-0.5">#{{ d.request.publicReference }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" (click)="toggleAssign()" [disabled]="busy()"
+            class="btn-outline text-sm">
+            {{ d.request.assignedAdminId ? 'Libérer' : 'Prendre en charge' }}
+          </button>
+          <button type="button" (click)="closeDetail()" class="text-sm text-navy/50 hover:underline">
+            Fermer
+          </button>
+        </div>
+      </div>
+
+      <!-- Critères -->
+      <div class="grid lg:grid-cols-2 gap-5">
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Critères</h3>
+          <dl class="text-sm space-y-1.5">
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Années</dt>
+              <dd class="text-navy">
+                {{ d.request.yearFrom ?? '—' }} – {{ d.request.yearTo ?? '—' }}
+              </dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Kilométrage max.</dt>
+              <dd class="text-navy">
+                {{ d.request.maxMileage !== null ? d.request.maxMileage + ' km' : '—' }}
+              </dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Budget max.</dt>
+              <dd class="text-navy">
+                @if (d.request.maxBudget !== null) { {{ d.request.maxBudget | fcfa }} } @else { — }
+              </dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-navy/60">Provenance</dt>
+              <dd class="text-navy">{{ d.request.origin }}</dd>
+            </div>
+            @if (d.criteria.version) {
+              <div class="flex justify-between gap-3">
+                <dt class="text-navy/60">Version</dt>
+                <dd class="text-navy">{{ d.criteria.version }}</dd>
+              </div>
+            }
+            @if (d.criteria.importantEquipment) {
+              <div>
+                <dt class="text-navy/60">Équipements importants</dt>
+                <dd class="text-navy">{{ d.criteria.importantEquipment }}</dd>
+              </div>
+            }
+            @if (d.criteria.notes) {
+              <div>
+                <dt class="text-navy/60">Notes de l'utilisateur</dt>
+                <dd class="text-navy">{{ d.criteria.notes }}</dd>
+              </div>
+            }
+          </dl>
+        </div>
+
+        <!-- Statut -->
+        <div>
+          <h3 class="text-sm font-medium text-navy mb-2">Statut</h3>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label for="rs-status" class="block text-xs text-navy/60 mb-1">Nouveau statut</label>
+              <select id="rs-status" [(ngModel)]="newStatus"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
+                @for (s of statuses; track s) {
+                  <option [ngValue]="s">{{ statusLabel(s) }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="rs-reason" class="block text-xs text-navy/60 mb-1">
+                Motif @if (newStatus === 'Annulee') { <span class="text-red-600">*</span> }
+              </label>
+              <input id="rs-reason" type="text" [(ngModel)]="statusReason"
+                class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <button type="button" (click)="applyStatus()" class="btn-primary text-sm mt-3"
+            [disabled]="busy()">
+            Appliquer
+          </button>
+        </div>
+      </div>
+
+      <!-- Propositions -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-3">
+          Propositions ({{ d.proposals.length }})
+        </h3>
+
+        @if (d.proposals.length > 0) {
+          <ul class="space-y-3 mb-4" role="list">
+            @for (p of d.proposals; track p.id) {
+              <li class="border border-navy/10 rounded-lg p-3 flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  @if (p.isInternal) {
+                    <p class="text-sm text-navy font-medium">
+                      {{ p.vehicleTitle }}
+                      <span class="text-xs font-normal text-green-700 ml-1">annonce Yoon u Auto</span>
+                    </p>
+                    @if (p.vehiclePrice !== null) {
+                      <p class="text-sm text-navy/70">{{ p.vehiclePrice | fcfa }}</p>
+                    }
+                  } @else {
+                    <p class="text-sm text-navy font-medium">
+                      {{ p.makeModel }} {{ p.version }}
+                      <span class="text-xs font-normal text-navy/50 ml-1">proposition externe</span>
+                    </p>
+                    <p class="text-xs text-navy/50">
+                      {{ p.year ?? '—' }}
+                      @if (p.mileage !== null) { · {{ p.mileage }} km }
+                      @if (p.countryOfOrigin) { · {{ p.countryOfOrigin }} }
+                    </p>
+                    @if (p.estimatedPrice !== null) {
+                      <p class="text-sm text-navy/70">
+                        {{ p.estimatedPrice | fcfa }}
+                        @if (p.additionalCosts !== null) {
+                          <span class="text-xs text-navy/50">
+                            + {{ p.additionalCosts | fcfa }} de frais
+                          </span>
+                        }
+                      </p>
+                    }
+                    @if (p.externalUrl) {
+                      <a [href]="p.externalUrl" target="_blank" rel="noopener"
+                        class="text-xs text-azure-dark hover:underline">Voir l'origine ↗</a>
+                    }
+                  }
+                  @if (p.comments) {
+                    <p class="text-xs text-navy/60 mt-1">{{ p.comments }}</p>
+                  }
+                  <p class="text-xs mt-1"
+                    [class]="p.isSeenByUser ? 'text-navy/40' : 'text-azure-dark'">
+                    {{ p.isSeenByUser ? 'Vue par l\'utilisateur' : 'Pas encore vue' }}
+                  </p>
+                </div>
+                <button type="button" (click)="removeProposal(p)" [disabled]="busy()"
+                  class="text-xs text-red-600 hover:underline shrink-0">
+                  Retirer
+                </button>
+              </li>
+            }
+          </ul>
+        }
+
+        <!-- Anexar anuncio interno -->
+        <div class="bg-frost rounded-lg p-3 mb-3">
+          <p class="text-sm font-medium text-navy mb-2">Anexer une annonce Yoon u Auto</p>
+          <div class="flex flex-wrap gap-2">
+            <input type="text" [(ngModel)]="vehicleSearch" (keyup.enter)="searchVehicles()"
+              placeholder="Chercher une annonce…"
+              class="flex-1 min-w-[14rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            <button type="button" (click)="searchVehicles()" class="btn-outline text-sm">
+              Chercher
+            </button>
+          </div>
+
+          @if (searchResults().length > 0) {
+            <ul class="mt-3 space-y-2" role="list">
+              @for (v of searchResults(); track v.id) {
+                <li class="flex items-center justify-between gap-3 text-sm">
+                  <span class="text-navy truncate">
+                    {{ v.title }}
+                    <span class="text-navy/50">· {{ v.price | fcfa }}</span>
+                  </span>
+                  <button type="button" (click)="attachVehicle(v)" [disabled]="busy()"
+                    class="text-azure-dark hover:underline shrink-0">
+                    Proposer
+                  </button>
+                </li>
+              }
+            </ul>
+            <input type="text" [(ngModel)]="proposalComments" placeholder="Commentaire (facultatif)"
+              class="w-full mt-2 rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          }
+        </div>
+
+        <!-- Propuesta externa -->
+        <button type="button" (click)="toggleExternal()" class="text-sm text-azure-dark hover:underline">
+          {{ externalOpen() ? '− Masquer' : '+ Ajouter une proposition externe' }}
+        </button>
+
+        @if (externalOpen()) {
+          <div class="border border-navy/10 rounded-lg p-3 mt-3 space-y-3">
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div>
+                <label for="e-make" class="block text-xs text-navy/60 mb-1">
+                  Marque et modèle <span class="text-red-600">*</span>
+                </label>
+                <input id="e-make" type="text" [(ngModel)]="externalForm.makeModel"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="e-version" class="block text-xs text-navy/60 mb-1">Version</label>
+                <input id="e-version" type="text" [(ngModel)]="externalForm.version"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="e-year" class="block text-xs text-navy/60 mb-1">Année</label>
+                <input id="e-year" type="number" [(ngModel)]="externalForm.year"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="e-km" class="block text-xs text-navy/60 mb-1">Kilométrage</label>
+                <input id="e-km" type="number" [(ngModel)]="externalForm.mileage"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="e-price" class="block text-xs text-navy/60 mb-1">Prix (FCFA)</label>
+                <input id="e-price" type="number" [(ngModel)]="externalForm.estimatedPrice"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="e-costs" class="block text-xs text-navy/60 mb-1">
+                  Frais additionnels (FCFA)
+                </label>
+                <input id="e-costs" type="number" [(ngModel)]="externalForm.additionalCosts"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="e-country" class="block text-xs text-navy/60 mb-1">Pays</label>
+                <input id="e-country" type="text" [(ngModel)]="externalForm.countryOfOrigin"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label for="e-url" class="block text-xs text-navy/60 mb-1">Lien d'origine</label>
+                <input id="e-url" type="url" [(ngModel)]="externalForm.externalUrl"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+              </div>
+              <div class="sm:col-span-2">
+                <label for="e-photos" class="block text-xs text-navy/60 mb-1">
+                  Photographies (une URL par ligne)
+                </label>
+                <textarea id="e-photos" rows="2" [(ngModel)]="photoUrlsText"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm"></textarea>
+              </div>
+              <div class="sm:col-span-2">
+                <label for="e-comments" class="block text-xs text-navy/60 mb-1">Commentaires</label>
+                <textarea id="e-comments" rows="2" [(ngModel)]="externalForm.comments"
+                  class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm"></textarea>
+              </div>
+            </div>
+            <button type="button" (click)="submitExternal()" class="btn-primary text-sm"
+              [disabled]="busy()">
+              Proposer ce véhicule
+            </button>
+            <p class="text-xs text-navy/40">
+              L'utilisateur recevra&nbsp;: «&nbsp;Nous avons trouvé un véhicule pour vous&nbsp;».
+            </p>
+          </div>
+        }
+      </div>
+
+      <!-- Conversation -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-3">Conversation</h3>
+
+        @if (d.messages.length === 0) {
+          <p class="text-sm text-navy/50 mb-3">Aucun message.</p>
+        } @else {
+          <ul class="space-y-2 mb-3" role="list">
+            @for (m of d.messages; track m.id) {
+              <li class="text-sm">
+                <p class="text-xs text-navy/40">
+                  {{ m.fromAdmin ? 'Yoon u Auto' : d.request.userName }} ·
+                  {{ m.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+                <p [class]="m.fromAdmin ? 'text-navy/70' : 'text-navy'">{{ m.body }}</p>
+              </li>
+            }
+          </ul>
+        }
+
+        <div class="flex flex-wrap gap-2">
+          <input type="text" [(ngModel)]="replyBody" (keyup.enter)="reply()"
+            placeholder="Répondre à l'utilisateur…"
+            class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          <button type="button" (click)="reply()" class="btn-outline text-sm" [disabled]="busy()">
+            Envoyer
+          </button>
+        </div>
+      </div>
+
+      <!-- Historique -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-2">Historique</h3>
+        @if (d.actions.length === 0) {
+          <p class="text-sm text-navy/50">Aucune action enregistrée.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (a of d.actions; track a.id) {
+              <li class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-navy">{{ actionLabel(a) }}</p>
+                  @if (a.reason) { <p class="text-xs text-navy/60">{{ a.reason }}</p> }
+                </div>
+                <p class="text-xs text-navy/40 whitespace-nowrap">
+                  {{ a.adminName }} · {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Notes internes -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-1">Notes internes</h3>
+        <p class="text-xs text-navy/50 mb-3">Jamais visibles par l'utilisateur.</p>
+
+        <div class="flex flex-wrap gap-2 mb-3">
+          <input type="text" [(ngModel)]="noteBody" (keyup.enter)="addNote()"
+            placeholder="Ajouter une note…"
+            class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+          <button type="button" (click)="addNote()" class="btn-outline text-sm" [disabled]="busy()">
+            Ajouter
+          </button>
+        </div>
+
+        @if (d.notes.length === 0) {
+          <p class="text-sm text-navy/50">Aucune note.</p>
+        } @else {
+          <ul class="space-y-2 text-sm" role="list">
+            @for (n of d.notes; track n.id) {
+              <li class="flex items-start justify-between gap-3">
+                <p class="text-navy">{{ n.body }}</p>
+                <div class="flex items-center gap-3 shrink-0">
+                  <span class="text-xs text-navy/40 whitespace-nowrap">
+                    {{ n.adminName }} · {{ n.createdAt | date:'dd/MM/yyyy' }}
+                  </span>
+                  <button type="button" (click)="deleteNote(n.id)" [disabled]="busy()"
+                    class="text-xs text-red-600 hover:underline">Retirer</button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+</section>

@@ -13,7 +13,7 @@
              [class.justify-start]="msg.senderId !== auth.user()?.id">
           <div class="max-w-xs lg:max-w-md px-4 py-2.5 rounded-2xl text-sm text-navy"
                [ngClass]="msg.senderId === auth.user()?.id
-                 ? 'bg-gold'
+                 ? 'bg-azure'
                  : 'bg-white border border-navy/10'">
             <p>{{ msg.body }}</p>
             <p class="text-xs mt-1 opacity-60 text-right flex items-center justify-end gap-1">
@@ -45,7 +45,7 @@
         @for (t of templates; track t) {
           <button type="button"
                   (click)="useTemplate(t)"
-                  class="whitespace-nowrap text-xs px-3 py-1.5 rounded-full border border-navy/15 text-navy/70 hover:border-gold hover:text-navy transition-colors">
+                  class="whitespace-nowrap text-xs px-3 py-1.5 rounded-full border border-navy/15 text-navy/70 hover:border-azure hover:text-navy transition-colors">
             {{ t }}
           </button>
         }
@@ -62,12 +62,12 @@
         placeholder="Escribe un mensaje..."
         (input)="onInput()"
         (keydown.enter)="send()"
-        class="flex-1 px-4 py-2.5 rounded-full border border-navy/20 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none text-navy text-sm"
+        class="flex-1 px-4 py-2.5 rounded-full border border-navy/20 focus:border-azure focus:ring-2 focus:ring-azure/20 outline-none text-navy text-sm"
       >
       <button
         (click)="send()"
         [disabled]="!bodyCtrl.value?.trim() || sending() || !conversation()"
-        class="btn-gold px-4 py-2.5 rounded-full disabled:opacity-40"
+        class="btn-azure px-4 py-2.5 rounded-full disabled:opacity-40"
         aria-label="Enviar mensaje"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

@@ -12,21 +12,31 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
 
         builder.HasKey(u => u.Id);
 
-        builder.Property(u => u.Email).HasMaxLength(256).IsRequired();
+        // Teléfono: identificador principal de la cuenta.
+        // PostgreSQL admite varios NULL en un índice UNIQUE, por lo que las cuentas
+        // anteriores a la migración que aún no tienen teléfono no rompen el índice.
+        builder.Property(u => u.Phone).HasMaxLength(20);
+        builder.HasIndex(u => u.Phone).IsUnique();
+
+        // Correo: opcional, solo para notificaciones.
+        builder.Property(u => u.Email).HasMaxLength(256);
         builder.HasIndex(u => u.Email).IsUnique();
 
         builder.Property(u => u.PasswordHash).HasMaxLength(256).IsRequired();
-        builder.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
-        builder.Property(u => u.LastName).HasMaxLength(100).IsRequired();
-        builder.Property(u => u.Phone).HasMaxLength(30);
+        builder.Property(u => u.DisplayName).HasMaxLength(150).IsRequired();
         builder.Property(u => u.AvatarUrl).HasMaxLength(512);
-        builder.Property(u => u.Role).HasConversion<string>().HasMaxLength(50);
-        builder.Property(u => u.CountryCode).HasMaxLength(2);
+
+        builder.Property(u => u.Role).HasConversion<string>().HasMaxLength(20);
+        builder.Property(u => u.AccountType).HasConversion<string>().HasMaxLength(20);
+        builder.Property(u => u.Status).HasConversion<string>().HasMaxLength(20);
+
+        builder.Property(u => u.Region).HasMaxLength(10);
         builder.Property(u => u.City).HasMaxLength(100);
-        builder.Property(u => u.CompanyName).HasMaxLength(200);
-        builder.Property(u => u.CompanyVat).HasMaxLength(50);
         builder.Property(u => u.Bio).HasMaxLength(1000);
         builder.Property(u => u.RefreshToken).HasMaxLength(256);
+
+        // Propiedad calculada, no se persiste.
+        builder.Ignore(u => u.CanSignIn);
 
         builder.HasQueryFilter(u => u.DeletedAt == null);
     }

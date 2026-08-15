@@ -6,7 +6,7 @@
       <span class="text-sm font-bold text-navy">{{ completionPercent() }}%</span>
     </div>
     <div class="h-2 bg-navy/10 rounded-full">
-      <div class="h-full bg-gold rounded-full transition-all duration-500"
+      <div class="h-full bg-azure rounded-full transition-all duration-500"
         [style.width]="completionPercent() + '%'"></div>
     </div>
   </div>
@@ -35,7 +35,7 @@
               <div class="flex items-center gap-3 mt-2">
                 @if (doc.templateUrl) {
                   <a [href]="doc.templateUrl" target="_blank"
-                    class="text-xs text-gold hover:underline">
+                    class="text-xs text-azure hover:underline">
                     Descargar plantilla
                   </a>
                 }
@@ -81,7 +81,7 @@
               <div class="flex items-center gap-3 mt-2">
                 @if (doc.templateUrl) {
                   <a [href]="doc.templateUrl" target="_blank"
-                    class="text-xs text-gold hover:underline">Descargar plantilla</a>
+                    class="text-xs text-azure hover:underline">Descargar plantilla</a>
                 }
                 @if (doc.officialUrl) {
                   <a [href]="doc.officialUrl" target="_blank"

@@ -24,12 +24,20 @@ public class ApplicationDbContext(
     public DbSet<VehicleMake> VehicleMakes => Set<VehicleMake>();
     public DbSet<VehicleModel> VehicleModels => Set<VehicleModel>();
     public DbSet<VehicleImage> VehicleImages => Set<VehicleImage>();
+    public DbSet<VehicleEquipment> VehicleEquipments => Set<VehicleEquipment>();
+    public DbSet<VehicleEquipmentLink> VehicleEquipmentLinks => Set<VehicleEquipmentLink>();
+    public DbSet<VehiclePriceHistory> VehiclePriceHistories => Set<VehiclePriceHistory>();
+    public DbSet<PriceIndicatorSettings> PriceIndicatorSettings => Set<PriceIndicatorSettings>();
     public DbSet<Country> Countries => Set<Country>();
 
     // ─── M2 ────────────────────────────────────────────────────────────────
     public DbSet<VehicleDocument> VehicleDocuments => Set<VehicleDocument>();
     public DbSet<VehicleHistory> VehicleHistories => Set<VehicleHistory>();
     public DbSet<SavedVehicle> SavedVehicles => Set<SavedVehicle>();
+    public DbSet<SavedSearch> SavedSearches => Set<SavedSearch>();
+    public DbSet<VehicleRequest> VehicleRequests => Set<VehicleRequest>();
+    public DbSet<VehicleRequestMessage> VehicleRequestMessages => Set<VehicleRequestMessage>();
+    public DbSet<VehicleRequestProposal> VehicleRequestProposals => Set<VehicleRequestProposal>();
 
     // ─── M3 ────────────────────────────────────────────────────────────────
     public DbSet<CountryRequirement> CountryRequirements => Set<CountryRequirement>();
@@ -41,13 +49,42 @@ public class ApplicationDbContext(
     public DbSet<ProcessIncident> ProcessIncidents => Set<ProcessIncident>();
 
     // ─── M5 ────────────────────────────────────────────────────────────────
-    public DbSet<Conversation> Conversations => Set<Conversation>();
+    public DbSet<Negotiation> Negotiations => Set<Negotiation>();
+    public DbSet<NegotiationEvent> NegotiationEvents => Set<NegotiationEvent>();
+    public DbSet<Offer> Offers => Set<Offer>();
+    public DbSet<Contract> Contracts => Set<Contract>();
+    public DbSet<VehicleInspection> VehicleInspections => Set<VehicleInspection>();
+    public DbSet<VehicleInspectionItem> VehicleInspectionItems => Set<VehicleInspectionItem>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
     public DbSet<ServicePartner> ServicePartners => Set<ServicePartner>();
 
+    // ─── Mon Garage ────────────────────────────────────────────────────────
+    public DbSet<GarageVehicle> GarageVehicles => Set<GarageVehicle>();
+    public DbSet<GarageVehicleImage> GarageVehicleImages => Set<GarageVehicleImage>();
+    public DbSet<GarageDocument> GarageDocuments => Set<GarageDocument>();
+    public DbSet<MaintenanceRecord> MaintenanceRecords => Set<MaintenanceRecord>();
+    public DbSet<MaintenanceRecordImage> MaintenanceRecordImages => Set<MaintenanceRecordImage>();
+    public DbSet<VehicleReminder> VehicleReminders => Set<VehicleReminder>();
+    public DbSet<VehicleValuationSnapshot> VehicleValuationSnapshots => Set<VehicleValuationSnapshot>();
+    public DbSet<VehicleValuationSettings> VehicleValuationSettings => Set<VehicleValuationSettings>();
+    public DbSet<VehicleTransparency> VehicleTransparencies => Set<VehicleTransparency>();
+    public DbSet<SharedMaintenanceRecord> SharedMaintenanceRecords => Set<SharedMaintenanceRecord>();
+
     // ─── M6 ────────────────────────────────────────────────────────────────
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<AdminAction> AdminActions => Set<AdminAction>();
+    public DbSet<AdminNote> AdminNotes => Set<AdminNote>();
+    public DbSet<Report> Reports => Set<Report>();
+    public DbSet<Communication> Communications => Set<Communication>();
+
+    public DbSet<LoyaltyPointEntry> LoyaltyPointEntries => Set<LoyaltyPointEntry>();
+
+    // ─── Configuration ──────────────────────────────────────────────────────
+    public DbSet<PlatformSettings> PlatformSettings => Set<PlatformSettings>();
+    public DbSet<FeatureFlag> FeatureFlags => Set<FeatureFlag>();
+    public DbSet<UpcomingFeature> UpcomingFeatures => Set<UpcomingFeature>();
+    public DbSet<FeatureInterest> FeatureInterests => Set<FeatureInterest>();
 
     // ─── Newsletter ─────────────────────────────────────────────────────────
     public DbSet<NewsletterSubscriber> NewsletterSubscribers => Set<NewsletterSubscriber>();

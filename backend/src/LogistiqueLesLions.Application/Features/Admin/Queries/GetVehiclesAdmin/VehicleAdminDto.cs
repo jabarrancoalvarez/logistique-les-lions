@@ -7,7 +7,7 @@ public record VehicleAdminDto(
     string Status,
     decimal Price,
     string Currency,
-    string SellerEmail,
+    string SellerName,
     string MakeName,
     int Year,
     DateTimeOffset CreatedAt,

@@ -1,0 +1,110 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="font-heading text-2xl font-bold text-navy">Recherches enregistrées</h1>
+    <a routerLink="/vehiculos" class="text-sm text-navy/60 hover:text-azure-dark">
+      Nouvelle recherche →
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="space-y-3">
+      @for (i of [1,2,3]; track i) {
+        <div class="animate-pulse bg-white rounded-xl border border-navy/10 p-5 space-y-2">
+          <div class="h-4 bg-navy/10 rounded w-1/3"></div>
+          <div class="h-3 bg-navy/5 rounded w-2/3"></div>
+        </div>
+      }
+    </div>
+  } @else if (hasError()) {
+    <div class="text-center py-20 bg-white rounded-2xl border border-red-200">
+      <p class="text-red-600">Impossible de charger vos recherches. Veuillez réessayer.</p>
+    </div>
+  } @else if (searches().length === 0) {
+    <div class="text-center py-20 bg-white rounded-2xl border border-navy/10">
+      <svg class="w-16 h-16 mx-auto mb-4 text-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <p class="text-lg font-medium text-navy mb-2">Aucune recherche enregistrée</p>
+      <p class="text-navy/50 text-sm mb-6 max-w-md mx-auto">
+        Choisissez vos critères dans le Marketplace et cliquez sur « Enregistrer la recherche ».
+        Vous serez averti dès qu'un véhicule correspondant est publié.
+      </p>
+      <a routerLink="/vehiculos" class="btn-azure">Chercher un véhicule</a>
+    </div>
+  } @else {
+
+    <div class="space-y-3">
+      @for (search of searches(); track search.id) {
+        <div class="bg-white rounded-xl border border-navy/10 p-5">
+
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0 flex-1">
+
+              <!-- Nom, éditable en ligne -->
+              @if (editingId() === search.id) {
+                <div class="flex items-center gap-2">
+                  <input type="text" [(ngModel)]="editingName" class="input py-1.5 text-sm"
+                    (keyup.enter)="saveName(search)" (keyup.escape)="cancelEditing()"
+                    aria-label="Nom de la recherche">
+                  <button type="button" (click)="saveName(search)"
+                    class="text-sm font-medium text-azure-dark hover:underline shrink-0">
+                    Enregistrer
+                  </button>
+                  <button type="button" (click)="cancelEditing()"
+                    class="text-sm text-navy/50 hover:text-navy shrink-0">
+                    Annuler
+                  </button>
+                </div>
+              } @else {
+                <h2 class="font-heading font-semibold text-navy text-lg truncate">
+                  {{ search.name }}
+                </h2>
+              }
+
+              <!-- Critères -->
+              @if (summary(search); as line) {
+                <p class="text-sm text-navy/60 mt-1">{{ line }}</p>
+              }
+
+              <!-- Nombre de résultats -->
+              <p class="text-sm mt-2"
+                 [class]="search.resultsCount > 0 ? 'text-navy font-medium' : 'text-navy/50'">
+                {{ search.resultsCount }}
+                {{ search.resultsCount === 1 ? 'véhicule disponible' : 'véhicules disponibles' }}
+              </p>
+            </div>
+
+            <!-- Alerte nouveaux véhicules -->
+            <label class="flex items-center gap-2 cursor-pointer shrink-0">
+              <input type="checkbox" class="w-4 h-4 accent-azure"
+                [checked]="search.alertEnabled" (change)="toggleAlert(search)">
+              <span class="text-xs text-navy/60">Alerte</span>
+            </label>
+          </div>
+
+          <!-- Actions : Voir les résultats · Modifier · Supprimer -->
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 pt-3 border-t border-navy/10">
+            <button type="button" (click)="viewResults(search)"
+              class="text-sm font-semibold text-azure-dark hover:underline">
+              Voir les résultats
+            </button>
+            <button type="button" (click)="startEditing(search)"
+              class="text-sm text-navy/60 hover:text-navy">
+              Modifier
+            </button>
+            <button type="button" (click)="remove(search)"
+              class="text-sm text-navy/60 hover:text-red-600">
+              Supprimer
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <p class="text-xs text-navy/50 mt-5">
+      L'alerte fait partie de la recherche : lorsqu'elle est active, vous recevez une
+      notification dès qu'un véhicule correspondant est publié.
+    </p>
+  }
+</div>

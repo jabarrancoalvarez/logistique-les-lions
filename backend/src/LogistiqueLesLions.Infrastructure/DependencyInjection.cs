@@ -77,6 +77,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUserService>();
         services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IPublicReferenceGenerator, PublicReferenceGenerator>();
         services.AddScoped<IStorageService, LocalStorageService>();
 
         // ─── Email transaccional ─────────────────────────────────────────────
@@ -119,6 +120,9 @@ public static class DependencyInjection
         // ─── BackgroundService: detector de procesos atascados ──────────────
         services.Configure<StaleProcessOptions>(configuration.GetSection(StaleProcessOptions.SectionName));
         services.AddHostedService<StaleProcessNotifierService>();
+
+        // ─── BackgroundService: rappels de Mon Garage vencidos por fecha ────
+        services.AddHostedService<ReminderNotifierService>();
 
         // ─── AI generativa (Anthropic Claude) ────────────────────────────────
         // Si no hay API key, fallback a NoopAiContentService para no romper desarrollo.

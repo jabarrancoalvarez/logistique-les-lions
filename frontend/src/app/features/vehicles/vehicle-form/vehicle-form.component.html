@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-ivory/50 py-10">
+<div class="min-h-screen bg-frost/50 py-10">
   <div class="container mx-auto px-4 max-w-2xl">
 
     <!-- Cabecera -->
@@ -15,7 +15,7 @@
             <div
               class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors"
               [ngClass]="step.number <= currentStep()
-                ? 'bg-gold text-white'
+                ? 'bg-azure text-white'
                 : 'bg-navy/10 text-navy/40'"
             >
               {{ step.number < currentStep() ? '✓' : step.number }}
@@ -25,7 +25,7 @@
         }
       </div>
       <div class="h-1.5 bg-navy/10 rounded-full">
-        <div class="h-full bg-gold rounded-full transition-all duration-300"
+        <div class="h-full bg-azure rounded-full transition-all duration-300"
           [style.width]="progress() + '%'"></div>
       </div>
     </div>
@@ -38,7 +38,7 @@
         <h2 class="font-heading text-xl font-semibold text-navy mb-6">Datos básicos</h2>
 
         <!-- IA: extraer datos de documento -->
-        <div class="mb-6 p-4 rounded-xl border border-gold/30 bg-gold/5">
+        <div class="mb-6 p-4 rounded-xl border border-azure/30 bg-azure/5">
           <p class="text-sm font-medium text-navy mb-2">
             ✨ ¿Tienes la ficha técnica o el COC?
           </p>
@@ -92,7 +92,7 @@
               @for (opt of [{v:'Used',l:'Segunda mano'},{v:'New',l:'Nuevo'},{v:'Km0',l:'Km 0'}]; track opt.v) {
                 <label class="flex items-center gap-2 cursor-pointer border rounded-xl p-3 transition-colors"
                   [ngClass]="step1.get('condition')?.value === opt.v
-                    ? 'border-gold bg-gold/5'
+                    ? 'border-azure bg-azure/5'
                     : 'border-navy/20'"
                 >
                   <input type="radio" formControlName="condition" [value]="opt.v" class="sr-only">
@@ -148,38 +148,47 @@
       @if (currentStep() === 3) {
         <h2 class="font-heading text-xl font-semibold text-navy mb-6">Precio y ubicación</h2>
         <form [formGroup]="step3" class="space-y-5">
-          <div class="grid grid-cols-3 gap-3">
-            <div class="col-span-2">
-              <label class="block text-sm font-medium text-navy mb-1.5">Precio *</label>
-              <input type="number" formControlName="price" class="input" placeholder="0" min="1">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-navy mb-1.5">Divisa</label>
-              <select formControlName="currency" class="input">
-                @for (c of currencies; track c) { <option [value]="c">{{ c }}</option> }
-              </select>
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Precio *</label>
+            <div class="relative">
+              <input type="number" formControlName="price" class="input pr-16" placeholder="0" min="1">
+              <span class="absolute inset-y-0 right-3 flex items-center text-sm font-medium text-navy/50 pointer-events-none">
+                FCFA
+              </span>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <input type="checkbox" formControlName="priceNegotiable" id="negotiable" class="w-4 h-4">
             <label for="negotiable" class="text-sm text-navy">Precio negociable</label>
           </div>
+          <!-- Statut douanier: bloque destacado de la ficha en Senegal -->
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">País de origen *</label>
-            <select formControlName="countryOrigin" class="input">
-              <option value="">Selecciona el país</option>
-              @for (c of countries; track c.code) { <option [value]="c.code">{{ c.name }}</option> }
+            <label class="block text-sm font-medium text-navy mb-1.5">Statut douanier *</label>
+            <select formControlName="customsStatus" class="input">
+              <option value="">Sélectionner…</option>
+              @for (c of customsStatuses; track c.value) {
+                <option [value]="c.value">{{ c.label }}</option>
+              }
             </select>
+            <p class="text-xs text-navy/50 mt-1">
+              Cette information est déclarée par vous. Yoon u Auto ne la vérifie pas.
+            </p>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Ciudad</label>
-            <input type="text" formControlName="city" class="input" placeholder="ej: Berlín">
-          </div>
-          <div class="flex items-center gap-2">
-            <input type="checkbox" formControlName="isExportReady" id="exportReady" class="w-4 h-4">
-            <label for="exportReady" class="text-sm text-navy">
-              Vehículo listo para exportar (documentación completa)
-            </label>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-navy mb-1.5">Région</label>
+              <select formControlName="region" (change)="onRegionChange($event)" class="input">
+                <option value="">Choisir…</option>
+                @for (r of regions; track r.code) { <option [value]="r.code">{{ r.name }}</option> }
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-navy mb-1.5">Ville</label>
+              <select formControlName="city" [disabled]="cities().length === 0" class="input">
+                <option value="">Choisir…</option>
+                @for (c of cities(); track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+            </div>
           </div>
         </form>
       }
@@ -191,7 +200,7 @@
         <!-- Upload de fotos -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-navy mb-2">Fotos del vehículo</label>
-          <div class="border-2 border-dashed border-navy/20 rounded-xl p-6 text-center hover:border-gold transition-colors">
+          <div class="border-2 border-dashed border-navy/20 rounded-xl p-6 text-center hover:border-azure transition-colors">
             <input type="file" id="vehicle-images" accept="image/*" multiple
               (change)="onImagesSelected($event)" class="hidden">
             <label for="vehicle-images" class="cursor-pointer inline-flex flex-col items-center gap-2">
@@ -228,34 +237,10 @@
             <p class="text-xs text-navy/40 mt-1">{{ step4.get('title')?.value?.length ?? 0 }}/200 caracteres</p>
           </div>
           <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-sm font-medium text-navy">Descripción (en español)</label>
-              <button type="button" (click)="generateDescription()"
-                [disabled]="isGeneratingDesc()"
-                class="text-xs px-3 py-1.5 rounded-lg bg-gold/10 text-navy border border-gold/40 hover:bg-gold/20 disabled:opacity-50 inline-flex items-center gap-1.5">
-                @if (isGeneratingDesc()) {
-                  <svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                  </svg>
-                  Generando…
-                } @else {
-                  ✨ Generar con IA
-                }
-              </button>
-            </div>
-            <textarea formControlName="descriptionEs" class="input h-40 resize-none"
-              placeholder="Describe el estado del vehículo, historial, extras incluidos..."></textarea>
-            <p class="text-xs text-navy/40 mt-1">{{ step4.get('descriptionEs')?.value?.length ?? 0 }}/5000 caracteres</p>
-            @if (aiError()) {
-              <p class="text-xs text-red-600 mt-1">{{ aiError() }}</p>
-            }
-            @if (aiDescriptionEn()) {
-              <div class="mt-3 p-3 rounded-lg bg-navy/5 border border-navy/10">
-                <p class="text-xs font-medium text-navy/70 mb-1">English (auto-generated)</p>
-                <p class="text-sm text-navy/80 whitespace-pre-line">{{ aiDescriptionEn() }}</p>
-              </div>
-            }
+            <label class="block text-sm font-medium text-navy mb-1.5">Description du vendeur</label>
+            <textarea formControlName="description" class="input h-40 resize-none"
+              placeholder="État général, entretien réalisé, réparations récentes, motif de vente, défauts connus…"></textarea>
+            <p class="text-xs text-navy/40 mt-1">{{ step4.get('description')?.value?.length ?? 0 }}/5000 caractères</p>
           </div>
 
           @if (submitError()) {
@@ -277,14 +262,14 @@
       </button>
 
       @if (currentStep() < 4) {
-        <button (click)="next()" class="btn-gold py-3 px-8">
+        <button (click)="next()" class="btn-azure py-3 px-8">
           Siguiente →
         </button>
       } @else {
         <button
           (click)="submit()"
           [disabled]="isSubmitting()"
-          class="btn-gold py-3 px-8"
+          class="btn-azure py-3 px-8"
         >
           @if (isSubmitting()) {
             <svg class="animate-spin w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24">

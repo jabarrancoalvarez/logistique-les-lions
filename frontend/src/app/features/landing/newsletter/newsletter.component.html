@@ -10,16 +10,16 @@
       <rect width="100%" height="100%" fill="url(#nl-grid)"/>
     </svg>
   </div>
-  <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-gold opacity-[0.06] blur-3xl pointer-events-none" aria-hidden="true"></div>
-  <div class="absolute bottom-0 -left-20 w-80 h-80 rounded-full bg-gold opacity-[0.04] blur-3xl pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-azure opacity-[0.06] blur-3xl pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute bottom-0 -left-20 w-80 h-80 rounded-full bg-azure opacity-[0.04] blur-3xl pointer-events-none" aria-hidden="true"></div>
 
   <div class="relative container mx-auto px-4 lg:px-6">
     <div class="max-w-2xl mx-auto text-center">
-      <span class="divider-gold">Mantente informado</span>
-      <h2 id="newsletter-heading" class="mt-4 font-heading text-ivory text-2xl lg:text-3xl">
+      <span class="divider-azure">Mantente informado</span>
+      <h2 id="newsletter-heading" class="mt-4 font-heading text-frost text-2xl lg:text-3xl">
         Alertas de vehículos importados
       </h2>
-      <p class="mt-3 text-ivory/60 max-w-lg mx-auto leading-relaxed">
+      <p class="mt-3 text-frost/60 max-w-lg mx-auto leading-relaxed">
         Recibe en tu email los mejores vehículos según tus preferencias, guías de importación actualizadas y ofertas exclusivas.
       </p>
 
@@ -40,14 +40,14 @@
                 type="email"
                 formControlName="email"
                 placeholder="tu@email.com"
-                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-ivory placeholder-ivory/40 focus:outline-none focus:border-gold focus:bg-white/15 transition-all duration-200 text-sm"
+                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-frost placeholder-frost/40 focus:outline-none focus:border-azure focus:bg-white/15 transition-all duration-200 text-sm"
                 autocomplete="email"
               >
               @if (emailError) {
                 <p class="mt-1.5 text-xs text-red-400 text-left" role="alert">{{ emailError }}</p>
               }
             </div>
-            <button type="submit" class="btn-gold whitespace-nowrap" [disabled]="state() === 'loading'">
+            <button type="submit" class="btn-azure whitespace-nowrap" [disabled]="state() === 'loading'">
               @if (state() === 'loading') {
                 <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -60,8 +60,8 @@
           </div>
           <div class="flex items-start gap-2 justify-center">
             <input id="nl-privacy" type="checkbox" formControlName="acceptPrivacy" class="mt-0.5 w-4 h-4 rounded border-white/30 bg-white/10">
-            <label for="nl-privacy" class="text-xs text-ivory/40 text-left">
-              Acepto la <a routerLink="/legal/privacidad" class="text-gold hover:underline transition-colors">política de privacidad</a>.
+            <label for="nl-privacy" class="text-xs text-frost/40 text-left">
+              Acepto la <a routerLink="/legal/privacidad" class="text-azure hover:underline transition-colors">política de privacidad</a>.
               Puedes darte de baja en cualquier momento.
             </label>
           </div>
@@ -69,21 +69,21 @@
       }
 
       <!-- Trust indicators -->
-      <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-ivory/30 text-xs">
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-frost/30 text-xs">
         <span class="flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5 text-gold/60" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+          <svg class="w-3.5 h-3.5 text-azure/60" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
           </svg>
           Sin spam, prometido
         </span>
         <span class="flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5 text-gold/60" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+          <svg class="w-3.5 h-3.5 text-azure/60" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
           </svg>
           Cancela cuando quieras
         </span>
         <span class="flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5 text-gold/60" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+          <svg class="w-3.5 h-3.5 text-azure/60" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
             <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
           </svg>
