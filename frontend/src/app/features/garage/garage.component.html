@@ -57,9 +57,8 @@
           @for (v of g.vehicles; track v.id) {
             <li class="bg-white rounded-xl border border-navy/10 overflow-hidden flex">
               <div class="w-28 sm:w-32 bg-frost-dark shrink-0">
-                @if (v.thumbnailUrl) {
-                  <img [src]="v.thumbnailUrl" [alt]="v.title"
-                    class="w-full h-full object-cover" loading="lazy" />
+                @if (thumbnails()[v.id]; as thumb) {
+                  <img [src]="thumb" [alt]="v.title" class="w-full h-full object-cover" />
                 } @else {
                   <div class="w-full h-full min-h-[8rem] flex items-center justify-center
                               text-navy/20 text-3xl" aria-hidden="true">🚗</div>

@@ -101,6 +101,21 @@ public class LocalStorageService(
         return Task.CompletedTask;
     }
 
+    public async Task<(string Url, string? ThumbnailUrl)?> PublishPrivateAsync(
+        string key,
+        string fileName,
+        string contentType,
+        string folder,
+        CancellationToken ct = default)
+    {
+        await using var origen = await OpenPrivateAsync(key, ct);
+        if (origen is null) return null;
+
+        // Se copia, no se mueve: el original tiene que seguir en el garaje aunque el
+        // anuncio se retire después.
+        return await UploadAsync(origen, fileName, contentType, folder, ct);
+    }
+
     /// <summary>
     /// Convierte la clave en una ruta, comprobando que no se sale del directorio privado.
     /// </summary>

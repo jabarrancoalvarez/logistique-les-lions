@@ -65,8 +65,8 @@ public class SellVehicleTests : IDisposable
             Color = "Gris", Vin = "JTMBFREV60D012345"
         });
         _context.GarageVehicleImages.AddRange(
-            new GarageVehicleImage { GarageVehicleId = _vehicleId, Url = "/a.webp", ThumbnailUrl = "/a-t.webp", IsPrimary = true },
-            new GarageVehicleImage { GarageVehicleId = _vehicleId, Url = "/b.webp", SortOrder = 1 });
+            new GarageVehicleImage { GarageVehicleId = _vehicleId, StorageKey = "garage/a.webp", FileName = "a.webp", ContentType = "image/webp", IsPrimary = true },
+            new GarageVehicleImage { GarageVehicleId = _vehicleId, StorageKey = "garage/b.webp", FileName = "b.webp", ContentType = "image/webp", SortOrder = 1 });
         _context.GarageDocuments.Add(new GarageDocument
         {
             Id = _documentId, GarageVehicleId = _vehicleId, Type = GarageDocumentType.FactureEntretien,
@@ -80,7 +80,18 @@ public class SellVehicleTests : IDisposable
             .Setup(r => r.NextVehicleReferenceAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => $"YU{10000 + ++_sequence}");
 
-        _sell     = new CreateListingFromGarageCommandHandler(_context, references.Object);
+        // Publicar copia cada foto privada al almacenamiento público: el doble devuelve
+        // la URL que tendría la copia, para poder comprobar que el anuncio la recibe.
+        var storage = new Mock<IStorageService>();
+        storage
+            .Setup(s => s.PublishPrivateAsync(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string key, string fileName, string _, string folder, CancellationToken _) =>
+                ($"/{folder}/{fileName}", $"/{folder}/thumb-{fileName}"));
+
+        _sell     = new CreateListingFromGarageCommandHandler(
+            _context, references.Object, storage.Object);
         _settings = new GetTransparencySettingsQueryHandler(_context);
         _save     = new SaveTransparencySettingsCommandHandler(_context);
         _public   = new GetVehicleTransparencyQueryHandler(_context);
@@ -153,7 +164,7 @@ public class SellVehicleTests : IDisposable
     }
 
     [Fact]
-    public async Task DebeReutilizarLasFotografiasDelGaraje()
+    public async Task DebeCopiarLasFotografiasDelGarajeAlAnuncio()
     {
         var result = await SellAsync();
 
@@ -164,9 +175,29 @@ public class SellVehicleTests : IDisposable
 
         images.Should().HaveCount(2);
         // La principal del garaje sigue siendo la principal del anuncio.
-        images[0].Url.Should().Be("/a.webp");
         images[0].IsPrimary.Should().BeTrue();
         images[1].IsPrimary.Should().BeFalse();
+        result.CopiedImages.Should().Be(2);
+
+        // Las del garaje son privadas: el anuncio recibe una copia en el almacenamiento
+        // público, no la misma referencia.
+        images[0].Url.Should().Be($"/vehicles/{result.VehicleId}/a.webp");
+        images[0].Url.Should().NotContain("garage/");
+    }
+
+    [Fact]
+    public async Task NoDebeVaciarElGarajeAlPublicar()
+    {
+        var result = await SellAsync();
+
+        // Se copia, no se mueve: el vehículo conserva sus fotografías después de
+        // ponerse a la venta.
+        var enElGaraje = await _context.GarageVehicleImages
+            .Where(i => i.GarageVehicleId == _vehicleId)
+            .ToListAsync();
+
+        enElGaraje.Should().HaveCount(2);
+        enElGaraje.Should().OnlyContain(i => i.StorageKey.StartsWith("garage/"));
         result.CopiedImages.Should().Be(2);
     }
 

@@ -130,21 +130,57 @@ public static class GarageEndpoints
             if (file.Length > 10_485_760)
                 return Results.BadRequest("El archivo supera el límite de 10 MB.");
 
+            // Al almacenamiento privado, como los documentos: Mon Garage se anuncia como
+            // privado, y una foto en la carpeta pública la abre cualquiera que dé con la
+            // URL. Si algún día se publica, «Vendre ce véhicule» hace una copia.
             await using var stream = file.OpenReadStream();
-            var (url, thumbnailUrl) = await storage.UploadAsync(
-                stream, file.FileName, file.ContentType, $"garage/{id}", ct);
+            var key = await storage.UploadPrivateAsync(
+                stream, file.FileName, file.ContentType, $"garage/{id}/images", ct);
 
-            var result = await mediator.Send(
-                new AddGarageVehicleImageCommand(userId, id, url, thumbnailUrl, isPrimary, sortOrder), ct);
+            var result = await mediator.Send(new AddGarageVehicleImageCommand(
+                userId, id, key, file.FileName, file.ContentType, file.Length,
+                isPrimary, sortOrder), ct);
 
-            return result.IsSuccess
-                ? Results.Created($"/api/v1/garage/{id}/images/{result.Value}",
-                    new { id = result.Value, url, thumbnailUrl })
-                : Results.BadRequest(result.Error);
+            if (!result.IsSuccess)
+            {
+                await storage.DeletePrivateAsync(key, ct);
+                return Results.BadRequest(result.Error);
+            }
+
+            return Results.Created($"/api/v1/garage/images/{result.Value}",
+                new { id = result.Value });
         })
         .WithName("UploadGarageVehicleImage")
         .WithSummary("Subir una fotografía del vehículo (multipart/form-data)")
         .DisableAntiforgery();
+
+        // ─── GET /api/v1/garage/images/{imageId} ─────────────────────────────
+        // Única vía de acceso a la fotografía: comprueba de quién es antes de servirla.
+        group.MapGet("/images/{imageId:guid}", async (
+            Guid imageId,
+            ClaimsPrincipal user,
+            IMediator mediator,
+            IStorageService storage,
+            CancellationToken ct) =>
+        {
+            if (!TryGetUserId(user, out var userId)) return Results.Unauthorized();
+
+            var result = await mediator.Send(
+                new GetGarageVehicleImageFileQuery(userId, imageId), ct);
+
+            if (!result.IsSuccess)
+                return result.Error == "GarageVehicle.AccessDenied"
+                    ? Results.Forbid()
+                    : Results.NotFound(result.Error);
+
+            var file = result.Value!;
+            var stream = await storage.OpenPrivateAsync(file.StorageKey, ct);
+            if (stream is null) return Results.NotFound("GarageVehicle.ImageMissing");
+
+            return Results.File(stream, file.ContentType, fileDownloadName: file.FileName);
+        })
+        .WithName("GetGarageVehicleImage")
+        .WithSummary("Fotografía de un vehículo del garaje");
 
         // ─── DELETE /api/v1/garage/images/{imageId} ──────────────────────────
         group.MapDelete("/images/{imageId:guid}", async (

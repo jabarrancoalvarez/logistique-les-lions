@@ -186,8 +186,10 @@ public class AddGarageVehicleImageCommandHandler(IApplicationDbContext db)
         var image = new GarageVehicleImage
         {
             GarageVehicleId = vehicle!.Id,
-            Url             = request.Url,
-            ThumbnailUrl    = request.ThumbnailUrl,
+            StorageKey      = request.StorageKey,
+            FileName        = request.FileName,
+            ContentType     = request.ContentType,
+            SizeBytes       = request.SizeBytes,
             IsPrimary       = isPrimary,
             SortOrder       = request.SortOrder
         };

@@ -81,7 +81,8 @@ public class CompletenessTests : IDisposable
 
         _context.GarageVehicleImages.Add(new GarageVehicleImage
         {
-            GarageVehicleId = _vehicleId, Url = "/a.webp", IsPrimary = true
+            GarageVehicleId = _vehicleId, StorageKey = "garage/a.webp",
+            FileName = "a.webp", ContentType = "image/webp", IsPrimary = true
         });
 
         var invoice = new GarageDocument
@@ -209,7 +210,8 @@ public class CompletenessTests : IDisposable
             [
                 new GarageVehicleImage
                 {
-                    Url = "/vieille.webp", IsPrimary = true,
+                    StorageKey = "garage/vieille.webp", FileName = "vieille.webp",
+                    ContentType = "image/webp", IsPrimary = true,
                     CreatedAt = DateTimeOffset.UtcNow.AddMonths(-20)
                 }
             ]

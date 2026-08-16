@@ -124,12 +124,14 @@ export class GarageVehicleComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Las URLs de las fotos privadas viven en memoria: hay que liberarlas.
     this.revokePhotos();
+    this.revokeVehiclePhotos();
   }
 
   private load(id: string): void {
     this.service.getVehicle(id).subscribe({
       next: v => {
         this.vehicle.set(v);
+        this.loadVehiclePhotos(v.images);
         this.form = this.toForm(v);
         this.loadModels(v.makeId);
         this.loadDocuments(v.id);
@@ -875,6 +877,34 @@ export class GarageVehicleComponent implements OnInit, OnDestroy {
     }
 
     return parts.length ? parts.join(' · ') : null;
+  }
+
+  // ─── Photographies du véhicule ───────────────────────────────────────────
+  /**
+   * URLs temporales de las fotos del vehículo.
+   *
+   * Igual que las de una intervención: el archivo es privado, llega como blob por un
+   * endpoint autenticado y hay que construir la URL en memoria y liberarla después. Una
+   * etiqueta &lt;img&gt; no envía el token, así que no puede apuntar al endpoint.
+   */
+  readonly vehiclePhotoUrls = signal<Record<string, string>>({});
+
+  private loadVehiclePhotos(images: readonly GarageVehicleImage[]): void {
+    this.revokeVehiclePhotos();
+
+    for (const image of images) {
+      this.service.getImageFile(image.id).subscribe({
+        next: blob => this.vehiclePhotoUrls.update(urls => ({
+          ...urls, [image.id]: URL.createObjectURL(blob)
+        })),
+        error: () => { /* una foto que falla no debe romper la ficha */ }
+      });
+    }
+  }
+
+  private revokeVehiclePhotos(): void {
+    for (const url of Object.values(this.vehiclePhotoUrls())) URL.revokeObjectURL(url);
+    this.vehiclePhotoUrls.set({});
   }
 
   // ─── Photos d'une intervention ───────────────────────────────────────────

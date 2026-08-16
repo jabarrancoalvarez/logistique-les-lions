@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { GarageService, Garage, GarageCardReminder } from '@core/services/garage.service';
@@ -17,18 +17,42 @@ import { FcfaPipe } from '@shared/pipes/fcfa.pipe';
   imports: [CommonModule, RouterLink, FcfaPipe],
   templateUrl: './garage.component.html'
 })
-export class GarageComponent implements OnInit {
+export class GarageComponent implements OnInit, OnDestroy {
   private readonly service = inject(GarageService);
 
   readonly garage = signal<Garage | null>(null);
   readonly loading = signal(true);
   readonly error = signal(false);
 
+  /**
+   * Miniaturas de las tarjetas, en memoria.
+   *
+   * Las fotos del garaje son privadas: se piden por endpoint autenticado y llegan como
+   * blob. Una etiqueta &lt;img&gt; no envía el token, así que no puede apuntar a la API.
+   */
+  readonly thumbnails = signal<Record<string, string>>({});
+
   ngOnInit(): void {
     this.service.getMyGarage().subscribe({
-      next: g => { this.garage.set(g); this.loading.set(false); },
+      next: g => {
+        this.garage.set(g);
+        this.loading.set(false);
+        for (const v of g.vehicles) {
+          if (!v.primaryImageId) continue;
+          this.service.getImageFile(v.primaryImageId).subscribe({
+            next: blob => this.thumbnails.update(t => ({
+              ...t, [v.id]: URL.createObjectURL(blob)
+            })),
+            error: () => { /* sin miniatura se ve el icono, no se rompe la tarjeta */ }
+          });
+        }
+      },
       error: () => { this.error.set(true); this.loading.set(false); }
     });
+  }
+
+  ngOnDestroy(): void {
+    for (const url of Object.values(this.thumbnails())) URL.revokeObjectURL(url);
   }
 
   /** «147.500 km» */

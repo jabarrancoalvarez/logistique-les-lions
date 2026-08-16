@@ -130,8 +130,11 @@
               <ul class="grid grid-cols-2 sm:grid-cols-3 gap-3" role="list">
                 @for (img of images(); track img.id) {
                   <li class="relative rounded-lg overflow-hidden border border-navy/10">
-                    <img [src]="img.thumbnailUrl ?? img.url" alt=""
-                      class="w-full h-28 object-cover" loading="lazy" />
+                    @if (vehiclePhotoUrls()[img.id]; as photo) {
+                      <img [src]="photo" alt="" class="w-full h-28 object-cover" />
+                    } @else {
+                      <div class="w-full h-28 bg-frost-dark" aria-hidden="true"></div>
+                    }
                     @if (img.isPrimary) {
                       <span class="absolute top-1 left-1 text-[10px] font-medium px-1.5 py-0.5
                                    rounded bg-navy text-white">

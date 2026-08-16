@@ -89,11 +89,26 @@ public class GarageVehicle : AuditableEntity
 }
 
 /// <summary>Fotografía de un vehículo de Mon Garage. Privada, como el resto de la ficha.</summary>
+/// <remarks>
+/// Va al almacenamiento privado y se sirve por endpoint autenticado, igual que los
+/// documentos. Antes se subía a la carpeta pública, y bastaba conocer la URL para verla:
+/// el garaje se anuncia como privado, así que no lo era.
+///
+/// Se diferencia de <see cref="MaintenanceRecordImage"/> en que estas fotos <b>sí</b>
+/// pueden hacerse públicas algún día, pero solo por decisión de su dueño: al pulsar
+/// «Vendre ce véhicule» se <b>copian</b> al almacenamiento público para el anuncio. La
+/// copia es deliberada; el original sigue siendo privado.
+/// </remarks>
 public class GarageVehicleImage : AuditableEntity
 {
     public Guid GarageVehicleId { get; set; }
-    public string Url { get; set; } = string.Empty;
-    public string? ThumbnailUrl { get; set; }
+
+    /// <summary>Clave en el almacenamiento privado. ❌ Nunca se expone en la API.</summary>
+    public string StorageKey { get; set; } = string.Empty;
+    public string FileName { get; set; } = string.Empty;
+    public string ContentType { get; set; } = string.Empty;
+    public long SizeBytes { get; set; }
+
     public int SortOrder { get; set; }
     public bool IsPrimary { get; set; }
 
