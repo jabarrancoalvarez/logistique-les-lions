@@ -17,7 +17,7 @@
           class="block h-full bg-white rounded-xl border border-navy/10 p-5
                  hover:border-azure/40 transition-colors">
           <div class="flex items-start justify-between gap-3">
-            <h2 class="font-heading font-semibold text-navy">Favoris</h2>
+            <h2 class="font-heading font-semibold text-navy text-lg">Favoris</h2>
             @if (favoritesCount() !== null) {
               <span class="text-sm font-medium text-navy/60">{{ favoritesCount() }}</span>
             }
@@ -34,7 +34,7 @@
           class="block h-full bg-white rounded-xl border border-navy/10 p-5
                  hover:border-azure/40 transition-colors">
           <div class="flex items-start justify-between gap-3">
-            <h2 class="font-heading font-semibold text-navy">Recherches enregistrées</h2>
+            <h2 class="font-heading font-semibold text-navy text-lg">Recherches enregistrées</h2>
             @if (savedSearchesCount() !== null) {
               <span class="text-sm font-medium text-navy/60">{{ savedSearchesCount() }}</span>
             }
@@ -57,7 +57,7 @@
           class="block h-full bg-white rounded-xl border border-navy/10 p-5
                  hover:border-azure/40 transition-colors">
           <div class="flex items-start justify-between gap-3">
-            <h2 class="font-heading font-semibold text-navy">Comparateur</h2>
+            <h2 class="font-heading font-semibold text-navy text-lg">Comparateur</h2>
             <span class="text-sm font-medium text-navy/60">{{ comparator.count() }}</span>
           </div>
           <p class="text-sm text-navy/60 mt-1">
@@ -72,7 +72,7 @@
           class="block h-full bg-white rounded-xl border border-navy/10 p-5
                  hover:border-azure/40 transition-colors">
           <div class="flex items-start justify-between gap-3">
-            <h2 class="font-heading font-semibold text-navy">Mes demandes</h2>
+            <h2 class="font-heading font-semibold text-navy text-lg">Mes demandes</h2>
             @if (requestsCount() !== null) {
               <span class="text-sm font-medium text-navy/60">{{ requestsCount() }}</span>
             }

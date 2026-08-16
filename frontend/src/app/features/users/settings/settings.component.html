@@ -14,7 +14,7 @@
     @if (profile(); as p) {
       <!-- ─── Compte ────────────────────────────────────────────────────── -->
       <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
-        <h2 class="font-heading font-semibold text-navy mb-3">Compte</h2>
+        <h2 class="font-heading font-semibold text-navy text-lg mb-3">Compte</h2>
         <dl class="text-sm space-y-2">
           <div class="flex justify-between gap-3">
             <dt class="text-navy/60">Téléphone</dt>
@@ -40,7 +40,7 @@
 
       <!-- ─── Notifications ─────────────────────────────────────────────── -->
       <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
-        <h2 class="font-heading font-semibold text-navy mb-1">Notifications</h2>
+        <h2 class="font-heading font-semibold text-navy text-lg mb-1">Notifications</h2>
         <p class="text-xs text-navy/50 mb-4">
           Les alertes propres à une recherche enregistrée se règlent dans
           <a routerLink="/busquedas-guardadas" class="text-azure-dark hover:underline">
@@ -64,7 +64,7 @@
 
       <!-- ─── Contact ───────────────────────────────────────────────────── -->
       <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
-        <h2 class="font-heading font-semibold text-navy mb-3">Contact</h2>
+        <h2 class="font-heading font-semibold text-navy text-lg mb-3">Contact</h2>
         <label class="flex items-start gap-3 text-sm text-navy cursor-pointer">
           <input type="checkbox" [checked]="p.allowWhatsAppContact" [disabled]="saving()"
             (change)="toggleWhatsApp()" class="mt-0.5" />
@@ -79,7 +79,7 @@
 
       <!-- ─── Langue ────────────────────────────────────────────────────── -->
       <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
-        <h2 class="font-heading font-semibold text-navy mb-1">Langue</h2>
+        <h2 class="font-heading font-semibold text-navy text-lg mb-1">Langue</h2>
         <p class="text-sm text-navy/60">Français</p>
         <p class="text-xs text-navy/40 mt-1">
           Yoon u Auto est disponible en français.
@@ -88,7 +88,7 @@
 
       <!-- ─── Session ───────────────────────────────────────────────────── -->
       <div class="bg-white rounded-xl border border-navy/10 p-5">
-        <h2 class="font-heading font-semibold text-navy mb-3">Session</h2>
+        <h2 class="font-heading font-semibold text-navy text-lg mb-3">Session</h2>
         <button type="button" (click)="logout()" class="btn-outline text-sm">
           Se déconnecter
         </button>
