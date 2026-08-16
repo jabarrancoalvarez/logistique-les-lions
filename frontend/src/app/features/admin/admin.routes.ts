@@ -65,24 +65,6 @@ export const ADMIN_ROUTES: Routes = [
         title: 'Modération — Administration'
       },
       {
-        path: 'procesos',
-        loadComponent: () =>
-          import('./sections/admin-section.components').then(m => m.AdminProcessesComponent),
-        title: 'Procesos — Admin'
-      },
-      {
-        path: 'incidencias',
-        loadComponent: () =>
-          import('./sections/admin-section.components').then(m => m.AdminIncidentsComponent),
-        title: 'Incidencias — Admin'
-      },
-      {
-        path: 'partners',
-        loadComponent: () =>
-          import('./sections/admin-section.components').then(m => m.AdminPartnersComponent),
-        title: 'Marketplace — Admin'
-      },
-      {
         path: 'usuarios',
         loadComponent: () =>
           import('./users/admin-users.component').then(m => m.AdminUsersComponent),

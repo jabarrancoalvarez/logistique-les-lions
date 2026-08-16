@@ -140,7 +140,6 @@ public static class DependencyInjection
 
         // ─── BackgroundService: detector de procesos atascados ──────────────
         services.Configure<StaleProcessOptions>(configuration.GetSection(StaleProcessOptions.SectionName));
-        services.AddHostedService<StaleProcessNotifierService>();
 
         // ─── BackgroundService: rappels de Mon Garage vencidos por fecha ────
         services.AddHostedService<ReminderNotifierService>();

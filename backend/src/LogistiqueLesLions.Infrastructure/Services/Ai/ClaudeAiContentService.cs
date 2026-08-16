@@ -28,49 +28,6 @@ public class ClaudeAiContentService(
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    public async Task<AiVehicleDescription> GenerateVehicleDescriptionAsync(
-        VehicleAiContext c, CancellationToken cancellationToken = default)
-    {
-        var prompt =
-            $$"""
-            Genera una descripción comercial para este vehículo en dos idiomas. Tono profesional,
-            destaca puntos fuertes (eficiencia, equipamiento, estado), 80-120 palabras por idioma.
-            NO inventes datos que no aparezcan abajo. NO incluyas precio ni emojis.
-
-            Datos:
-            - Marca/Modelo: {{c.Make}} {{c.Model}}
-            - Año: {{c.Year}}
-            - Kilometraje: {{(c.Mileage?.ToString() ?? "no especificado")}}
-            - Combustible: {{c.FuelType ?? "no especificado"}}
-            - Transmisión: {{c.Transmission ?? "no especificada"}}
-            - Carrocería: {{c.BodyType ?? "no especificada"}}
-            - Color: {{c.Color ?? "no especificado"}}
-            - Estado: {{c.Condition}}
-            - País de origen: {{c.CountryOrigin}}
-            - Listo para exportación: {{(c.IsExportReady ? "sí" : "no")}}
-
-            Devuelve ÚNICAMENTE un objeto JSON con esta forma exacta, sin markdown ni texto extra:
-            {"es": "descripción en español", "en": "description in english"}
-            """;
-
-        var json = await SendMessageAsync(
-            new[] { new ContentBlock { Type = "text", Text = prompt } },
-            cancellationToken);
-
-        try
-        {
-            using var doc = JsonDocument.Parse(json);
-            var es = doc.RootElement.GetProperty("es").GetString() ?? string.Empty;
-            var en = doc.RootElement.GetProperty("en").GetString() ?? string.Empty;
-            return new AiVehicleDescription(es, en);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Respuesta de Claude no parseable como JSON: {Json}", json);
-            return new AiVehicleDescription(json, string.Empty);
-        }
-    }
-
     public async Task<AiDocumentExtraction> ExtractVehicleDocumentAsync(
         byte[] imageBytes, string mediaType, CancellationToken cancellationToken = default)
     {

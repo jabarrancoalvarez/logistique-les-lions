@@ -25,9 +25,6 @@ const ADMIN_NAV: AdminNavItem[] = [
   { path: 'notificaciones',label: 'Communications',  icon: '🔔' },
   { path: 'statistiques',  label: 'Statistiques',    icon: '📈' },
   { path: 'configuration', label: 'Configuration',   icon: '⚙️' },
-  { path: 'procesos',      label: 'Processus',       icon: '📦' },
-  { path: 'incidencias',   label: 'Incidents',       icon: '⚠️' },
-  { path: 'partners',      label: 'Partenaires',     icon: '🤝' },
 ];
 
 @Component({

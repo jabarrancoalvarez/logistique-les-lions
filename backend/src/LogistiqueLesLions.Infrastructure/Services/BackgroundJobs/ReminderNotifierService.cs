@@ -14,7 +14,7 @@ namespace LogistiqueLesLions.Infrastructure.Services.BackgroundJobs;
 /// tiempo. La condición por <b>kilometraje</b> se evalúa cuando el usuario declara una
 /// lectura nueva: la especificación prohíbe estimar cuánto ha rodado el vehículo.
 ///
-/// Sigue el patrón de <see cref="StaleProcessNotifierService"/>: cron en proceso, sin
+/// Cron en proceso, sin
 /// Hangfire ni Quartz. Con varias instancias en paralelo cada una haría el mismo trabajo,
 /// pero el aviso no se duplica porque <c>NotifiedAt</c> lo impide.
 /// </remarks>

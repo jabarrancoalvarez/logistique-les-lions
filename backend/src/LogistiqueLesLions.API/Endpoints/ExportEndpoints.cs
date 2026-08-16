@@ -61,76 +61,9 @@ public static class ExportEndpoints
         .WithSummary("Exportar listado de vehículos a CSV");
 
         // GET /api/v1/exports/processes/{id}.pdf
-        group.MapGet("/processes/{id:guid}.pdf", async (Guid id, IApplicationDbContext db, CancellationToken ct) =>
-        {
-            QuestPDF.Settings.License = LicenseType.Community;
-
-            var process = await db.ImportExportProcesses
-                .AsNoTracking()
-                .Where(p => p.Id == id)
-                .Select(p => new
-                {
-                    p.Id,
-                    p.TrackingCode,
-                    Status = p.Status.ToString(),
-                    ProcessType = p.ProcessType.ToString(),
-                    p.OriginCountry,
-                    p.DestinationCountry,
-                    p.CompletionPercent,
-                    p.EstimatedCostEur,
-                    p.StartedAt,
-                    p.CompletedAt,
-                    VehicleTitle = p.Vehicle.Title
-                })
-                .FirstOrDefaultAsync(ct);
-
-            if (process is null) return Results.NotFound();
-
-            var pdfBytes = Document.Create(container =>
-            {
-                container.Page(page =>
-                {
-                    page.Margin(40);
-                    page.Size(PageSizes.A4);
-                    page.DefaultTextStyle(t => t.FontSize(11).FontColor(Colors.Grey.Darken3));
-
-                    page.Header().Column(col =>
-                    {
-                        col.Item().Text("Logistique Les Lions").FontSize(18).Bold().FontColor(Colors.Black);
-                        col.Item().Text("Resumen de proceso de tramitación").FontSize(12).FontColor(Colors.Grey.Darken1);
-                        col.Item().PaddingTop(8).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
-                    });
-
-                    page.Content().PaddingTop(16).Column(col =>
-                    {
-                        col.Spacing(8);
-                        Row(col, "Código tracking:", process.TrackingCode);
-                        Row(col, "Vehículo:",        process.VehicleTitle);
-                        Row(col, "Estado:",          process.Status);
-                        Row(col, "Tipo:",            process.ProcessType);
-                        Row(col, "Origen → Destino:", $"{process.OriginCountry} → {process.DestinationCountry}");
-                        Row(col, "Progreso:",        $"{process.CompletionPercent}%");
-                        Row(col, "Coste estimado:",  process.EstimatedCostEur is null
-                            ? "—"
-                            // Sin cultura: la imagen de producción corre en modo
-                            // globalization-invariant y pedir «es-ES» lanza excepción.
-                            : process.EstimatedCostEur.Value.ToString("N2", CultureInfo.InvariantCulture));
-                        Row(col, "Iniciado:",        process.StartedAt?.ToString("dd/MM/yyyy") ?? "—");
-                        Row(col, "Completado:",      process.CompletedAt?.ToString("dd/MM/yyyy") ?? "—");
-                    });
-
-                    page.Footer().AlignCenter().Text(t =>
-                    {
-                        t.Span("Documento generado el ");
-                        t.Span(DateTime.UtcNow.ToString("dd/MM/yyyy HH:mm 'UTC'"));
-                        t.Span(" — logistiqueleslions.com");
-                    });
-                });
-            }).GeneratePdf();
-
-            return Results.File(pdfBytes, "application/pdf", $"proceso-{process.TrackingCode}.pdf");
-        })
-        .WithSummary("Generar PDF resumen de un proceso de tramitación");
+        // ❌ Se retiró «/processes/{id}.pdf», el albarán del producto anterior: iba con
+        // los procesos de tramitación. El CSV de vehículos se conserva porque puede
+        // reutilizarse en Statistiques.
 
         return group;
     }

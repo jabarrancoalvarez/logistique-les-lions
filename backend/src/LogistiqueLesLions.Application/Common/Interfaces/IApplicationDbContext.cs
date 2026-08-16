@@ -18,10 +18,8 @@ public interface IApplicationDbContext
     DbSet<VehicleEquipmentLink> VehicleEquipmentLinks { get; }
     DbSet<VehiclePriceHistory> VehiclePriceHistories { get; }
     DbSet<PriceIndicatorSettings> PriceIndicatorSettings { get; }
-    DbSet<Country> Countries { get; }
 
     // ─── M2: Vehículos ampliado ────────────────────────────────────────────
-    DbSet<VehicleDocument> VehicleDocuments { get; }
     DbSet<VehicleHistory> VehicleHistories { get; }
     DbSet<SavedVehicle> SavedVehicles { get; }
     DbSet<SavedSearch> SavedSearches { get; }
@@ -30,13 +28,6 @@ public interface IApplicationDbContext
     DbSet<VehicleRequestProposal> VehicleRequestProposals { get; }
 
     // ─── M3: Tramitación / Compliance ──────────────────────────────────────
-    DbSet<CountryRequirement> CountryRequirements { get; }
-    DbSet<ImportExportProcess> ImportExportProcesses { get; }
-    DbSet<ProcessDocument> ProcessDocuments { get; }
-    DbSet<DocumentTemplate> DocumentTemplates { get; }
-    DbSet<HomologationRequirement> HomologationRequirements { get; }
-    DbSet<CustomsTariff> CustomsTariffs { get; }
-    DbSet<ProcessIncident> ProcessIncidents { get; }
 
     // ─── M5: Mensajería ────────────────────────────────────────────────────
     DbSet<Negotiation> Negotiations { get; }
@@ -47,7 +38,6 @@ public interface IApplicationDbContext
     DbSet<VehicleInspectionItem> VehicleInspectionItems { get; }
     DbSet<Message> Messages { get; }
     DbSet<UserNotification> UserNotifications { get; }
-    DbSet<ServicePartner> ServicePartners { get; }
 
     // ─── Mon Garage ────────────────────────────────────────────────────────
     DbSet<GarageVehicle> GarageVehicles { get; }
@@ -76,7 +66,6 @@ public interface IApplicationDbContext
     DbSet<UpcomingFeature> UpcomingFeatures { get; }
     DbSet<FeatureInterest> FeatureInterests { get; }
 
-    DbSet<NewsletterSubscriber> NewsletterSubscribers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

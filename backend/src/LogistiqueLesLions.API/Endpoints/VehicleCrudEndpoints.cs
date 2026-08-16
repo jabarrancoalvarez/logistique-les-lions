@@ -1,7 +1,6 @@
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.AskVehicleQuestion;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.CreateVehicle;
-using LogistiqueLesLions.Application.Features.Vehicles.Commands.GenerateVehicleDescription;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.DeleteVehicle;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.ToggleFavorite;
 using LogistiqueLesLions.Application.Features.Vehicles.Commands.UpdateVehicle;
@@ -15,7 +14,6 @@ using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetFilterOptions;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetMyFavorites;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleModels;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleBySlug;
-using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleFacets;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleHistory;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicles;
 using LogistiqueLesLions.Domain.Enums;
@@ -114,27 +112,6 @@ public static class VehicleCrudEndpoints
         })
         .WithName("RegisterVehicleView")
         .WithSummary("Registra una visualización del anuncio")
-        .AllowAnonymous();
-
-        // ─── GET /api/v1/vehicles/facets ─────────────────────────────────────
-        group.MapGet("/facets", async (
-            IMediator mediator,
-            CancellationToken ct,
-            [FromQuery] string? search = null,
-            [FromQuery] int? yearFrom = null,
-            [FromQuery] int? yearTo = null,
-            [FromQuery] decimal? priceFrom = null,
-            [FromQuery] decimal? priceTo = null,
-            [FromQuery] string? countryOrigin = null,
-            [FromQuery] string? fuelType = null,
-            [FromQuery] string? condition = null) =>
-        {
-            var result = await mediator.Send(new GetVehicleFacetsQuery(
-                search, yearFrom, yearTo, priceFrom, priceTo, countryOrigin, fuelType, condition), ct);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        })
-        .WithName("GetVehicleFacets")
-        .WithSummary("Agregaciones para filtros tipo Amazon (counts por marca/combustible/estado/país)")
         .AllowAnonymous();
 
         // ─── GET /api/v1/vehicles/{slug} ─────────────────────────────────────
@@ -340,34 +317,10 @@ public static class VehicleCrudEndpoints
         .WithSummary("Interruptor general de alertas de Favoris")
         .RequireAuthorization();
 
-        // ─── POST /api/v1/vehicles/{id}/ai/description ───────────────────────
-        group.MapPost("/{id:guid}/ai/description", async (
-            Guid id,
-            IMediator mediator,
-            CancellationToken ct,
-            [FromQuery] bool overwrite = true) =>
-        {
-            var result = await mediator.Send(new GenerateVehicleDescriptionCommand(id, overwrite), ct);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        })
-        .WithName("GenerateVehicleDescription")
-        .WithSummary("Generar con IA descripción ES/EN del vehículo y persistirla")
-        .RequireAuthorization("CanPublishVehicle");
-
-        // ─── POST /api/v1/vehicles/ai/preview-description ────────────────────
-        // Variante sin persistencia: el wizard de creación llama aquí con los datos
-        // del formulario y recibe la descripción sin necesidad de tener vehicle Id.
-        group.MapPost("/ai/preview-description", async (
-            VehicleAiContext context,
-            IAiContentService ai,
-            CancellationToken ct) =>
-        {
-            var result = await ai.GenerateVehicleDescriptionAsync(context, ct);
-            return Results.Ok(result);
-        })
-        .WithName("PreviewVehicleDescription")
-        .WithSummary("Generar descripción IA sin persistir (para el wizard de creación)")
-        .RequireAuthorization("CanPublishVehicle");
+        // ❌ Retiradas las dos vías de generación de descripciones con IA: el documento
+        // funcional lo prohíbe expresamente («Yoon u Auto no modificará ni generará
+        // mediante IA esta descripción»). La extracción de datos de documentos se
+        // conserva: rellena el formulario a partir de la carte grise, no inventa texto.
 
         // ─── POST /api/v1/vehicles/{id}/ai/ask ───────────────────────────────
         // Chat IA contextual: el cliente envía pregunta + historial; el handler
