@@ -166,6 +166,13 @@ Si estás de acuerdo, se hacen y ya. Están aquí para que las veas, no para deb
       error (`Admin.ReasonRequired`, `GarageVehicle.MileageWentBackwards`).
       ⚠️ **El patrón correcto ya existe**: publicar un borrador sin precio responde
       «Publication impossible. Vérifiez que l'annonce a un prix.» Hay que replicarlo.
+- [ ] 🔴 **`POST /auth/login` devuelve 500 si el cuerpo no trae `identifier`.** Con la
+      contraseña equivocada responde 401, que es lo correcto; pero si falta el campo,
+      revienta. Es un endpoint **anónimo y con límite de peticiones**, o sea el primero
+      que va a recibir basura desde fuera. Debería contestar 400.
+- [ ] ⚠️ **`credenciales.txt` estaba versionado en un repositorio público** con la
+      contraseña `Test1234!` en claro. Ya está fuera del control de versiones y en
+      `.gitignore`, pero **sigue en el historial de git**: hay que darla por quemada.
 - [ ] **Falta el filtro «reportadas»** en Annonces. La API acepta `Reported`; el formulario
       solo expone «Masquées» y «À réviser». El doc §6.4 lo pide.
 - [ ] **No se puede consultar el PDF del contrato ni verificar el QR desde el backoffice.**

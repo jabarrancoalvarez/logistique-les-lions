@@ -52,3 +52,6 @@ private-uploads/
 
 # Capturas de Playwright durante las pruebas
 .playwright-mcp/
+
+# Credenciales de las cuentas de prueba: nunca al repositorio
+credenciales.txt
