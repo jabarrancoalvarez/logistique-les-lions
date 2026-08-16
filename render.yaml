@@ -1,6 +1,13 @@
 services:
   - type: web
-    name: logistique-les-lions-api
+    # ⚠️ El nombre no manda sobre la URL. Al renombrar el servicio el 16/08/2026, Render
+    # conservó su hostname original: la API sigue respondiendo en
+    # logistique-les-lions-api.onrender.com y así queda apuntada en
+    # environment.production.ts. No es un descuido —cambiarlo exigiría recrear el
+    # servicio y migrar a mano todas las variables de abajo— y no la ve nadie: solo la
+    # llama el frontend. Con un dominio propio se resuelve añadiendo un dominio
+    # personalizado al servicio.
+    name: yoon-u-auto-api
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
@@ -17,9 +24,9 @@ services:
       - key: Jwt__Key
         sync: false
       - key: Jwt__Issuer
-        value: logistique-les-lions-api
+        value: yoon-u-auto-api
       - key: Jwt__Audience
-        value: logistique-les-lions-client
+        value: yoon-u-auto-client
       - key: Jwt__AccessTokenExpirationMinutes
         value: "15"
       - key: Jwt__RefreshTokenExpirationDays
