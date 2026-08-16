@@ -248,11 +248,14 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
       ejemplo) que no dan acceso a producción, donde las claves vienen del entorno y
       `appsettings.json` no lleva ninguna.
 
-      ⚠️ Queda una comprobación de 30 segundos que conviene hacer una vez: confirmar que
-      la clave JWT de producción **no** es la pública de `docker-compose`
-      (`dev_jwt_secret_key_minimum_32_characters_long_for_hmac`). En Render →
-      Environment, `Jwt__Key` debe ser un secreto propio y distinto. Si lo fuera,
-      cualquiera podría firmarse un token de administrador; cambiarla es un campo.
+      ✅ **Comprobado el 16/08/2026: la `Jwt__Key` de producción es un secreto propio**, no
+      la pública de `docker-compose`. Producción firma sus tokens con su propia clave, así
+      que nadie puede forjarse un token de administrador con la del repositorio.
+
+      ℹ️ Recomendación permanente: `Jwt__Key` nunca debe salir de Render. Si en algún
+      momento se sospecha que se ha expuesto, se rota (otra cadena aleatoria de 32+
+      caracteres): el único efecto es que las sesiones abiertas caducan y hay que volver a
+      entrar.
 - [x] ✅ **RESUELTO el 16/08/2026: el administrador sí puede descargar el PDF del
       contrato.** El endpoint ya existía; faltaba el botón, y se había dejado aparte
       porque el PDF lleva las pièces d'identité, las direcciones y los teléfonos de las
