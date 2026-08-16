@@ -46,7 +46,7 @@ export class LandingPageComponent implements OnInit {
     { id: 'Berline',    emoji: '🚘', label: 'Berlines' },
     { id: 'Suv',        emoji: '🚙', label: 'SUV / 4x4' },
     { id: 'Break',      emoji: '🚐', label: 'Breaks' },
-    { id: 'Pickup',     emoji: '🛻', label: 'Pick-up' },
+    { id: 'PickUp',     emoji: '🛻', label: 'Pick-up' },
     { id: 'Utilitaire', emoji: '🚚', label: 'Utilitaires' }
   ];
 

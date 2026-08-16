@@ -58,6 +58,7 @@ try
     builder.Services.AddScoped<LogistiqueLesLions.Application.Common.Interfaces.INotificationPusher,
                                LogistiqueLesLions.API.Hubs.SignalRNotificationPusher>();
     builder.Services.AddScoped<LogistiqueLesLions.Infrastructure.Persistence.Seeding.DatabaseSeeder>();
+    builder.Services.AddScoped<LogistiqueLesLions.Infrastructure.Persistence.Seeding.YoonUAutoReseeder>();
 
     // ─── OpenTelemetry ──────────────────────────────────────────────────────────
     builder.Services.AddOpenTelemetry()
@@ -228,6 +229,14 @@ try
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             await db.Database.MigrateAsync();
             Log.Information("✓ Migraciones aplicadas correctamente");
+
+            // Sustituye el catálogo de demostración del producto anterior por uno
+            // senegalés. Se limita solo: si no quedan anuncios de fuera de Senegal, no
+            // hace nada. No lleva bandera de configuración porque debe ocurrir una vez
+            // en cada entorno que arrastre esos datos.
+            var reseeder = scope.ServiceProvider
+                .GetRequiredService<LogistiqueLesLions.Infrastructure.Persistence.Seeding.YoonUAutoReseeder>();
+            await reseeder.ReseedAsync();
 
             if (builder.Configuration.GetValue<bool>("Seed:Enabled"))
             {
