@@ -732,22 +732,32 @@ hacen mejor a mano.
 
 ### 12.2 Necesita esperar
 
-- [ ] **Rappels de Mon Garage**: el trabajo en segundo plano corre cada 6 h. Crear uno
-      que venza hoy y comprobar que llega la notificación
-- [ ] **Alerta de bajada de precio**: bajar el precio de un favorito y ver la notificación
-- [ ] **Alerta de búsqueda guardada**: publicar un anuncio que encaje y comprobar que
-      salta **una sola vez**, y que no vuelve a saltar al reactivar tras una pausa
+- [x] **Rappels de Mon Garage**: no hizo falta esperar. Un recordatorio por kilometraje
+      salta **en el acto** al actualizar el contador, con su notificación `reminder`
+      (§12.5). Queda sin probar solo el disparo autónomo del trabajo de las 6 h
+- [x] **Alerta de bajada de precio**: bajado `YU00042` de 4.700.000 a 4.400.000 y llegó
+      la notificación «Baisse de prix» (categoría `price-drop`) al instante
+- [ ] **Alerta de búsqueda guardada**: publicado `YU10026` con una búsqueda guardada sin
+      filtros y alerta activa, y **no llegó nada** — correctamente: el servicio excluye a
+      quien publica (`NewVehicleAlertService.cs:27`, «Quien publica no necesita que le
+      avisen de su propio anuncio»). **Sigue sin poder probarse de punta a punta** con una
+      sola cuenta, igual que lo de «una sola vez» y lo de no repetir tras una pausa
 - [ ] **Caducidad del token**: dejar la sesión abierta más de 15 minutos y seguir
       navegando sin que se cierre (corregido, pero conviene confirmarlo en uso real)
 
-### 12.3 Etapa 1 — sin probar
+### 12.3 Etapa 1
 
-- [ ] Favoritos: marcar, desmarcar, y que el contador del anuncio cambie
-- [ ] Búsquedas guardadas: guardar desde el buscador, activar y desactivar su alerta
-- [ ] Comparador: añadir hasta 3, que el cuarto avise, y que **cambiar el límite en
-      Configuration lo cambie sin desplegar**
-- [ ] «Trouvez-moi cette voiture»: crear una demande, ver su `YD#####`, cancelarla
-- [ ] Que el **teléfono del vendedor esté oculto** para quien no tiene cuenta
+- [x] Favoritos: marcar, desmarcar, y que el contador del anuncio cambie *(9 → 10 → 9)*
+- [x] Búsquedas guardadas: guardar desde el buscador, activar y desactivar su alerta
+- [x] Comparador: que **cambiar el límite en Configuration lo cambie sin desplegar**
+      *(la ficha pasó a «Comparer (0/4)» sin redesplegar nada)*
+- [ ] ❌ **Al llenarse, el comparador no avisa: expulsa uno en silencio.** Con cuatro
+      seleccionados, el botón sigue activo, marca «(3/4)» —una menos de las que hay— y al
+      pulsarlo entra el quinto y desaparece uno de los anteriores. El doc pide avisar de
+      que está lleno
+- [x] «Trouvez-moi cette voiture»: crear una demande, ver su `YD00001`, cancelarla
+- [x] Que el **teléfono del vendedor esté oculto** para quien no tiene cuenta
+      *(el DTO del anuncio no trae ningún teléfono, ni siquiera autenticado)*
 
 ### 12.4 Etapa 2 — sin probar
 
@@ -757,17 +767,70 @@ hacen mejor a mano.
 - [ ] Plantillas de respuesta rápida del vendedor
 - [ ] Rechazar una oferta
 
-### 12.5 Mon Garage — sin probar
+### 12.5 Mon Garage
 
-- [ ] **Rappels**: crear por fecha y por kilometraje, y que el de kilómetros solo salte
-      al actualizar el contador
-- [ ] Que el **kilometraje no pueda bajar**
-- [ ] **Transparence**: compartir una intervención y comprobar que **su factura no se
-      comparte sola** — son dos casillas
-- [ ] Ver lo compartido en el anuncio público desde una sesión cerrada
-- [ ] **«Vendre ce véhicule»**: que salga un borrador **sin precio, sin estado aduanero
-      y sin descripción**
-- [ ] Fotos del vehículo (⚠️ se perderán al reiniciar Render, pendiente nº 2)
+Recorrido entero el 16/08/2026 sobre un vehículo creado a mano (Toyota Land Cruiser 2018).
+
+- [x] ⚠️ **Mon Garage es privado**: el garaje del comprador tiene 1 vehículo y desde la
+      cuenta del administrador se ven **0**
+- [x] Alta a mano con marca → modelo encadenado, y ficha completa
+- [x] **Rappels**: creado uno por fecha (vence hoy → «À faire») y otro por kilometraje
+      (100.000 km → «À venir · 1.000 km restants»)
+- [x] ⚠️ **El de kilómetros solo salta al actualizar el contador**: al pasar de 99.000 a
+      100.500 km cambió a «À faire · dépassé de 500 km» **y llegó su notificación**
+      (`reminder`). No hizo falta esperar las 6 h del trabajo en segundo plano
+- [x] Estados del recordatorio: «À faire» → «Terminé», con opción de «Rouvrir»
+- [x] Que el **kilometraje no pueda bajar**: la API responde
+      `GarageVehicle.MileageWentBackwards` (400) y el valor no se mueve
+- [x] **Entretien**: intervención con fecha, km, tipo, taller, coste y notas; **agrupada
+      por año** y con el total correcto («1 intervention · 85.000 FCFA au total»)
+- [x] **Factura enlazada** a la intervención («Facture disponible ✓»)
+- [x] **Documentos**: subido un PDF; la API **no devuelve la `StorageKey`** (solo el
+      nombre original del fichero); la descarga da 200 con token y **401 sin él**, y el
+      fichero **no** se sirve desde `/uploads` (404). La propiedad se comprueba en el
+      handler (`document.GarageVehicle.UserId != userId` → 403)
+- [x] **Valeur estimée**: «Pas assez de données pour estimer la valeur» — ninguna cifra
+      inventada, y **sin mencionar inteligencia artificial**
+- [x] ⚠️ **Complétude**: el aviso de que **no es un diagnóstico mecánico** está en la
+      propia pantalla, no en un tooltip
+- [x] **«Vendre ce véhicule»**: crea `#YU10026` en **`Brouillon`**, no visible, y
+      **precio `0`, estado aduanero `null` y descripción `null`**. Sí hereda marca,
+      modelo, año, km, carburante, caja, carrocería, potencia y color
+- [x] ⚠️ **Transparence — «son dos casillas», confirmado**: compartida la intervención
+      **sin** su factura, la respuesta pública trae el registro con
+      `invoiceDocumentId: null`, y pedir la factura por su id real da **404
+      `Transparency.NotShared`**. Al marcar también la factura, se descarga (200, PDF).
+      Al desmarcar todo, la transparencia vuelve a venir vacía
+- [x] ⚠️ Sin marcar «dates et kilométrage», la respuesta pública devuelve `performedAt` y
+      `mileage` a **null**: no se filtra solo en pantalla
+- [x] Ver lo compartido **desde sesión cerrada** *(comprobado sin token contra la API)*
+- [ ] Fotos: se suben y se marcan «Principale», pero ver el fallo de abajo
+      (⚠️ además se perderán al reiniciar Render, pendiente nº 2)
+- [ ] Que «Vendre ce véhicule» **herede las fotos**: el borrador se creó cuando el garaje
+      aún no tenía ninguna, así que dice «0 photo(s) reprise(s)». Sin comprobar
+- [ ] Que el vehículo comprado en la plataforma entre **una sola vez**: hace falta la
+      cuenta del comprador
+
+**Lo que falló:**
+
+- [ ] 🔴 **Las fotos de Mon Garage se sirven sin autenticación.** Van a `/uploads/`, que
+      es la carpeta estática: `GET .../uploads/garage/<id>/<guid>.png` devuelve **200
+      image/png sin token**. Los documentos sí están bien (401), pero las fotos no. El
+      identificador es un GUID, o sea que la protección es solo que nadie adivine la URL.
+      Contradice la regla de Mon Garage privado
+- [ ] ❌ **La API devuelve las URLs de fichero en `http://`**, no en `https://`. Chrome
+      registra «Mixed Content» y las eleva él solo, pero con una política más estricta la
+      imagen no cargaría
+- [ ] ⚠️ **El panel de complétude no se refresca**: al cerrar un recordatorio siguió
+      diciendo «2 rappels en retard» hasta recargar la página
+- [ ] ⚠️ **La complétude puede bajar al añadir cosas**: pasó de 50 % a 45 % tras añadir un
+      documento y una intervención, porque los dos recordatorios recién creados estaban
+      vencidos y eso pesa más. No es un fallo, pero el doc dice que «la puntuación sube al
+      añadir documentos e intervenciones» y no siempre es así
+- [ ] ⚠️ Subir una factura de entretien **no** quita el aviso «Aucun document essentiel»:
+      cuentan carte grise, assurance y contrôle technique. Coherente, pero conviene saberlo
+- [ ] ⚠️ El rechazo del kilometraje hacia atrás **tampoco se explica en pantalla**: mismo
+      patrón mudo que en el backoffice
 
 ### 12.6b Observaciones de Mes annonces
 
@@ -777,14 +840,37 @@ hacen mejor a mano.
       lo que ve quien abre un anuncio vendido. Decidir si se retira la acción
 - [ ] ⚠️ La cuenta de pruebas `+221770000101` **posee 3 anuncios del catálogo sembrado**,
       porque existía antes de que corriera el reseed. Tenerlo en cuenta al limpiar
+- [ ] ⚠️ **Confirmado**: la acción «Prix» sigue ofreciéndose sobre `YU10025`, que está
+      `Vendu`. Y también «Kilométrage»
 
-### 12.6 Mes annonces — sin probar
+### 12.6 Mes annonces
 
-- [ ] Los seis estados y sus cambios desde la lista
-- [ ] Estadísticas por anuncio: visitas, favoritos, contactos
-- [ ] Score de calidad del anuncio
-- [ ] Duplicar y archivar
-- [ ] Publicar cinco anuncios seguidos: **sin límite**
+- [x] Los **seis estados** con su recuento, y las acciones cambiando según el estado:
+      un `Brouillon` ofrece «Publier l'annonce», un `Actif` ofrece «Mettre en pause /
+      Marquer réservé / Marquer vendu», un `Réservé` ofrece «Remettre en vente»
+- [x] Cambios de estado **desde la lista**: `Actif → Réservé → Actif`, con los contadores
+      de las pestañas actualizándose al momento
+- [x] Estadísticas por anuncio: visitas, favoritos y contactos, distintas en cada uno
+- [x] **Score de calidad**: reacciona de verdad. El borrador del Land Cruiser marcaba
+      15 %; al ponerle precio subió a **30 %**
+- [x] **Duplicar**: crea `YU10027` en `Brouillon` con referencia **consecutiva**. Sí
+      hereda el precio, a diferencia de «Vendre ce véhicule» — y es lo correcto:
+      duplicar es repetir un anuncio, no estrenar uno
+- [x] **Archivar**: sale de la lista por defecto y **desaparece del escaparate**
+      (contador público 47 → 46)
+- [x] **Publicar**: `Brouillon → Actif`, con `publishedAt` y el contador público
+      46 → 47
+- [x] ✅ **Un borrador sin precio no se puede publicar**, y aquí el rechazo **sí se
+      explica**: «Publication impossible. Vérifiez que l'annonce a un prix.» Es la
+      excepción a los rechazos mudos del resto de la aplicación
+- [x] Sin límite de anuncios: la cuenta es `Particulier` y llegó a **6 anuncios, 3 de
+      ellos activos a la vez**, sin que apareciera ninguna restricción
+
+**Observado, sin ser fallo:**
+
+- Un anuncio `Réservé` **sigue apareciendo en el buscador**, con su etiqueta; los
+  `Vendu`, `En pause`, `Brouillon`, `Archivé` y los ocultados, no. Encaja con el doc
+  (§2.2 solo excluye borradores, pausados y archivados; §2.3 pide que se vea el estado)
 
 ### 12.6c Invalidar un contrato: qué pasa con el anuncio
 
@@ -800,37 +886,299 @@ Pero quedan dos cosas **como estaban** y conviene decidir si es lo que se quiere
 - [ ] La **negociación sigue en `Terminée`**. Si el contrato se invalidó por fraude,
       quizá deba reabrirse; si fue un error administrativo, quizá no
 
-### 12.7 Backoffice — la mayor parte sin probar
+### 12.7 Backoffice
 
-Verificado: tableau de bord y statistiques. Falta:
+Recorrido entero el 16/08/2026. Lo verificado:
 
-- [ ] **Utilisateurs**: suspender con fecha, bloquear, notas internas, y que **toda
-      medida exija motivo**
-- [ ] **Annonces**: ocultar con `AdminHiddenAt` sin tocar el estado del vendedor, y que
-      el administrador **no pueda editar** título, precio ni descripción
-- [ ] **Demandes**: asignarse, proponer vehículo interno y externo, responder
-- [ ] ⚠️ **Négociations**: que el contenido **no aparezca** en el listado ni en la ficha,
-      que leerlo **exija motivo**, y que esa lectura quede registrada en el journal
-- [ ] **Contrats**: invalidar con motivo, que baje el contador de ventas verificadas y
-      **que no exista forma de validar** en nombre de las partes
-- [ ] **Modération**: reportar, referencia `SG#####`, cerrar exigiendo explicación
-- [ ] **Communications**: enviar por audiencia y región; ⚠️ **no saldrá ningún correo**
-      (pendiente nº 3)
-- [ ] **Configuration**: parámetros fuera de rango rechazados, interruptores, catálogos,
-      y que el **código de un equipamiento no cambie**
-- [ ] **Journal**: valor anterior y nuevo, filtros, y que **no se pueda editar ni borrar**
-- [ ] **Points**: ajuste manual sin motivo rechazado *(el +100 automático ya está
-      verificado)*
+- [x] **Utilisateurs**: suspender con fecha, bloquear, reactivar, notas internas, y que
+      **toda medida exija motivo** (`Admin.ReasonRequired`, 400)
+- [x] **Annonces**: ocultar deja el anuncio en `Actif` + «masquée» sin tocar el estado del
+      vendedor; **no hay ningún campo para editar** título, precio ni descripción, solo
+      «Demander une correction», que queda registrada
+- [x] **Demandes**: asignarse, proponer vehículo interno y externo, retirar la propuesta,
+      responder y cambiar de estado con motivo
+- [x] ⚠️ **Négociations**: el contenido no aparece ni en el listado ni en la ficha;
+      leerlo exige elegir motivo **y** escribir por qué; la lectura queda registrada en
+      «Accès enregistrés» y en el journal, con nombre y motivo
+- [x] **Contrats**: **no existe ningún botón de validar** por ninguna vía; la pantalla lo
+      dice explícitamente
+- [x] **Modération**: reportar desde la ficha pública → `SG00001`; el mismo usuario no
+      puede abrir un segundo signalement («déjà signalé»); «En examen» no pide motivo;
+      cerrar **sí** lo exige y queda con su decisión
+- [x] **Communications**: envío a «Tous» → **9 destinatarios de 10 usuarios**, la cuenta
+      bloqueada quedó excluida; el histórico registra qué, cuándo, quién y a cuántos.
+      ⚠️ El correo sigue sin probar: no hay API key (pendiente nº 3)
+- [x] **Configuration**: comparador = 20 → «Le comparateur doit accepter entre 2 et 6
+      véhicules.»; margen = 3 → «La fourchette doit être comprise entre 0 et 1.»;
+      guardar sin cambios **no** añade fila al journal; marca y modelo duplicados
+      rechazados, el mismo modelo en otra marca admitido; el **código de un equipamiento
+      no cambia** al renombrarlo (probado contra producción)
+- [x] **Journal**: administrador, acción, motivo, fecha y **valor anterior → nuevo**;
+      filtrar «Du = Au = hoy» devuelve las entradas de hoy, o sea que **incluye** ese día
+- [x] **Points**: ajuste sin motivo rechazado; `+50` y `−50` con motivo dejan los dos
+      movimientos y el saldo vuelve a 0 sin borrar nada
+
+**Lo que falló:**
+
+- [ ] ❌ **El listado de negociaciones cuenta 12 y enseña 1.** La API devuelve
+      `totalCount: 12` con un solo elemento: el recuento se hace antes de proyectar, y la
+      proyección lee `n.Vehicle`, cuyo filtro de borrado lógico convierte la consulta en
+      un *inner join*. Afecta también a la paginación. **Corregido, pendiente de
+      desplegar**
+- [ ] ❌ **Falta el filtro «reportadas» en Annonces.** La API acepta `Reported`, pero el
+      formulario solo expone «Masquées» y «À réviser». El doc §6.4 lo pide
+- [ ] ❌ **No se puede consultar el PDF del contrato ni verificar el QR desde el
+      backoffice.** La ficha enseña el código de verificación como texto, pero no hay
+      enlace ni descarga. El doc §6.7 pide ambas cosas
+- [ ] ❌ **Enums crudos en francés a medias**: el journal escribe `Dispute` en vez de
+      «Litige entre les parties», y el historial de un signalement escribe `EnExamen`.
+      Es el mismo fallo que se corrigió en la ficha de negociación (commit 239cca6)
+- [ ] ❌ **El historial de un signalement rotula «Signalement clôturé» también al ponerlo
+      en examen**, que no lo cierra
+- [ ] ❌ **Al proponer un vehículo interno, el buscador ofrece anuncios vendidos**
+      (`YU10025`, en estado `Vendu`, aparece entre las propuestas posibles)
+- [ ] ⚠️ **Los rechazos no se explican.** Suspender sin motivo, leer una conversación sin
+      justificarla o ajustar puntos sin motivo **no hacen nada y no dicen por qué**: el
+      botón sigue activo y no aparece mensaje. La regla se cumple, pero el administrador
+      no sabe qué le falta
+- [ ] ⚠️ Tras un error de catálogo, el aviso («Cette marque existe déjà») **se queda en
+      pantalla** aunque la acción siguiente funcione
+- [ ] ⚠️ Falta de ortografía: «**Anexer** une annonce Yoon u Auto» → *Annexer*
 
 ### 12.8 Transversal
 
-- [ ] ⚠️ Que **ningún endpoint acepte `userId` por query string**: añadir
-      `?userId=<otro>` a una llamada y comprobar que se ignora
-- [ ] Repaso de idioma pantalla por pantalla: quedan zonas del producto anterior sin
-      traducir, y las nuevas conviene mirarlas con ojos frescos
-- [ ] Que ninguna pantalla tarde más de 3 segundos con datos reales
-- [ ] **Statistiques con volumen**: las agregaciones se hacen en memoria (pendiente
-      nº 19); medir cuánto tardan cuando haya miles de filas
+- [x] ⚠️ Que **ningún endpoint acepte `userId` por query string**: añadido
+      `?userId=<otro>` a `/notifications`, `/saved-searches` y `/negotiations`, y la
+      respuesta es **byte a byte idéntica** a la de la llamada sin él
+#### Repaso de idioma — hecho el 16/08/2026
+
+Barrido automático de todas las pantallas buscando palabras inequívocamente españolas,
+símbolos de divisa y formatos de fecha.
+
+- [x] **Yoon u Auto está limpio.** Ni una palabra en español en: portada, Marketplace,
+      ficha de anuncio, `/prochainement`, `/comparateur`, `/dashboard`, `/favoritos`,
+      `/mis-negociaciones`, `/mensajes`, `/perfil`, `/ajustes`, `/mis-vehiculos`,
+      `/mi-garaje`, el formulario de publicar, el de añadir al garaje y **todo el
+      backoffice nuevo**. Ninguna divisa que no sea FCFA
+- [ ] 🔴 **Las cinco páginas legales tienen el título en francés y el cuerpo en español —
+      y describen una empresa española.** No es solo idioma:
+  - `/legal/aviso-legal` → «Yoon U Auto, **S.L.** … Domicilio social: Calle de ejemplo,
+    123, 28001 **Madrid, España**. NIF: B-12345678. **Registro Mercantil de Madrid**»,
+    invocando la **Ley 34/2002 (LSSI-CE)** española
+  - `/legal/rgpd` → Reglamento (UE) 2016/679 y **Ley Orgánica 3/2018**, normativa europea
+    y española, no senegalesa
+  - `/legal/cookies` → «¿Qué son las cookies?»; `/legal/terminos` → «1. Descripción del
+    servicio», «2. Registro y cuenta de usuario»
+  - Las cinco llevan «**Volver al inicio**» y «Última actualización: Enero 2025»
+  - ⚠️ **Están enlazadas desde el pie de todas las páginas**, así que cualquiera llega
+- [ ] ⚠️ **`/admin/procesos`, `/admin/incidencias` y `/admin/partners` siguen en el menú
+      lateral del backoffice**, en español y con datos europeos («Gestoría Iberia»,
+      «Carfax Europe Inspectors»). Incidencias enseña además enums crudos: «Medium»,
+      «Open», «Resolved». Sus títulos de pestaña rompen el patrón: «Procesos — Admin» en
+      vez de «— Administration»
+- [ ] ⚠️ **Quedan euros en producción**: `/precios`, `/transporte` y `/financiacion`
+      muestran importes en **€**. Solo se llega por URL directa, pero están vivas.
+      Es el ❌ de §7.1 («no aparece ningún €»), pendiente de la decisión sobre el legacy
+
+#### Rendimiento — medido el 16/08/2026
+
+- [x] **Ninguna pantalla se acerca a los 3 segundos.** Navegación entre rutas: 51–215 ms.
+      Carga completa del Marketplace: **DOM 144 ms, primer pintado 228 ms**, 24 ficheros
+      JS. Las llamadas más lentas de esa pantalla: listado 304 ms, notificaciones 219 ms,
+      marcas 191 ms
+- [x] **API**: todo por debajo de 350 ms. Backoffice 110–346 ms; catálogos 150 ms (12 kB)
+- [x] **Statistiques**: 254 ms (7 j), 275 ms (30 j), 302 ms (90 j), **308 ms (12 mois)**
+- [ ] ⚠️ Pero eso **no responde al pendiente nº 19**: con 10 usuarios y 49 anuncios, unas
+      agregaciones en memoria van rápidas por fuerza. Sigue sin probarse con volumen
+- [ ] ⚠️ **Todo se midió con la API caliente.** No se ha medido el arranque en frío de
+      Render —el caso que se lleva el primer visitante del día— ni la latencia real desde
+      Senegal: el navegador de pruebas no está allí
+- [x] La consola no muestra errores propios de la aplicación. Los únicos son los del
+      punto siguiente
+
+#### SignalR no se recupera del refresco de token — confirmado en vivo
+
+- [ ] 🔴 Al caducar el token, el `negotiate` del hub recibe **401 y el cliente no lo
+      reintenta nunca**. Comprobado que el token nuevo **sí vale**: repitiendo el
+      `negotiate` a mano con él, responde **200**. O sea que no es un problema de
+      permisos, es que falta el reintento. Efecto práctico: **pasados los 15 minutos, las
+      notificaciones en vivo dejan de llegar en silencio** y solo reaparecen al recargar.
+      Es el pendiente nº 22, ahora con su impacto medido
+
+### 12.9b Últimas pruebas en solitario (2026-08-16)
+
+Lo que quedaba y no exigía una segunda cuenta.
+
+**Prochainement — *doc §6.14***
+
+- [x] `/prochainement` muestra las **cinco** funcionalidades sembradas
+- [x] «Ça m'intéresse» marca y desmarca, y el contador cambia **al instante**
+      (0 → 1 → 0 → 1), con el singular y el plural bien puestos
+- [x] ⚠️ **Índice único parcial `feature_interests` validado**: retirar el interés y
+      volver a declararlo funciona, y **dos peticiones simultáneas no lo cuentan por
+      dos** (el contador nunca pasa de 1). Era uno de los tres índices que los tests en
+      memoria no comprueban
+
+**Notificaciones (campana) — *doc §2.9***
+
+- [x] La campana muestra el número de no leídas (13) y desaparece al quedarse en cero
+- [x] Marcar una como leída baja el contador (13 → 12)
+- [x] **Cada notificación lleva al sitio correcto**: «Baisse de prix» abrió justo
+      `/vehiculos/peugeot-208-2020`, el anuncio cuyo precio había bajado
+- [x] «Tout marquer comme lu» deja el contador a 0, confirmado también por la API
+- [x] Categorías vistas en producción: `price-drop`, `reminder`, `offer`, `contract`,
+      `message`, `request-proposal`, `admin`, `system`
+
+**Statistiques — *doc §6.13***
+
+- [x] Las cuatro ventanas, y **precio mediano (7.600.000) con la media al lado
+      (8.692.553)**
+- [x] Kilometraje y año medianos, marcas, modelos, ciudades, carburante y aduana
+- [x] «Budget médian recherché» muestra **«—»** cuando no hay datos: no se inventa nada
+- [x] ❌ La pantalla **dice** que los vehículos más comparados no se miden, y por qué
+- [x] El aviso de que las vistas son acumuladas y el resto del periodo está visible
+- [ ] ⚠️ **La columna «Personnes» de «Ce qu'on cherche et qu'on ne trouve pas» se lee
+      mal**: para Toyota Hilux marca «Personnes 0 · Demandes 1», que parece imposible.
+      No lo es: «Personnes» cuenta *quien tiene una búsqueda guardada apuntando a ese
+      modelo*, y la demande vino por otra vía. El dato es correcto; la etiqueta engaña
+- [ ] ⚠️ **Una demande cancelada sigue contando** en esa tabla (`YD00001` está `Annulée`)
+- [ ] ⚠️ **El embudo enseña porcentajes por encima del 100 %**: «Offres 200 %»,
+      «Contrats 100 %». La API devuelve recuentos crudos (vues 21279, favoris 2,
+      négociations 1, offres 2, contrats 1) y el porcentaje lo calcula el frontend
+      **sobre el paso anterior**, así que 2 ofertas en 1 negociación dan 200 %. Es
+      legítimo como ratio, pero en algo llamado «embudo» se lee como un error
+- [ ] Un `filters_json` corrupto no deja el panel en blanco: **no se ha podido probar**,
+      haría falta escribir directamente en la base de datos
+
+**Navegación en móvil — *doc §5.2***
+
+- [x] A 390 px el menú se pliega tras «Ouvrir le menu» y se despliega con **todos** los
+      enlaces: Mes recherches · Mes négociations · Mon Garage · Mes annonces · Mon profil ·
+      Paramètres · Prochainement · Administration, más los accesos por carrocería
+- [x] **Ningún enlace sin destino** y **sin desbordamiento horizontal**
+- [x] La campana está en la cabecera, no dentro del menú
+
+### 12.10 Registro de la segunda sesión (2026-08-16, tarde)
+
+Recorrido del backoffice entero, la Etapa 1 y lo transversal. El detalle por bloques está
+arriba; esto es lo que hay que decidir o desplegar.
+
+#### Lo más grave: ocultar un anuncio no lo oculta
+
+🔴 **Un anuncio sin página pública se sirve entero a cualquiera que tenga el enlace.**
+`GET /api/v1/vehicles/{slug}` no miraba quién preguntaba: devolvía 200 con todos los datos
+para un anuncio en `Brouillon`, `EnPause`, `Archive` **y para uno ocultado por
+moderación**. Comprobado en producción sin token con `renault-duster-2021` (en pausa) y
+con `peugeot-208-2019-2` (ocultado a las 11:48 desde el backoffice): los dos responden
+200. Ocultar solo lo quitaba del buscador.
+
+Corregido: la consulta recibe ahora la identidad del token y devuelve `Vehicle.NotFound`
+—no «prohibido», que ya delataría que existe— salvo que pregunte su dueño o un
+administrador. Un anuncio **vendido** conserva su página, porque de ella cuelgan el
+contrato y los favoritos. **Pendiente de desplegar.**
+
+#### Segundo agujero de privacidad: las fotos de Mon Garage
+
+🔴 **Las fotos de un vehículo de Mon Garage se sirven a cualquiera, sin autenticación.**
+Se guardan en `/uploads/`, la carpeta estática, y
+`GET https://…/uploads/garage/<vehículo>/<guid>.png` responde **200 image/png sin token**.
+Los **documentos** sí están bien resueltos —401 sin token, y ni siquiera aparece la
+`StorageKey` en el DTO—, pero las fotos se quedaron por el camino público. Lo único que
+protege una foto hoy es que su URL lleve un GUID.
+
+En el código está a la vista: `GarageEndpoints.cs:134` sube las fotos con
+`storage.UploadAsync(...)`, mientras que las líneas 205 y 380 —documentos y facturas— usan
+`UploadPrivateAsync`.
+
+**No lo he corregido porque no es un descuido evidente, sino una tensión de diseño.** Las
+fotos del garaje están en la carpeta pública *precisamente* porque «Vendre ce véhicule»
+las hereda en el anuncio, y las fotos de un anuncio tienen que ser públicas. Pasarlas a
+`UploadPrivateAsync` obliga a copiarlas o a republicarlas al crear el borrador. Las
+opciones son:
+
+1. Servirlas por endpoint autenticado y **copiarlas a la carpeta pública** al pulsar
+   «Vendre ce véhicule» — es lo que respeta la regla, y cuesta un paso más.
+2. Dejarlas donde están y **asumir** que la foto de un coche del garaje es adivinable solo
+   con su GUID.
+
+Hace falta tu decisión antes de tocar nada.
+
+De paso: la API devuelve esas URLs en **`http://`**, no `https://`. Chrome las eleva solo
+y deja un aviso de «Mixed Content» en consola.
+
+#### Las fotos de los anuncios no eran de coches
+
+Los 48 anuncios sembrados pedían su imagen a `picsum.photos`, que devuelve fotografías
+**aleatorias**: paisajes, personas y objetos sin relación con el vehículo. Un Toyota Hilux
+podía salir ilustrado con una montaña.
+
+Corregido: 16 fotografías reales de Wikimedia Commons, dos por modelo, recortadas a 3:2
+(1280×853 y miniatura de 480×320) y servidas desde los estáticos del frontend —no desde
+`uploads/`, que se pierde en cada reinicio de Render—. La procedencia y las licencias
+quedan en `frontend/src/assets/vehicles/CREDITS.md`.
+
+Cambiar el sembrador no bastaba, porque los anuncios ya estaban en la base de datos: el
+reseeder gana un paso que **sustituye solo las imágenes que siguen apuntando a picsum**,
+así que es idempotente y nunca pisa una foto subida por una persona.
+
+#### Corregido en el mismo pase
+
+- **El listado de negociaciones del backoffice contaba 12 y enseñaba 1** (§12.7).
+- Ambas correcciones llevan pruebas: 511 en verde, sin cambios de modelo pendientes.
+
+#### Verificado funcionando
+
+- Suspender, bloquear y reactivar cuentas, siempre con motivo y con su fila en el journal
+- Ocultar un anuncio **sin tocar** el estado del vendedor, y la imposibilidad de editar su
+  información comercial
+- La privacidad de las negociaciones de punta a punta: sin contenido en listado ni ficha,
+  lectura con motivo y registro en la misma operación
+- La cola de demandes completa, de `YD00001` a su cancelación por el usuario
+- Modération de `SG00001` a su cierre, con la explicación exigida
+- Comunicación a «Tous» que **excluye a la cuenta bloqueada** (9 de 10)
+- Los rangos de Configuration, los catálogos y la inmutabilidad del código de equipamiento
+- Puntos: ajuste sin motivo rechazado, `+50`/`−50` con los dos movimientos conservados
+- Favoritos, alerta de **bajada de precio** (llegó la notificación `price-drop`) y el
+  histórico de precios intacto
+- Búsqueda guardada con su alerta, y `?userId=` ignorado en todos los endpoints probados
+
+#### Tercer frente: las páginas legales
+
+🔴 **Las cinco páginas legales describen una sociedad española y citan leyes españolas y
+europeas.** Título en francés, cuerpo en español: «Yoon U Auto, **S.L.**», domicilio en
+**Madrid**, NIF de relleno `B-12345678`, Registro Mercantil de Madrid, y la **Ley 34/2002**
+como base del aviso legal. La de RGPD invoca el Reglamento (UE) 2016/679 y la Ley Orgánica
+3/2018. Están **enlazadas desde el pie de todas las páginas**.
+
+No es un problema de traducción: es que el aviso legal de un marketplace senegalés declara
+una empresa que no es la suya, en un país que no es el suyo, bajo una ley que no le aplica.
+Hay que reescribirlas con los datos reales y la normativa de Senegal, no traducirlas.
+
+#### Lo que ya no hace falta esperar
+
+Dos puntos del apartado 12.2 se han podido cerrar sin cronómetro:
+
+- El **recordatorio por kilometraje** salta en el acto al actualizar el contador, con su
+  notificación. Solo queda sin ver el disparo autónomo del trabajo de las 6 h.
+- La **alerta de bajada de precio** llegó al instante.
+
+Y uno se ha aclarado sin poder cerrarlo: la **alerta de búsqueda guardada** no saltó
+porque el servicio excluye a quien publica de su propia alerta
+(`NewVehicleAlertService.cs:27`). Es lo correcto, pero deja el camino completo sin probar.
+
+#### Decisiones pendientes
+
+- [ ] **Retirar un equipamiento lo borra de los anuncios que ya lo tenían.** Al retirar
+      «Climatisation», el anuncio `YU10025` dejó de mostrarla; al reactivarla, volvió. La
+      fila de enlace no se borra —la ficha filtra por `IsActive`—, pero retirar una
+      entrada del catálogo cambia lo que dicen los anuncios ya publicados. ¿Es lo que se
+      quiere, o solo debería desaparecer del formulario de publicación?
+- [ ] **El administrador ve los anuncios no públicos dentro del Marketplace público.** La
+      portada le anuncia «49 véhicules disponibles» cuando hay 46: el listado le cuela los
+      pausados, el vendido y el ocultado. `/vehicles/count` sí devuelve 46. ¿Debería el
+      backoffice ser el único sitio donde se ven?
+- [ ] **«Jusqu'à trois véhicules» está escrito a mano** en `/mis-busquedas` con el límite
+      configurado en 4. El resto de la aplicación lee el ajuste
 
 ### 12.9 Limpieza pendiente de las pruebas
 
@@ -846,3 +1194,19 @@ público:**
 | 48 anuncios sembrados | Catálogo senegalés de demostración |
 | 6 cuentas de vendedor | `+221771000001` … `+221771000006`, sin contraseña utilizable |
 | ⚠️ 11 negociaciones huérfanas | Del seed anterior, apuntan a anuncios retirados (pendiente nº 23) |
+
+Añadido en la segunda sesión (16/08/2026):
+
+| Qué | Detalle |
+|---|---|
+| Marca `Kia` y modelo `Sportage` | Creados para probar el rechazo de duplicados |
+| Modelo `Sportage` en `Seat` | Creado para probar que el mismo nombre vale en otra marca |
+| Equipamiento `SIEGES_CHAUFF` | «Sièges chauffants (renommé)», creado para probar que el código no cambia |
+| Signalement `SG00001` | Sobre `YU00043`, cerrado como «Résolu» |
+| Demande `YD00001` | Cancelada, con una propuesta externa a `example.com` |
+| Comunicación «Test de recette» | Enviada a los 9 usuarios no bloqueados |
+| Anuncio `YU00042` | Precio bajado de 4.700.000 a 4.400.000 para probar la alerta. **No revertido a propósito**: revertirlo añadiría otra fila al histórico, que es inmutable |
+| Petición de corrección sobre `YU00039` | Y ese anuncio sigue **ocultado** desde las 11:48 |
+| Vehículo de Mon Garage | Toyota Land Cruiser 2018, con 2 recordatorios, 1 intervención, 1 documento (PDF de 193 o) y 1 foto de 79 o. **La transparencia quedó desactivada del todo** |
+| Anuncio `YU10026` | Creado por «Vendre ce véhicule». Se le puso precio y se publicó para probar, y **quedó archivado**: no está en el escaparate |
+| Anuncio `YU10027` | Duplicado de `YU00042` para probar «Dupliquer». **Archivado** |

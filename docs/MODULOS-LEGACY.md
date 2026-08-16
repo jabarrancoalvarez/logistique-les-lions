@@ -7,6 +7,33 @@ multi-país con tramitación aduanera).
 > **Decisión tomada:** no se toca nada de esta lista durante la adaptación al documento.
 > Al terminar (parte P35) se decide módulo por módulo: eliminar, adaptar o conservar.
 
+**La adaptación ya está cerrada: toca decidir.** Marca cada bloque con `ELIMINAR`,
+`ADAPTAR` o `CONSERVAR` en la columna de la derecha. Las decisiones que no son de legacy
+están en [`DECISIONES-PENDIENTES.md`](DECISIONES-PENDIENTES.md).
+
+## Comprobado en producción el 16/08/2026
+
+Todo esto **sigue vivo y accesible** en el despliegue actual:
+
+| Qué | Estado real |
+|---|---|
+| `/precios` | Viva. Planes de **49 € y 199 €/mes**. Título «Precios — Yoon U Auto» |
+| `/transporte` | Viva, en español, con importes en **€**. «Red de transporte… en toda Europa» |
+| `/financiacion` | Viva, en español, con importes en **€** |
+| `/tramitacion` | Viva, en español. «Importa y exporta vehículos sin complicaciones» |
+| `/inspectores` | Viva, en español |
+| `/guias/importacion` | Viva. «…importar un vehículo **a España** desde cualquier país» |
+| `/tracking` | Viva, en español |
+| `/concesionarios` | Viva, en español. «Si eres un **dealer**, regístrate…» |
+| `/admin/procesos` | ⚠️ **En el menú lateral del backoffice**, en español |
+| `/admin/incidencias` | ⚠️ **En el menú**, en español y con enums crudos: «Medium», «Open», «Resolved» |
+| `/admin/partners` | ⚠️ **En el menú**. Datos europeos: «Gestoría Iberia», «Carfax Europe Inspectors». Título de pestaña «Marketplace — Admin» |
+| `GET /vehicles/facets` | Devuelve **500** en producción. El frontend no lo llama |
+
+Las públicas solo se alcanzan por URL directa (están fuera del menú desde P25), pero
+responden 200 y las indexa cualquiera. **Las tres del backoffice sí están en el menú**: son
+lo primero que ve un administrador al entrar.
+
 ---
 
 ## 1. Frontend — rutas y features
@@ -22,7 +49,7 @@ multi-país con tramitación aduanera).
 | `/concesionarios` | `features/dealers` | Listado de concesionarios | El doc reduce «Professionnel» a un campo del perfil sin interfaz propia |
 | `/tracking` | `features/tracking` | Seguimiento público de trámite | No existe en el doc |
 | `/pagos`, `/valoraciones` | `shared/coming-soon` | Placeholders | Sustituibles por el concepto *Prochainement* del doc |
-| `/legal/*` | `features/legal` | Aviso legal, privacidad, cookies, términos, RGPD | ✅ **Conservar**: el doc los referencia en `Paramètres → Textos legales` |
+| `/legal/*` | `features/legal` | Aviso legal, privacidad, cookies, términos, RGPD | ⚠️ **Conservar la ruta, tirar el contenido.** El doc las referencia, pero hoy están **en español y describen una sociedad española** («Yoon U Auto, S.L.», Madrid, Ley 34/2002). Ver [`DECISIONES-PENDIENTES.md`](DECISIONES-PENDIENTES.md) §1.1 |
 
 ### Componentes de la landing
 | Componente | Observación |
@@ -100,3 +127,40 @@ multi-país con tramitación aduanera).
 - **Planes / límites por rol** (`User` hasta 3 anuncios, `Dealer` ilimitado).
   ⚠️ Contradice el doc: todo gratuito e ilimitado.
 - **Multi-divisa** (`Currency` en `Vehicle` y `Country`). El doc trabaja únicamente en FCFA.
+
+---
+
+## 7. Hoja de decisión
+
+Un bloque por línea. Marca `ELIMINAR`, `ADAPTAR` o `CONSERVAR`.
+
+| # | Bloque | Alcance | Decisión |
+|---|---|---|---|
+| 1 | **Planes de precio** (`/precios`) | Frontend | |
+| 2 | **Concesionarios** (`/concesionarios`) | Frontend | |
+| 3 | **Tramitación aduanera** (`/tramitacion` + wizard, checklist, estimador, guía, tracker) | Frontend + `ComplianceEndpoints` + `Features/Compliance` + 8 entidades | |
+| 4 | **Transporte** (`/transporte`) | Frontend | |
+| 5 | **Financiación** (`/financiacion`) | Frontend | |
+| 6 | **Inspectores** (`/inspectores`) | Frontend | |
+| 7 | **Guías** (`/guias/*`) | Frontend | |
+| 8 | **Tracking público** (`/tracking`) | Frontend + `PublicTrackingEndpoints` | |
+| 9 | **Placeholders** (`/pagos`, `/valoraciones`) | Frontend. Sustituibles por *Prochainement* | |
+| 10 | **Componentes huérfanos de la portada** (`country-map`, `newsletter`, `stats-counters`) | Frontend. Ya no se usan | |
+| 11 | **Backoffice heredado** (`/admin/procesos`, `/admin/incidencias`, `/admin/partners`) | ⚠️ **Sigue en el menú** | |
+| 12 | **`dashboard-kpis.component.ts`** | Huérfano, no lo usa nadie | |
+| 13 | **`CountryEndpoints` + `Features/Countries`** | Backend. El doc es mono-país | |
+| 14 | **`NewsletterEndpoints` + `NewsletterSubscriber`** | Backend | |
+| 15 | **`ExportEndpoints`** | Backend. ⚠️ El CSV **puede reutilizarse** en Statistiques | |
+| 16 | **`GET /vehicles/facets`** | Backend. **Devuelve 500 en producción** | |
+| 17 | **`Features/Marketplace` (partners)** | Backend. ⚠️ Colisión de nombres con el marketplace de vehículos | |
+| 18 | **Generación de descripciones con IA** | Backend. Ya desactivada, el código sigue. El doc **la prohíbe** | |
+| 19 | **Extracción IA de documentos** | Backend + paso 1 del formulario. **Sigue activa** | |
+| 20 | **Entidades de tramitación** (`Country`, `CountryRequirement`, `CustomsTariff`, `DocumentTemplate`, `HomologationRequirement`, `ImportExportProcess`, `ProcessDocument`, `ProcessIncident`, `ServicePartner`) | Dominio + migraciones | |
+| 21 | **`VehicleDocument` y `VehicleHistory`** | Dominio. ⚠️ **Revisar solape con Mon Garage antes de tocar** | |
+| 22 | **Multi-divisa** (`Currency` en `Vehicle` y `Country`) | Dominio. El doc es solo FCFA | |
+| 23 | **Contenido de las páginas legales** | Frontend. Hay que **reescribirlo**, no traducirlo | |
+| 24 | **Namespaces `LogistiqueLesLions.*` → `YoonUAuto.*`** | Todo el backend. Aplazado a propósito | |
+| 25 | **Rutas en español** (`/mis-vehiculos`, `/mi-garaje`, `/mis-busquedas`, `/ajustes`, `/mis-pedidos`…) | Frontend. Traducirlas rompe los enlaces ya compartidos | |
+
+> Al eliminar entidades hay que **generar la migración correspondiente**, y las tablas
+> tienen datos sembrados. Nada de esto es borrar archivos y ya.
