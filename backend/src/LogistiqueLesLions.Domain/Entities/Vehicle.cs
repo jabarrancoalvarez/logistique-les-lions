@@ -137,4 +137,20 @@ public class Vehicle : AuditableEntity
     /// contratos, pero deja de admitir ofertas y nuevos contactos.
     /// </summary>
     public bool AcceptsNegotiation => Status == VehicleStatus.Actif && AdminHiddenAt is null;
+
+    /// <summary>
+    /// Si un visitante cualquiera puede abrir su ficha.
+    /// </summary>
+    /// <remarks>
+    /// Más amplio que <see cref="IsPubliclyVisible"/>, que decide si aparece en las
+    /// búsquedas: un anuncio <b>vendido</b> ya no se busca pero su ficha sigue en pie,
+    /// porque de ella cuelgan favoritos, comparaciones y el contrato de la venta.
+    ///
+    /// Lo que nunca se abre desde fuera es el borrador —que su autor no ha publicado—,
+    /// el pausado, el archivado y, sobre todo, <b>el ocultado por moderación</b>: si
+    /// bastara el enlace para verlo, ocultar no serviría de nada.
+    /// </remarks>
+    public bool HasPublicPage =>
+        Status is VehicleStatus.Actif or VehicleStatus.Reserve or VehicleStatus.Vendu
+        && AdminHiddenAt is null;
 }

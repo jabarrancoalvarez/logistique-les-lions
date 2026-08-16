@@ -25,6 +25,16 @@ public class GetVehicleBySlugQueryHandler(
         if (v is null)
             return Result<VehicleDetailDto>.Failure("Vehicle.NotFound");
 
+        // Un anuncio sin página pública solo lo abre su dueño o el backoffice. Se
+        // responde «no encontrado» y no «prohibido»: decir que existe ya sería contar
+        // algo de un borrador ajeno.
+        if (!v.HasPublicPage
+            && !request.IsAdmin
+            && (request.RequesterId is null || v.SellerId != request.RequesterId))
+        {
+            return Result<VehicleDetailDto>.Failure("Vehicle.NotFound");
+        }
+
         // «Évolution du prix»: precio inicial y fecha del último cambio.
         var history = await context.VehiclePriceHistories
             .AsNoTracking()
