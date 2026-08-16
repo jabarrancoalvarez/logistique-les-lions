@@ -5,12 +5,15 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MessagingService, MessageItem, ConversationSummary } from '@core/services/messaging.service';
 import { AuthService } from '@core/auth/auth.service';
 
+// Preguntas de arranque del chat. La última era «¿listo para exportación?», del producto
+// anterior: aquí se compra y se vende dentro de Senegal, y lo que se pregunta es el
+// estado aduanero.
 const MESSAGE_TEMPLATES: string[] = [
-  '¿Sigue disponible el vehículo?',
-  '¿Aceptas negociar el precio?',
-  '¿Puedo verlo en persona?',
-  '¿Tiene algún daño o golpe?',
-  '¿Está listo para exportación?'
+  'Le véhicule est-il toujours disponible ?',
+  'Le prix est-il négociable ?',
+  'Puis-je le voir sur place ?',
+  'Le véhicule a-t-il eu un accident ?',
+  'Le véhicule est-il dédouané ?'
 ];
 
 @Component({
