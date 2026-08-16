@@ -29,7 +29,9 @@ export const LEGAL_ROUTES: Routes = [
     path: 'rgpd',
     loadComponent: () => import('./legal-page.component').then(m => m.LegalPageComponent),
     data: { slug: 'rgpd' },
-    title: 'Protection des données (RGPD) — Yoon u Auto'
+    // Sin «(RGPD)»: la página explica precisamente que el reglamento europeo no aplica,
+    // y que la norma de referencia es la loi n° 2008-12 senegalesa.
+    title: 'Protection des données — Yoon u Auto'
   },
   {
     path: '',
