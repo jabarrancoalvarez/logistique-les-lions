@@ -272,12 +272,32 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
       caliente: nada por encima de 350 ms. Eso **no** responde al pendiente nº 19
       (agregaciones de Statistiques en memoria) ni al arranque en frío de Render, que es lo
       que se lleva el primer visitante del día.
-- [ ] **Renombrar los servicios a `yoon-u-auto`.** Las URL siguen siendo
-      `logistique-les-lions.vercel.app` y `logistique-les-lions-api.onrender.com`, la marca
-      anterior. **El renombrado lo tienes que hacer tú** en los paneles de Render y Vercel;
-      en cuanto estén los nombres nuevos hay que tocar tres sitios del código:
-      `environment.production.ts`, `render.yaml` y el valor por defecto de `Frontend:Url`
-      del reseeder. Los namespaces `LogistiqueLesLions.*` se dejan para el final, aparte.
+- [x] ✅ **RESUELTO el 16/08/2026: el dominio público ya es `yoon-u-auto.vercel.app`.**
+      Verificado de punta a punta sobre él: catálogo, fotos, login, llamada autenticada,
+      backoffice y SignalR.
+
+      ⚠️ **Lo que aprendimos, para no repetirlo:** ni Vercel ni Render cambian el
+      hostname al renombrar. En Vercel hubo que **añadir el dominio** en *Settings →
+      Domains* y retirar el antiguo. En Render **no hay forma** sin recrear el servicio y
+      migrar a mano las diez variables de entorno, así que la API se queda en
+      `logistique-les-lions-api.onrender.com` — razonado en `render.yaml`. No la ve
+      nadie: solo la llama el frontend. Con un dominio propio se resuelve añadiendo un
+      dominio personalizado.
+
+      Dos cosas que el cambio de dominio rompió y conviene tener presentes para el
+      siguiente:
+      1. **CORS.** `Cors__AllowedOrigins` seguía autorizando solo el dominio viejo y la
+         web quedó servida pero muda. Se arregla en Render, sin desplegar nada. Acepta
+         lista separada por comas, así que **autoriza el dominio nuevo antes de crearlo**.
+      2. **Las fotos del catálogo**, que guardaban la URL absoluta del frontend dentro de
+         la base de datos. Corregido de raíz: ahora son relativas.
+
+      Queda pendiente y es opcional: `Jwt__Issuer` y `Jwt__Audience` están renombrados en
+      `render.yaml` pero **mandan las variables del panel de Render**, así que los tokens
+      se siguen emitiendo como `logistique-les-lions-*`. Cambiarlas allí es seguro.
+
+      Los namespaces `LogistiqueLesLions.*` y el nombre del repositorio en GitHub siguen
+      sin tocar, a propósito.
 - [ ] **Probar el tiempo real con dos pestañas** (chat, indicador de escritura y acuses de
       lectura). Es lo único de `flujopruebas.md` §12.1 que sigue sin comprobarse; ya es
       posible desde que una cuenta admite sesiones simultáneas.
