@@ -684,6 +684,7 @@ está corregido y desplegado salvo donde se indique.
 | # | Fallo | Qué rompía |
 |---|---|---|
 | 1 | **Cultura `de-DE` en imagen alpine** | La imagen corre en modo *globalization-invariant*, donde pedir cualquier cultura lanza. Tumbaba **las ofertas, las alertas de bajada de precio, los recordatorios de Mon Garage y el PDF del contrato**, todos con 500. Invisible en local |
+| 0 | 🔴 **Bypass de autenticación** | `POST /auth/refresh` con `{"refreshToken": null}` devolvía **un token de administrador sin credencial alguna**. La consulta casaba con la primera cuenta de token nulo y el guardián de caducidad no frenaba porque `null < ahora` es falso. **El logout pone el token a nulo**, así que la exposición alcanzaba a toda cuenta que hubiera cerrado sesión alguna vez, no solo a la sembrada. Corregido y con siete pruebas |
 | 2 | **Refresco de token en carrera** | El servidor rota el refresh token y el interceptor lanzaba uno por petición fallida: dos a la vez ⇒ el segundo usaba un token consumido ⇒ **cierre de sesión cada 15 minutos** |
 | 3 | **Binding de `[AsParameters]`** | Un `int` o `bool` no anulable es obligatorio en las minimal APIs: `/vehicles/count` y `/notifications` devolvían 400 con cuerpo vacío. **Campana muerta y contador de resultados roto** |
 | 4 | **Sin selector de modelo al publicar** | Todo anuncio salía con `modelId` nulo ⇒ **nunca podía tener indicador de precio** ni aparecer en filtros por modelo |
