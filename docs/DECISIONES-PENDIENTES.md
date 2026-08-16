@@ -287,11 +287,28 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
       `chunk-*.js` del build anterior. Ahora se detecta el fallo de carga y se recarga una
       sola vez (corrección nº 13).
 
-- [ ] ⚠️ **Hay un tercer uso de IA que no estaba en la hoja del legacy**: un chat
-      contextual sobre el anuncio (`POST /vehicles/{id}/ai/ask`,
-      `IAiContentService.AnswerVehicleQuestionAsync`). No es generación de descripciones
-      —que ya se retiró— ni extracción de documentos —que se conserva—. **No aparece en
-      el documento funcional.** Queda en pie a la espera de tu decisión.
+- [ ] ⏸️ **El chat con IA sobre el anuncio queda oculto y aplazado** (decidido el
+      16/08/2026). Es `POST /vehicles/{id}/ai/ask`
+      (`IAiContentService.AnswerVehicleQuestionAsync`). No es generación de descripciones
+      —retirada— ni extracción de documentos —que se conserva porque sí está en el
+      documento y sí se usa—. **No aparece en el documento funcional.**
+
+      Estado real comprobado en producción ese día:
+
+      | | |
+      |---|---|
+      | Pantalla que lo use | **ninguna** — no hay interfaz para él |
+      | Autenticación | **ninguna**: el endpoint es anónimo |
+      | Clave de Anthropic en Render | **no está puesta** |
+      | Qué contesta hoy | el servicio de reserva, **en español**: «el servicio de IA no está configurado. Contacta con un asesor humano», declarando `model: "claude"` |
+
+      Hoy es inerte: sin clave no llama a ningún modelo. **Dos avisos para cuando se
+      retome:**
+      1. ⚠️ **Antes de poner la clave de Anthropic hay que cerrar el endpoint.** Tal
+         como está, sería una llamada a un LLM abierta a cualquiera sin cuenta y sin
+         tope de gasto.
+      2. La respuesta de reserva está en español y habla de «asesor humano», figura que
+         no existe en Yoon u Auto. Se traduce al decidir qué se hace.
 
 - [x] ✅ **RESUELTO el 16/08/2026: opción 1.** El chat de la Etapa 2 no tenía tiempo real
       y había dos pantallas de chat. Se lleva el tiempo real a la negociación —que es
