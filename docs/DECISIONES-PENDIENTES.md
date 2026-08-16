@@ -11,17 +11,12 @@ programe sin más. Ordenado por lo que bloquea abrir al público.
 
 ---
 
-## 0. Antes que nada: dos correcciones sin desplegar
+## 0. Correcciones ya desplegadas
 
-No son decisiones, son trabajo hecho esperando salida. Mientras no se desplieguen, la
-aplicación tiene un agujero abierto.
-
-- [ ] **Desplegar la corrección de visibilidad de anuncios.** Hoy, en producción, un
-      anuncio en `Brouillon`, `EnPause`, `Archive` **o ocultado por moderación** se sirve
-      entero a cualquiera que tenga el enlace. Ocultar por moderación no oculta nada.
-- [ ] **Desplegar la corrección del listado de negociaciones** (decía «12» y enseñaba 1).
-
-Ambas con pruebas: 511 en verde y sin cambios de modelo pendientes.
+- [x] **Visibilidad de anuncios**: un anuncio en `Brouillon`, `EnPause`, `Archive` o
+      ocultado por moderación se servía entero a cualquiera con el enlace. Corregido y
+      verificado en producción: ahora responde 404.
+- [x] **Listado de negociaciones**: decía «12» y enseñaba 1. Corregido.
 
 ---
 
@@ -42,10 +37,11 @@ desde el pie de todas las páginas.**
 No se arregla traduciendo: el aviso legal de un marketplace senegalés declara una empresa
 que no es la suya, en un país que no es el suyo, bajo una ley que no le aplica.
 
-- [ ] **Decisión:** ¿con qué datos reales se reescriben (razón social, domicilio, registro,
-      identificador fiscal) y bajo qué normativa senegalesa? ¿Hace falta un asesor legal
-      local, o hay textos ya redactados?
-- [ ] Mientras tanto, ¿se retiran del pie o se dejan visibles?
+- [x] ✅ **RESUELTO el 16/08/2026: textos provisionales en francés.** Reescritas las cinco
+      apuntando a la normativa senegalesa (loi n° 2008-12 y la CDP), con los datos de la
+      sociedad como «[à compléter]» y un aviso destacado de que son provisionales.
+- [ ] ⏳ **Queda**: rellenar razón social, domicilio, RCCM y NINEA reales, y que lo revise
+      un abogado en Senegal antes de abrir al público.
 
 ### 1.2 🔴 Las fotos de Mon Garage se sirven sin autenticación
 
@@ -270,10 +266,9 @@ para marcar **eliminar / adaptar / conservar**. Lo urgente de allí:
 
 ## 5. Operativo
 
-- [ ] **La contraseña de `+221770000101` no consta en ninguna parte**, y esa cuenta es el
-      administrador actual (`Seed:AdminPhone`). Bloquea probar la Etapa 2 y el tiempo real,
-      que exigen dos cuentas a la vez. Opciones: recuperarla, apuntar `Seed:AdminPhone` a
-      una cuenta nueva con contraseña conocida, o dar el backoffice por probado.
+- [x] ✅ **RESUELTO el 16/08/2026.** `Seed__AdminPhone` apunta ahora a `+221771234500`
+      («QA Administration», contraseña conocida). La cuenta anterior volvió a ser usuario
+      normal. Con dos cuentas utilizables se pudo probar la Etapa 2 entera.
 - [ ] **Retirar los datos de prueba antes de abrir al público.** La lista completa está en
       `flujopruebas.md` §12.9: dos cuentas QA, 48 anuncios sembrados, 6 vendedores, 11
       negociaciones huérfanas, y lo creado en las pruebas (marca `Kia`, modelo `Sportage`,
