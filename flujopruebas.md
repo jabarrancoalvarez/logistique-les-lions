@@ -786,6 +786,20 @@ hacen mejor a mano.
 - [ ] Duplicar y archivar
 - [ ] Publicar cinco anuncios seguidos: **sin límite**
 
+### 12.6c Invalidar un contrato: qué pasa con el anuncio
+
+Verificado que invalidar **sí** revierte la reputación: el saldo de puntos vuelve a 0 con
+un movimiento `-100 VenteInvalidee` que no borra el `+100` original, el contador de
+ventas verificadas baja, y la página pública del QR deja de verificar (404).
+
+Pero quedan dos cosas **como estaban** y conviene decidir si es lo que se quiere:
+
+- [ ] El **anuncio sigue en `Vendu`**. El vendedor puede recuperarlo, pero por un camino
+      poco evidente: Archiver → Remettre en brouillon → volver a publicar. ¿Debería
+      invalidar devolverlo a `Actif`, u ofrecer «Remettre en vente» desde `Vendu`?
+- [ ] La **negociación sigue en `Terminée`**. Si el contrato se invalidó por fraude,
+      quizá deba reabrirse; si fue un error administrativo, quizá no
+
 ### 12.7 Backoffice — la mayor parte sin probar
 
 Verificado: tableau de bord y statistiques. Falta:

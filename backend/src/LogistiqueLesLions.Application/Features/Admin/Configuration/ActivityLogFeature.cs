@@ -78,13 +78,19 @@ public class GetActivityLogQueryHandler(IApplicationDbContext db)
                 a.Reason, a.OldValue, a.NewValue, a.CreatedAt))
             .ToListAsync(ct);
 
-        var admins = await db.AdminActions
+        // Proyección anónima y no al DTO: un Distinct() sobre un record con constructor
+        // no se puede traducir a SQL, y la consulta entera reventaba con 500.
+        var adminPairs = await db.AdminActions
             .AsNoTracking()
             .Where(a => a.Admin != null)
-            .Select(a => new ActivityAdminDto(a.AdminId, a.Admin!.DisplayName))
+            .Select(a => new { a.AdminId, a.Admin!.DisplayName })
             .Distinct()
-            .OrderBy(a => a.Name)
             .ToListAsync(ct);
+
+        var admins = adminPairs
+            .Select(a => new ActivityAdminDto(a.AdminId, a.DisplayName))
+            .OrderBy(a => a.Name)
+            .ToList();
 
         return Result<ActivityLogDto>.Success(
             new ActivityLogDto(total, page, pageSize, rows, admins));
