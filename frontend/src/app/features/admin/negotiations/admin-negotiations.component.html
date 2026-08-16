@@ -266,6 +266,11 @@
           </div>
         </div>
 
+        <!-- El aviso también aquí: arriba del listado queda fuera de la vista al actuar
+             desde el panel, y parecía que el botón no hacía nada. -->
+        @if (error()) {
+          <p class="text-sm text-red-600 mt-3" role="alert">{{ error() }}</p>
+        }
         <button type="button" (click)="readContent()" class="btn-outline text-sm mt-3"
           [disabled]="busy()">
           Accéder au contenu
@@ -364,6 +369,17 @@
               <div class="flex justify-between gap-3">
                 <dt class="text-navy/60">Code de vérification</dt>
                 <dd class="text-navy font-mono text-xs">{{ d.verificationCode }}</dd>
+              </div>
+              <!-- La página del QR es pública y no muestra pièces d'identité ni adresses:
+                   sirve para comprobar el contrato sin abrir datos personales. -->
+              <div class="flex justify-between gap-3">
+                <dt class="text-navy/60">Vérification publique</dt>
+                <dd>
+                  <a [routerLink]="['/verification', d.verificationCode]" target="_blank"
+                     class="text-azure-dark hover:underline text-xs">
+                    Ouvrir la page du QR ↗
+                  </a>
+                </dd>
               </div>
             }
           </dl>

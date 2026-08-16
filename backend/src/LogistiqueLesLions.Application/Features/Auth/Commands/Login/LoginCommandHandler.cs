@@ -14,6 +14,15 @@ public class LoginCommandHandler(
 {
     public async Task<Result<AuthResponseDto>> Handle(LoginCommand request, CancellationToken ct)
     {
+        // Un cuerpo incompleto no puede tumbar el endpoint: es anónimo, y es el primero
+        // que recibe peticiones malformadas desde fuera. Sin esto, un JSON sin
+        // «identifier» llegaba nulo a la normalización y devolvía un 500.
+        if (string.IsNullOrWhiteSpace(request.Identifier) ||
+            string.IsNullOrWhiteSpace(request.Password))
+        {
+            return Result<AuthResponseDto>.Failure("Auth.InvalidCredentials");
+        }
+
         var phone = SenegalPhone.Normalize(request.Identifier);
 
         var user = phone is not null

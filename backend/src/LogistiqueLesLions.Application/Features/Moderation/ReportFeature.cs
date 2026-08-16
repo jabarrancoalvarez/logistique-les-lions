@@ -332,18 +332,32 @@ public class ChangeReportStatusCommandHandler(IApplicationDbContext db)
             report.ResolvedAt = null;
         }
 
+        // Poner en examen no es cerrar: rotularlo «Signalement clôturé» en el journal
+        // decía lo contrario de lo que había pasado. Y el motivo iba con el enum crudo.
+        var cierra = request.Status is ReportStatus.Resolu or ReportStatus.Rejete;
+
         db.AdminActions.Add(new AdminAction
         {
             AdminId    = request.AdminId,
             TargetType = AdminTargetType.Report,
             TargetId   = report.Id,
-            Type       = AdminActionType.ReportResolved,
-            Reason     = resolution ?? request.Status.ToString()
+            Type       = cierra ? AdminActionType.ReportResolved : AdminActionType.ReportUnderReview,
+            Reason     = resolution ?? EtiquetaEstado(request.Status)
         });
 
         await db.SaveChangesAsync(ct);
         return Result.Success();
     }
+
+    /// <summary>El journal lo lee una persona: nunca el nombre del enum.</summary>
+    private static string EtiquetaEstado(ReportStatus estado) => estado switch
+    {
+        ReportStatus.Nouveau  => "Remis en attente",
+        ReportStatus.EnExamen => "Mis en examen",
+        ReportStatus.Resolu   => "Résolu",
+        ReportStatus.Rejete   => "Rejeté",
+        _                     => estado.ToString()
+    };
 }
 
 public class WarnReportedUserCommandHandler(

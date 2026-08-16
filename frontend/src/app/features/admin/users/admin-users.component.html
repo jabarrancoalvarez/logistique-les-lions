@@ -304,6 +304,9 @@
               </div>
             </div>
 
+            @if (error()) {
+              <p class="text-sm text-red-600 mt-3" role="alert">{{ error() }}</p>
+            }
             <button type="button" (click)="adjustPoints(d.profile.id)"
               class="btn-outline text-sm mt-3" [disabled]="busy()">
               Ajuster
@@ -341,6 +344,11 @@
               class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm" />
           </div>
         </div>
+        <!-- El aviso también aquí: arriba del listado queda fuera de la vista cuando se
+             actúa desde el panel, y el rechazo parecía que no hacía nada. -->
+        @if (error()) {
+          <p class="text-sm text-red-600 mt-3" role="alert">{{ error() }}</p>
+        }
         <button type="button" (click)="applyStatus()" class="btn-primary text-sm mt-3"
           [disabled]="busy()">
           Appliquer

@@ -306,6 +306,8 @@ export interface AdminListingFilters {
   sellerAccountType?: AdminAccountType;
   hidden?: boolean;
   flagged?: boolean;
+  /** Con signalements abiertos. */
+  reported?: boolean;
   page?: number;
   pageSize?: number;
 }

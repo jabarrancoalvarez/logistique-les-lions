@@ -238,7 +238,9 @@ public class AdminNegotiationTests : IDisposable
         var action = await _context.AdminActions.SingleAsync();
         action.Type.Should().Be(AdminActionType.NegotiationContentAccessed);
         action.TargetType.Should().Be(AdminTargetType.Negotiation);
-        action.Reason.Should().Contain("FraudInvestigation");
+        // En francés: el journal lo lee una persona, no un programa.
+        action.Reason.Should().Contain("Enquête sur une fraude");
+        action.Reason.Should().NotContain("FraudInvestigation");
         action.Reason.Should().Contain("Signalement reçu");
     }
 

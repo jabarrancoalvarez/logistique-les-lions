@@ -94,6 +94,8 @@ public enum AdminActionType
     UserWarned = 41,
     /// <summary>Se ha pedido más información a quien reporta.</summary>
     ReportInfoRequested = 42,
+    /// <summary>Puesto en examen: ni cerrado ni rechazado, solo en estudio.</summary>
+    ReportUnderReview = 43,
 
     /// <summary>Ajuste manual del saldo de puntos de un usuario.</summary>
     PointsAdjusted = 50,

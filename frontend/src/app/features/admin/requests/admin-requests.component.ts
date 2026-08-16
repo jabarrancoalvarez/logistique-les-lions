@@ -180,7 +180,10 @@ export class AdminRequestsComponent implements OnInit {
     const term = this.vehicleSearch.trim();
     if (!term) { this.searchResults.set([]); return; }
 
-    this.vehicles.getVehicles({ search: term, pageSize: 8 }).subscribe({
+    // Solo anuncios a la venta: como quien busca es administrador, el listado le
+    // devolvía también los vendidos, los pausados y los ocultados, y se llegaban a
+    // proponer coches que ya no estaban disponibles.
+    this.vehicles.getVehicles({ search: term, status: 'Actif', pageSize: 8 }).subscribe({
       next: r => this.searchResults.set(r.items),
       error: () => this.searchResults.set([])
     });
