@@ -6,14 +6,14 @@ export const VEHICLES_ROUTES: Routes = [
     path: '',
     loadComponent: () =>
       import('./vehicle-list/vehicle-list.component').then(m => m.VehicleListComponent),
-    title: 'Vehículos de importación — Yoon U Auto'
+    title: 'Voitures d’occasion au Sénégal — Yoon u Auto'
   },
   {
     path: 'nuevo',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./vehicle-form/vehicle-form.component').then(m => m.VehicleFormComponent),
-    title: 'Publicar vehículo — Yoon U Auto'
+    title: 'Publier une annonce — Yoon u Auto'
   },
   {
     path: 'publicar',
@@ -24,7 +24,7 @@ export const VEHICLES_ROUTES: Routes = [
     path: ':slug',
     loadComponent: () =>
       import('./vehicle-detail/vehicle-detail.component').then(m => m.VehicleDetailComponent),
-    title: 'Detalle de vehículo — Yoon U Auto'
+    title: 'Annonce — Yoon u Auto'
   }
 ];
 

@@ -7,13 +7,13 @@ export const ADMIN_ROUTES: Routes = [
     canActivate: [adminGuard],
     loadComponent: () =>
       import('./admin-layout.component').then(m => m.AdminLayoutComponent),
-    title: 'Panel de administración — Yoon U Auto',
+    title: 'Administration — Yoon u Auto',
     children: [
       {
         path: '',
         loadComponent: () =>
           import('./dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
-        title: 'Dashboard — Admin'
+        title: 'Tableau de bord — Administration'
       },
       {
         path: 'vehiculos',

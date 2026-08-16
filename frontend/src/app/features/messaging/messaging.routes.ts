@@ -6,12 +6,12 @@ export const MESSAGING_ROUTES: Routes = [
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./inbox/inbox.component').then(m => m.InboxComponent),
-    title: 'Mensajes — Yoon U Auto'
+    title: 'Messages — Yoon u Auto'
   },
   {
     path: ':id',
     canActivate: [authGuard],
     loadComponent: () => import('./conversation/conversation.component').then(m => m.ConversationComponent),
-    title: 'Conversación — Yoon U Auto'
+    title: 'Conversation — Yoon u Auto'
   }
 ];
