@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using Serilog.Events;
 using System.Threading.RateLimiting;
@@ -219,6 +220,18 @@ try
     // ────────────────────────────────────────────────────────────────────────────
     var app = builder.Build();
     // ────────────────────────────────────────────────────────────────────────────
+
+    // Render termina el TLS en su proxy y habla con el contenedor por HTTP plano. Sin
+    // esto, la aplicación cree que la petición llegó por «http» y compone las URL de los
+    // archivos con ese esquema: el navegador las marca como contenido mixto en una
+    // página servida por HTTPS.
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
+        // El proxy es el de Render y no se conoce su dirección de antemano.
+        KnownNetworks = { },
+        KnownProxies  = { }
+    });
 
     // ─── Aplicar migraciones automáticamente (excepto en design-time) ──
     if (Environment.GetEnvironmentVariable("EF_DESIGN_TIME") != "1")

@@ -236,7 +236,9 @@ public class AccessNegotiationContentCommandHandler(IApplicationDbContext db)
             TargetType = AdminTargetType.Negotiation,
             TargetId   = negotiation.Id,
             Type       = AdminActionType.NegotiationContentAccessed,
-            Reason     = $"{request.Reason} — {details}"
+            // En francés, no el nombre del enum: esta línea la lee una persona en el
+            // journal, no un programa.
+            Reason     = $"{EtiquetaMotivo(request.Reason)} — {details}"
         });
 
         await db.SaveChangesAsync(ct);
@@ -251,4 +253,14 @@ public class AccessNegotiationContentCommandHandler(IApplicationDbContext db)
 
         return Result<IReadOnlyList<AdminMessageDto>>.Success(messages);
     }
+    private static string EtiquetaMotivo(ContentAccessReason motivo) => motivo switch
+    {
+        ContentAccessReason.Report             => "Signalement",
+        ContentAccessReason.Moderation         => "Modération",
+        ContentAccessReason.Dispute            => "Litige entre les parties",
+        ContentAccessReason.FraudInvestigation => "Enquête sur une fraude",
+        ContentAccessReason.SupportRequested   => "Support demandé par une partie",
+        _                                      => motivo.ToString()
+    };
+
 }

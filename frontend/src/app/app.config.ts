@@ -9,7 +9,12 @@ import {
 } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
-import { provideRouter, withInMemoryScrolling, withViewTransitions } from '@angular/router';
+import {
+  provideRouter,
+  withInMemoryScrolling,
+  withNavigationErrorHandler,
+  withViewTransitions
+} from '@angular/router';
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -35,6 +40,25 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({
         scrollPositionRestoration: 'top',
         anchorScrolling: 'enabled'
+      }),
+      // Cada despliegue renombra los trozos de código que Angular carga bajo demanda.
+      // Una pestaña abierta desde antes pide uno que ya no existe, recibe el index.html
+      // en su lugar y falla con «Failed to fetch dynamically imported module»: la
+      // pantalla se queda rota hasta que alguien recarga a mano.
+      //
+      // Al detectarlo, se recarga una sola vez. La marca en sessionStorage evita el
+      // bucle si el fallo no fuera por un despliegue sino por falta de red.
+      withNavigationErrorHandler(error => {
+        const mensaje = String((error as { message?: string })?.message ?? error);
+        const esTrozoPerdido =
+          /dynamically imported module|Importing a module script failed|ChunkLoadError/i
+            .test(mensaje);
+
+        if (!esTrozoPerdido || typeof sessionStorage === 'undefined') return;
+        if (sessionStorage.getItem('yu_recarga_por_version')) return;
+
+        sessionStorage.setItem('yu_recarga_por_version', '1');
+        location.reload();
       })
     ),
 
@@ -49,6 +73,11 @@ export const appConfig: ApplicationConfig = {
     // se piden una vez al arrancar. No se espera a la respuesta: hasta que llegue valen
     // los valores de respaldo, para no retrasar el primer render por una configuración.
     provideAppInitializer(() => {
+      // Si la aplicación ha arrancado, la recarga por versión nueva funcionó: se borra
+      // la marca para que vuelva a estar disponible en el siguiente despliegue.
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem('yu_recarga_por_version');
+      }
       inject(PlatformService).load().subscribe({ error: () => {} });
     }),
 

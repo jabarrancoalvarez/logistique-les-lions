@@ -230,9 +230,16 @@ export class GarageVehicleComponent implements OnInit, OnDestroy {
     this.error.set(null);
 
     const existing = this.vehicle();
-    const failed = () => {
+
+    // La API distingue por qué ha fallado; repetirlo en francés evita el rechazo mudo
+    // que dejaba al usuario sin saber qué corregir.
+    const failed = (e: unknown) => {
       this.saving.set(false);
-      this.error.set('Enregistrement impossible. Vérifiez les données saisies.');
+      const codigo = (e as { error?: unknown })?.error;
+      this.error.set(
+        typeof codigo === 'string' && codigo.includes('MileageWentBackwards')
+          ? 'Le kilométrage ne peut pas diminuer : un compteur ne revient jamais en arrière.'
+          : 'Enregistrement impossible. Vérifiez les données saisies.');
     };
 
     if (existing) {
@@ -816,6 +823,9 @@ export class GarageVehicleComponent implements OnInit, OnDestroy {
       this.reminderBusy.set(false);
       this.closeReminderForm();
       this.loadReminders(v.id);
+      // La complétude cuenta los rappels en retard: si no se recarga, el panel sigue
+      // enseñando la cifra anterior hasta que se recargue la página entera.
+      this.loadCompleteness(v.id);
     };
     const failed = () => {
       this.reminderBusy.set(false);
@@ -837,7 +847,11 @@ export class GarageVehicleComponent implements OnInit, OnDestroy {
 
     this.reminderBusy.set(true);
     this.service.setReminderStatus(reminder.id, status).subscribe({
-      next: () => { this.reminderBusy.set(false); this.loadReminders(v.id); },
+      next: () => {
+        this.reminderBusy.set(false);
+        this.loadReminders(v.id);
+        this.loadCompleteness(v.id);
+      },
       error: () => {
         this.reminderBusy.set(false);
         this.reminderError.set('Action impossible.');
@@ -851,7 +865,11 @@ export class GarageVehicleComponent implements OnInit, OnDestroy {
 
     this.reminderBusy.set(true);
     this.service.deleteReminder(reminder.id).subscribe({
-      next: () => { this.reminderBusy.set(false); this.loadReminders(v.id); },
+      next: () => {
+        this.reminderBusy.set(false);
+        this.loadReminders(v.id);
+        this.loadCompleteness(v.id);
+      },
       error: () => {
         this.reminderBusy.set(false);
         this.reminderError.set('Suppression impossible.');

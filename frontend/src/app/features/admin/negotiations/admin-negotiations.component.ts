@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import {
   AdminService, AdminNegotiationRow, AdminNegotiationList, AdminNegotiationDetail,
@@ -28,7 +29,7 @@ const ACCESS_REASONS: readonly ContentAccessReason[] =
   selector: 'lll-admin-negotiations',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, FcfaPipe],
+  imports: [CommonModule, FormsModule, RouterLink, FcfaPipe],
   templateUrl: './admin-negotiations.component.html'
 })
 export class AdminNegotiationsComponent implements OnInit {
