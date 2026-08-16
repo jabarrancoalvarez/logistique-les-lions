@@ -2,8 +2,8 @@
 
 **Fecha:** 2026-04-14
 **Entorno probado:**
-- Frontend: https://logistique-les-lions.vercel.app
-- API: https://logistique-les-lions-api.onrender.com
+- Frontend: https://yoon-u-auto.vercel.app
+- API: https://yoon-u-auto-api.onrender.com
 - HEAD probado: `e616b9e` (master)
 
 ---

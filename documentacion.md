@@ -283,11 +283,11 @@ de forma idempotente:
 
 | Rol       | Email                                 |
 |-----------|----------------------------------------|
-| Admin     | admin@logistique-les-lions.test        |
-| Moderator | moderator@logistique-les-lions.test    |
-| Dealer    | dealer1@logistique-les-lions.test      |
-| Seller    | seller1@logistique-les-lions.test      |
-| Buyer     | buyer1@logistique-les-lions.test       |
+| Admin     | admin@yoon-u-auto.test        |
+| Moderator | moderator@yoon-u-auto.test    |
+| Dealer    | dealer1@yoon-u-auto.test      |
+| Seller    | seller1@yoon-u-auto.test      |
+| Buyer     | buyer1@yoon-u-auto.test       |
 
 ---
 

@@ -12,7 +12,7 @@ RUN npm run build:prod
 FROM nginx:alpine AS runtime
 
 # Copiar build de Angular
-COPY --from=build /app/dist/logistique-les-lions/browser /usr/share/nginx/html
+COPY --from=build /app/dist/yoon-u-auto/browser /usr/share/nginx/html
 
 # Configuración de Nginx para SPA (Angular Router)
 RUN printf 'server {\n\
