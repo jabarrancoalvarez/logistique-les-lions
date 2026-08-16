@@ -12,12 +12,16 @@ public static class NotificationsEndpoints
         group.RequireAuthorization();
 
         group.MapGet("/", async (
-            [FromQuery] bool unreadOnly,
+            // Anulables a propósito: un tipo de valor no anulable y sin valor por
+            // defecto es un parámetro *obligatorio* en las minimal APIs, y la campana
+            // llama solo con «take». Sin esto, el endpoint responde 400 con el cuerpo
+            // vacío antes de llegar aquí.
+            [FromQuery] bool? unreadOnly,
             [FromQuery] int? take,
             IMediator mediator,
             CancellationToken ct) =>
         {
-            var result = await mediator.Send(new GetMyNotificationsQuery(unreadOnly, take ?? 50), ct);
+            var result = await mediator.Send(new GetMyNotificationsQuery(unreadOnly ?? false, take ?? 50), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         }).WithName("GetMyNotifications");
 

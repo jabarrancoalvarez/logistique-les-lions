@@ -24,13 +24,14 @@ public static class VehicleEndpoints
     {
         // GET /api/v1/vehicles/featured
         group.MapGet("/featured", async (
-            [FromQuery] int count,
+            // Anulable por lo mismo: sin valor, el parámetro sería obligatorio.
+            [FromQuery] int? count,
             IMediator mediator,
             IDistributedCache cache,
             CancellationToken ct) =>
         {
-            count = Math.Clamp(count == 0 ? 6 : count, 1, 12);
-            var cacheKey = $"featured_vehicles_{count}";
+            var size = Math.Clamp(count is null or 0 ? 6 : count.Value, 1, 12);
+            var cacheKey = $"featured_vehicles_{size}";
 
             var cached = await cache.GetStringAsync(cacheKey, ct);
             if (cached is not null)
@@ -39,7 +40,7 @@ public static class VehicleEndpoints
                 return Results.Ok(cachedResult);
             }
 
-            var result = await mediator.Send(new GetFeaturedVehiclesQuery(count), ct);
+            var result = await mediator.Send(new GetFeaturedVehiclesQuery(size), ct);
             if (result.IsFailure)
                 return Results.Problem(result.Error, statusCode: 400);
 
