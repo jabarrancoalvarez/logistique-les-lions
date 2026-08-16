@@ -50,7 +50,12 @@
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
     >
       @for (step of activeSteps(); track step.step; let i = $index) {
-        <div class="relative reveal group" [style.animation-delay]="(i * 0.1) + 's'">
+        <!-- animate-fadeInUp en vez de reveal: el reveal dependía de un IntersectionObserver
+             que no disparaba, y las tarjetas se quedaban en opacity:0. La animación CSS con
+             fill-mode forwards siempre se ejecuta (aviso del CLAUDE.md). -->
+        <div class="relative animate-fadeInUp group"
+             style="opacity:0"
+             [style.animation-delay]="(i * 0.1) + 's'">
           <!-- Línea conectora (solo en desktop, entre cards de la misma fila) -->
           @if (i % 3 !== 2 && i < activeSteps().length - 1) {
             <div class="hidden lg:block absolute top-8 -right-3 w-6 h-0.5 bg-azure/30 z-10" aria-hidden="true"></div>
