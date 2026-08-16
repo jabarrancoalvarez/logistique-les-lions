@@ -259,12 +259,24 @@ export class AdminNegotiationsComponent implements OnInit {
   }
 
   private guardar(blob: Blob, nombre: string): void {
-    const url = URL.createObjectURL(blob);
+    // El blob que llega puede no traer tipo; se fuerza a PDF para que el sistema lo
+    // reconozca y lo abra el visor correspondiente.
+    const pdf = blob.type === 'application/pdf' ? blob : new Blob([blob], { type: 'application/pdf' });
+    const url = URL.createObjectURL(pdf);
+
     const a = document.createElement('a');
     a.href = url;
     a.download = nombre;
+    a.style.display = 'none';
+    // Debe estar en el documento antes de pulsarlo: algunos navegadores ignoran el
+    // atributo download si el enlace no está insertado en la página.
+    document.body.appendChild(a);
     a.click();
-    // Sin esto el blob se queda en memoria hasta recargar la pestaña.
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    // Revocar más tarde, nunca justo después de click(): hacerlo de inmediato corta la
+    // descarga a medias y el navegador guarda un fichero con nombre aleatorio y sin
+    // extensión, imposible de abrir.
+    setTimeout(() => URL.revokeObjectURL(url), 15000);
   }
 }
