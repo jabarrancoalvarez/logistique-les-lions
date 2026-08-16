@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build -- --configuration=production",
-  "outputDirectory": "dist/logistique-les-lions/browser",
+  "outputDirectory": "dist/yoon-u-auto/browser",
   "framework": null,
   "cleanUrls": false,
   "trailingSlash": false,
