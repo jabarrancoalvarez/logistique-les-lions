@@ -89,9 +89,30 @@ Es el pendiente nº 22, ahora medido.
 
 Ya estaban documentados, pero ahora hay datos reales encima.
 
-- [ ] **Disco de Render efímero** (pendiente nº 2): las fotos de anuncios y los documentos
-      de Mon Garage **se pierden en cada reinicio**. ¿Se contrata almacenamiento externo
-      (S3/Blob) antes de abrir, o se abre sabiendo que se pierden?
+- [x] ✅ **Disco de Render efímero** (pendiente nº 2) — **código listo el 16/08/2026,
+      esperando el bucket.** Los archivos nunca estuvieron en Neon: la base guarda las
+      filas y el contenedor de Render los ficheros, y ese contenedor se recrea en cada
+      despliegue. Se ha implementado `ObjectStorageService`, compatible con S3, contra
+      **Cloudflare R2** (10 GB gratis y sin coste de descarga).
+
+      **Sigue desactivado**: mientras falte cualquiera de las claves, la aplicación vuelve
+      sola al disco en lugar de no arrancar. Para encenderlo hacen falta cuatro pasos
+      tuyos, en Cloudflare y en Render:
+
+      1. Crear un bucket en Cloudflare R2.
+      2. Exponer **solo el prefijo `public/`** (dominio público o dominio propio).
+         ⚠️ Si se abre el bucket entero, la documentación privada de Mon Garage queda al
+         alcance de cualquiera: el servicio separa `public/` y `private/` por prefijo.
+      3. Crear un token de API con permiso de lectura y escritura sobre ese bucket.
+      4. En Render → Environment, rellenar y cambiar el proveedor:
+         - `Storage__Provider` → `r2`
+         - `Storage__Bucket` → nombre del bucket
+         - `Storage__ServiceUrl` → `https://<account-id>.r2.cloudflarestorage.com`
+         - `Storage__AccessKey` y `Storage__SecretKey` → las del token
+         - `Storage__PublicBaseUrl` → la URL pública del bucket
+
+      ⚠️ Lo ya subido al disco **no se migra solo**: son datos de prueba y se vuelven a
+      subir.
 - [ ] **Sin `Email__ApiKey`** (pendiente nº 3): no sale ningún correo. Las comunicaciones
       del backoffice solo llegan como notificación interna. ¿Se configura antes de abrir?
 

@@ -28,7 +28,23 @@ services:
         sync: false
       - key: Frontend__Url
         sync: false
+      # El disco de Render es efímero: en producción los archivos van a Cloudflare R2.
+      # Mientras Storage__Provider siga en «local», se escriben en disco y se pierden
+      # en cada reinicio.
+      # ⚠️ Cambiar a «r2» SOLO cuando el bucket y las cuatro claves de abajo estén
+      # puestas. Con «local» los archivos se pierden en cada reinicio.
       - key: Storage__Provider
         value: local
       - key: Storage__LocalPath
         value: /app/uploads
+      - key: Storage__Bucket
+        sync: false
+      - key: Storage__ServiceUrl
+        sync: false
+      - key: Storage__AccessKey
+        sync: false
+      - key: Storage__SecretKey
+        sync: false
+      # URL pública del bucket, solo para el prefijo public/
+      - key: Storage__PublicBaseUrl
+        sync: false
