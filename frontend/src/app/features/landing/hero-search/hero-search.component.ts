@@ -1,5 +1,6 @@
 import {
-  Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed
+  Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed,
+  ElementRef, HostListener
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -26,6 +27,31 @@ export class HeroSearchComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly vehicleService = inject(VehicleService);
+  private readonly host = inject(ElementRef<HTMLElement>);
+
+  /** Evita recalcular el parallax más de una vez por frame. */
+  private parallaxPending = false;
+
+  /**
+   * El fondo aurora sigue muy suavemente al cursor: da sensación de profundidad sin
+   * marear. Se escribe en variables CSS (--mx/--my) que consumen las capas del fondo,
+   * cada una con su propia intensidad. En móvil no hay ratón, así que no interviene.
+   */
+  @HostListener('mousemove', ['$event'])
+  onMouseMove(e: MouseEvent): void {
+    if (this.parallaxPending) return;
+    this.parallaxPending = true;
+    requestAnimationFrame(() => {
+      const el = this.host.nativeElement as HTMLElement;
+      const r = el.getBoundingClientRect();
+      // -1 … 1 respecto al centro del hero
+      const mx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+      const my = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      el.style.setProperty('--mx', mx.toFixed(3));
+      el.style.setProperty('--my', my.toFixed(3));
+      this.parallaxPending = false;
+    });
+  }
 
   readonly searchForm: FormGroup = this.fb.group({
     make: [''],
