@@ -293,25 +293,21 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
       —que ya se retiró— ni extracción de documentos —que se conserva—. **No aparece en
       el documento funcional.** Queda en pie a la espera de tu decisión.
 
-- [ ] 🔴 **El chat de la Etapa 2 no tiene tiempo real, y hay dos pantallas de chat.**
-      Probado el 16/08/2026 con dos identidades (`flujopruebas.md` §12.12). El hub
-      funciona y entrega los tres eventos; lo que falla es la pantalla:
+- [x] ✅ **RESUELTO el 16/08/2026: opción 1.** El chat de la Etapa 2 no tenía tiempo real
+      y había dos pantallas de chat. Se lleva el tiempo real a la negociación —que es
+      donde lo pide la especificación— y se retira el buzón duplicado.
 
-      - `/mensajes/:id` (la antigua) lo tiene **todo**: mensaje en vivo, indicador de
-        escritura y acuse de lectura.
-      - `/mis-negociaciones/:id` (la de la Etapa 2, **la que manda la especificación**)
-        no tiene **nada**: no escucha ningún evento y envía por REST, camino que no avisa
-        a nadie.
+      El aviso pasa a salir de **donde se guarda el mensaje**, no del transporte por el
+      que llegó la petición: antes solo notificaba el hub desde su propio `SendMessage`,
+      y la pantalla de la negociación enviaba por REST, camino que no avisaba a nadie.
+      Ahora `SendMessageCommandHandler` persiste la notificación en su transacción y
+      empuja después con `IChatPusher` e `INotificationPusher`.
 
-      Además, **un mensaje nuevo no genera notificación** para el destinatario: ni en
-      vivo, ni en la campana. Quien recibe un mensaje solo se entera si vuelve a entrar.
+      Con ello **un mensaje nuevo genera por fin notificación en la campana**, que se
+      quedaba a cero para siempre.
 
-      La decisión de fondo: la especificación dice que el chat cuelga de la negociación,
-      así que sobra una de las dos pantallas. Opciones:
-      1. **Llevar el tiempo real a la pantalla de negociación y retirar `/mensajes`.**
-         Es lo que pide el documento. Hay que suscribirse a los tres eventos, enviar por
-         el hub y notificar el mensaje nuevo.
-      2. Dejar las dos y arreglar solo la de negociación. Se queda un buzón duplicado.
+      `/mensajes` redirige a `/mis-negociaciones`, así que ninguna URL compartida se
+      rompe. Quedó un resto menor: `GET /messaging/conversations` ya no lo usa nadie.
 
 - [x] ✅ **RESUELTO**: la página de 404 estaba en español y con el león del producto
       anterior, y quedaban textos sin traducir en el buzón vacío y en las preguntas

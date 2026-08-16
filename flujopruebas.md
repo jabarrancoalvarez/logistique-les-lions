@@ -1294,6 +1294,31 @@ cualquiera ante cualquier fallo HTTP de toda la aplicación—.
 > ⚠️ El barrido de §12.11 no los vio porque buscaba etiqueta y texto en la misma línea, y
 > casi todo el marcado los tiene en líneas distintas. Repetido sin esa limitación.
 
+### 12.13 Tiempo real en la negociación, ya corregido (2026-08-16)
+
+Aplicada la opción 1: el tiempo real se lleva a la pantalla de la negociación y se retira
+el buzón duplicado. **Vuelto a probar en producción con el mismo montaje de dos
+identidades, sobre la negociación `b08596a5` (YU10029):**
+
+| Comprobación | Resultado |
+|---|---|
+| Mensaje de B, sin tocar la pantalla de A | ✅ **aparece solo** |
+| Notificación en la campana de A | ✅ categoría `message`, «Nouveau message», con el texto y enlace a `/mis-negociaciones/{id}` |
+| «QA Professionnel est en train d'écrire…» | ✅ aparece y se apaga sola a los 3 s |
+| Acuse de lectura del mensaje de A | ✅ pasa de ✓ «Envoyé» a ✓✓ «Lu» |
+| `/mensajes` y `/mensajes/:id` | ✅ redirigen a `/mis-negociaciones` y al hilo |
+
+El aviso sale ahora de **donde se guarda el mensaje**, no del transporte por el que llegó
+la petición, así que llega igual por el camino que sea.
+
+> Dos apuntes de método, por si sirven más adelante:
+> - Render tardó más que Vercel. Para saber si ya estaba la API nueva sin escribir nada en
+>   la base de datos, valió invocar el método `SendMessage` del hub —que la versión nueva
+>   ya no tiene—: contestó «Method does not exist».
+> - Un intento intermedio dio «la campana sigue a cero» y era **mío**: la respuesta de
+>   `/notifications` es `{unreadCount, items}` y yo la leía como si viniera envuelta en
+>   `value`. La notificación estaba desde el principio.
+
 ### 12.9 Limpieza pendiente de las pruebas
 
 Estas cuentas y datos los he creado yo probando. **Conviene retirarlos antes de abrir al
@@ -1307,6 +1332,8 @@ público:**
 | Contrato `YC00001` | Venta verificada de prueba, con su PDF y su QR |
 | 48 anuncios sembrados | Catálogo senegalés de demostración |
 | 6 cuentas de vendedor | `+221771000001` … `+221771000006`, sin contraseña utilizable |
+| Anuncio `YU10029` | «Toyota Corolla 2017 — recette temps réel», de QA Particulier. Creado para §12.12 |
+| Negociación `b08596a5` | Su hilo con QA Professionnel, con los mensajes de la prueba y sus notificaciones |
 | ⚠️ 11 negociaciones huérfanas | Del seed anterior, apuntan a anuncios retirados (pendiente nº 23) |
 
 Añadido en la segunda sesión (16/08/2026):
