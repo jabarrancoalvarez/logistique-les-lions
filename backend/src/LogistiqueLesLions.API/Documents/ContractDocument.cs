@@ -1,3 +1,4 @@
+using LogistiqueLesLions.Application.Common.Formatting;
 using System.Globalization;
 using LogistiqueLesLions.Application.Features.Negotiations;
 using QRCoder;
@@ -22,8 +23,7 @@ public class ContractDocument(ContractDocumentDto contract, string verificationU
     private const string Azure = "#157FA8";
 
     /// <summary>Los importes van en FCFA con separador de millar: 8.300.000 FCFA.</summary>
-    private static string Fcfa(decimal amount) =>
-        $"{amount.ToString("N0", CultureInfo.GetCultureInfo("de-DE"))} FCFA";
+    private static string Fcfa(decimal amount) => FcfaFormat.WithCurrency(amount);
 
     private static string Date(DateTimeOffset value) => value.ToString("dd/MM/yyyy");
 
@@ -69,7 +69,7 @@ public class ContractDocument(ContractDocumentDto contract, string verificationU
                     }.Where(s => !string.IsNullOrWhiteSpace(s))));
                     Field(inner, "Année", contract.VehicleYear.ToString(CultureInfo.InvariantCulture));
                     Field(inner, "Kilométrage", contract.VehicleMileage is { } km
-                        ? $"{km.ToString("N0", CultureInfo.GetCultureInfo("de-DE"))} km"
+                        ? FcfaFormat.Kilometres(km)
                         : "—");
                     Field(inner, "Numéro de châssis (VIN)", contract.VehicleVin ?? "—");
                     Field(inner, "Immatriculation", contract.RegistrationPlate ?? "—");

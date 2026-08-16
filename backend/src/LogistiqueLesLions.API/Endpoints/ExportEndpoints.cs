@@ -112,7 +112,9 @@ public static class ExportEndpoints
                         Row(col, "Progreso:",        $"{process.CompletionPercent}%");
                         Row(col, "Coste estimado:",  process.EstimatedCostEur is null
                             ? "—"
-                            : process.EstimatedCostEur.Value.ToString("C", CultureInfo.GetCultureInfo("es-ES")));
+                            // Sin cultura: la imagen de producción corre en modo
+                            // globalization-invariant y pedir «es-ES» lanza excepción.
+                            : process.EstimatedCostEur.Value.ToString("N2", CultureInfo.InvariantCulture));
                         Row(col, "Iniciado:",        process.StartedAt?.ToString("dd/MM/yyyy") ?? "—");
                         Row(col, "Completado:",      process.CompletedAt?.ToString("dd/MM/yyyy") ?? "—");
                     });

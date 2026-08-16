@@ -1,3 +1,4 @@
+using LogistiqueLesLions.Application.Common.Formatting;
 using System.Globalization;
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Domain.Entities;
@@ -109,7 +110,7 @@ public class ReminderService(
 
         // Se dice por qué toca: la fecha, el kilometraje o lo que se haya cumplido antes.
         var reason = reminder.DueMileage is { } mileage && vehicle.Mileage >= mileage
-            ? $"{mileage.ToString("N0", CultureInfo.GetCultureInfo("de-DE"))} km"
+            ? FcfaFormat.Kilometres(mileage)
             : reminder.DueDate?.ToString("dd/MM/yyyy") ?? string.Empty;
 
         return string.IsNullOrEmpty(reason)

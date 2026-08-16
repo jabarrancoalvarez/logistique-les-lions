@@ -18,6 +18,11 @@ RUN dotnet publish -c Release -o /app/publish --no-restore
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS runtime
 WORKDIR /app
 
+# QuestPDF compone el PDF del contrato midiendo texto, y para eso necesita fontconfig
+# y al menos una fuente instalada. La imagen alpine no trae ninguna de las dos: sin
+# esto, descargar un contrato validado revienta al dibujar la primera línea.
+RUN apk add --no-cache fontconfig ttf-dejavu
+
 # Crear directorio de uploads y usuario sin privilegios
 RUN mkdir -p /app/uploads && addgroup -S lll && adduser -S lll -G lll
 RUN chown -R lll:lll /app

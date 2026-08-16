@@ -1,3 +1,4 @@
+using LogistiqueLesLions.Application.Common.Formatting;
 using System.Globalization;
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Domain.Entities;
@@ -75,6 +76,5 @@ public class PriceDropAlertService(
     }
 
     /// <summary>Formato del documento: 8.900.000</summary>
-    private static string Format(decimal amount) =>
-        amount.ToString("N0", CultureInfo.GetCultureInfo("de-DE"));
+    private static string Format(decimal amount) => FcfaFormat.Amount(amount);
 }

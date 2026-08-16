@@ -1,3 +1,4 @@
+using LogistiqueLesLions.Application.Common.Formatting;
 using System.Globalization;
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Common.Models;
@@ -15,8 +16,7 @@ namespace LogistiqueLesLions.Application.Features.Negotiations;
 internal static class OfferWorkflow
 {
     /// <summary>Formato del documento: 8.300.000</summary>
-    public static string Format(decimal amount) =>
-        amount.ToString("N0", CultureInfo.GetCultureInfo("de-DE"));
+    public static string Format(decimal amount) => FcfaFormat.Amount(amount);
 
     /// <summary>
     /// Deja la oferta pendiente anterior como superada. Solo puede haber una viva en
