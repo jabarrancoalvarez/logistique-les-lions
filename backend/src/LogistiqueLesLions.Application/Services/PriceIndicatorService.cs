@@ -37,8 +37,30 @@ public class PriceIndicatorService(IApplicationDbContext context) : IPriceIndica
             return new Dictionary<Guid, PriceIndicatorResult>();
 
         // Un único viaje a base de datos para todas las tarjetas de la página: se traen
-        // los comparables de todas las marcas implicadas y se agrupan en memoria.
-        var makeIds = targets.Select(t => t.MakeId).Distinct().ToList();
+        // los comparables y se reparten en memoria. Ese viaje único evita un N+1 por
+        // tarjeta y se mantiene.
+        //
+        // ⚠️ Lo que se acota es el cubo. Antes se pedían **todos** los anuncios activos de
+        // cada marca de la página, y luego se descartaban aquí por modelo y por año: una
+        // página con ocho marcas se traía todos los Toyota, todos los Renault y todos los
+        // Peugeot del catálogo, en cada carga del listado público. Ahora esas dos
+        // condiciones viajan a la consulta.
+        //
+        // El filtro de abajo sigue siendo el que manda: esto es un superconjunto suyo, no
+        // un criterio distinto. Un comparable solo cuenta si comparte marca y modelo con
+        // algún objetivo y cae dentro de su franja de años, así que nada de lo que sirve
+        // queda fuera.
+        var makeIds  = targets.Select(t => t.MakeId).Distinct().ToList();
+        var modelIds = targets.Where(t => t.ModelId is not null)
+                              .Select(t => t.ModelId!.Value).Distinct().ToList();
+
+        // Los anuncios sin modelo se comparan entre sí, así que hay que dejarlos entrar.
+        var hayObjetivoSinModelo = targets.Any(t => t.ModelId is null);
+
+        // Franja que cubre a todos los objetivos de la página a la vez.
+        var anioMin = targets.Min(t => t.Year) - settings.YearBand;
+        var anioMax = targets.Max(t => t.Year) + settings.YearBand;
+
         var cutoff = DateTimeOffset.UtcNow.AddDays(-settings.MaxListingAgeDays);
 
         var pool = await context.Vehicles
@@ -47,7 +69,10 @@ public class PriceIndicatorService(IApplicationDbContext context) : IPriceIndica
                         && (v.Status == VehicleStatus.Actif || v.Status == VehicleStatus.Reserve)
                         // La antigüedad se mide desde la publicación, no desde la
                         // creación: un borrador antiguo publicado ayer es un anuncio nuevo.
-                        && (v.PublishedAt ?? v.CreatedAt) >= cutoff)
+                        && (v.PublishedAt ?? v.CreatedAt) >= cutoff
+                        && v.Year >= anioMin && v.Year <= anioMax
+                        && ((v.ModelId != null && modelIds.Contains(v.ModelId.Value))
+                            || (hayObjetivoSinModelo && v.ModelId == null)))
             .Select(v => new Comparable(v.Id, v.MakeId, v.ModelId, v.Year, v.Price))
             .ToListAsync(ct);
 
