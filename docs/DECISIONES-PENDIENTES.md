@@ -233,12 +233,15 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
       contraseña `Test1234!` en claro. Ya está fuera del control de versiones y en
       `.gitignore`, pero **sigue en el historial de git**: hay que darla por quemada.
       No tiene arreglo por código; es cambiar esas contraseñas.
-- [ ] **Falta el botón de descargar el PDF del contrato** en la pantalla del backoffice.
-      El endpoint existe y está bien hecho (`POST /admin/contracts/{id}/document`, exige
-      motivo y deja fila en `admin_actions`), pero nadie lo llama todavía desde el
-      frontend. Se dejó aparte porque el PDF lleva pièces d'identité y direcciones: si
-      prefieres que el administrador **no** pueda descargarlo, se retira el endpoint en
-      vez de añadir el botón.
+- [x] ✅ **RESUELTO el 16/08/2026: el administrador sí puede descargar el PDF del
+      contrato.** El endpoint ya existía; faltaba el botón, y se había dejado aparte
+      porque el PDF lleva las pièces d'identité, las direcciones y los teléfonos de las
+      dos partes.
+
+      Se sigue el patrón del resto del backoffice: el botón exige **motivo** antes de
+      descargar y avisa de que la descarga queda inscrita en la trazabilidad, que es lo
+      que hace el endpoint en la misma operación. Se añadieron de paso dos rótulos que
+      habrían salido como enum crudo: `ContractDocumentAccessed` y `ReportUnderReview`.
 
 ---
 
