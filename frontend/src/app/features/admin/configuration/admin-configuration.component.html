@@ -32,7 +32,7 @@
       <div class="max-w-3xl space-y-5">
 
         <div class="bg-white rounded-xl border border-navy/10 p-5">
-          <h2 class="font-heading font-semibold text-navy mb-4">Plateforme</h2>
+          <h2 class="font-heading font-semibold text-navy text-lg mb-4">Plateforme</h2>
 
           <div class="grid sm:grid-cols-2 gap-4">
             <label class="block">
@@ -71,7 +71,7 @@
         </div>
 
         <div class="bg-white rounded-xl border border-navy/10 p-5">
-          <h2 class="font-heading font-semibold text-navy">Indicateur de prix</h2>
+          <h2 class="font-heading font-semibold text-navy text-lg">Indicateur de prix</h2>
           <p class="text-xs text-navy/50 mt-1 mb-4">
             En dessous du minimum de comparables, aucun indicateur n'est affiché.
           </p>
@@ -109,7 +109,7 @@
         </div>
 
         <div class="bg-white rounded-xl border border-navy/10 p-5">
-          <h2 class="font-heading font-semibold text-navy">Valeur estimée</h2>
+          <h2 class="font-heading font-semibold text-navy text-lg">Valeur estimée</h2>
           <p class="text-xs text-navy/50 mt-1 mb-4">
             Sans assez de comparables, aucune estimation n'est donnée.
           </p>
@@ -162,7 +162,7 @@
 
         <!-- Interrupteurs -->
         <div class="bg-white rounded-xl border border-navy/10 p-5">
-          <h2 class="font-heading font-semibold text-navy">Fonctionnalités</h2>
+          <h2 class="font-heading font-semibold text-navy text-lg">Fonctionnalités</h2>
           <p class="text-xs text-navy/50 mt-1 mb-4">
             Éteindre une fonctionnalité la retire de l'application sans rien supprimer.
           </p>
@@ -200,7 +200,7 @@
 
         <!-- Marques et modèles -->
         <div class="bg-white rounded-xl border border-navy/10 p-5">
-          <h2 class="font-heading font-semibold text-navy mb-1">Marques et modèles</h2>
+          <h2 class="font-heading font-semibold text-navy text-lg mb-1">Marques et modèles</h2>
           <p class="text-xs text-navy/50 mb-4">
             Rien ne se supprime&nbsp;: le nombre d'annonces indique ce qui en dépend.
           </p>
@@ -255,7 +255,7 @@
         <div class="space-y-4">
           <!-- Équipements -->
           <div class="bg-white rounded-xl border border-navy/10 p-5">
-            <h2 class="font-heading font-semibold text-navy mb-1">Équipements</h2>
+            <h2 class="font-heading font-semibold text-navy text-lg mb-1">Équipements</h2>
             <p class="text-xs text-navy/50 mb-4">
               Le code ne change jamais une fois créé&nbsp;: les annonces s'y rattachent.
             </p>
@@ -293,7 +293,7 @@
 
           <!-- Prochainement -->
           <div class="bg-white rounded-xl border border-navy/10 p-5">
-            <h2 class="font-heading font-semibold text-navy mb-1">Prochainement</h2>
+            <h2 class="font-heading font-semibold text-navy text-lg mb-1">Prochainement</h2>
             <p class="text-xs text-navy/50 mb-4">
               Les fonctionnalités annoncées, avec le nombre de personnes intéressées.
             </p>
@@ -348,7 +348,7 @@
     @if (interest(); as r) {
       <div class="grid lg:grid-cols-2 gap-4 items-start">
         <div class="bg-white rounded-xl border border-navy/10 p-5">
-          <h2 class="font-heading font-semibold text-navy mb-3">Classement</h2>
+          <h2 class="font-heading font-semibold text-navy text-lg mb-3">Classement</h2>
 
           <ul class="divide-y divide-navy/5" role="list">
             @for (f of r.features; track f.id) {
@@ -373,7 +373,7 @@
 
         @if (r.segmentation; as seg) {
           <div class="bg-white rounded-xl border border-navy/10 p-5">
-            <h2 class="font-heading font-semibold text-navy">{{ seg.featureName }}</h2>
+            <h2 class="font-heading font-semibold text-navy text-lg">{{ seg.featureName }}</h2>
             <p class="text-xs text-navy/50 mt-1 mb-4">
               {{ seg.total }} personne(s) intéressée(s)
             </p>
