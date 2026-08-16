@@ -229,10 +229,26 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
 
 **Lo que quedó fuera de esas trece:**
 
-- [ ] ⚠️ **`credenciales.txt` estuvo versionado en un repositorio público** con la
-      contraseña `Test1234!` en claro. Ya está fuera del control de versiones y en
-      `.gitignore`, pero **sigue en el historial de git**: hay que darla por quemada.
-      No tiene arreglo por código; es cambiar esas contraseñas.
+- [x] ✅ **CERRADO el 16/08/2026: sin acción necesaria.** `credenciales.txt` estuvo
+      versionado con la contraseña `Test1234!` en claro y sigue en el historial de git,
+      pero una auditoría del historial completo confirma que **esa contraseña ya no abre
+      ninguna cuenta**:
+      - El sembrador actual usa `UnusablePassword()` —hash de dos GUID aleatorios—;
+        `Test1234!` no aparece en el código.
+      - Las cuentas vivas usan `YoonQA2026!`.
+      - Lo filtrado eran correos del producto anterior con roles (`Dealer`, `Seller`,
+        `Buyer`, `Moderator`) que ya no existen.
+
+      La auditoría no encontró **ningún otro secreto real** en el historial: lo demás son
+      valores de laboratorio de `docker-compose` (Postgres local y una clave JWT de
+      ejemplo) que no dan acceso a producción, donde las claves vienen del entorno y
+      `appsettings.json` no lleva ninguna.
+
+      ⚠️ Queda una comprobación de 30 segundos que conviene hacer una vez: confirmar que
+      la clave JWT de producción **no** es la pública de `docker-compose`
+      (`dev_jwt_secret_key_minimum_32_characters_long_for_hmac`). En Render →
+      Environment, `Jwt__Key` debe ser un secreto propio y distinto. Si lo fuera,
+      cualquiera podría firmarse un token de administrador; cambiarla es un campo.
 - [x] ✅ **RESUELTO el 16/08/2026: el administrador sí puede descargar el PDF del
       contrato.** El endpoint ya existía; faltaba el botón, y se había dejado aparte
       porque el PDF lleva las pièces d'identité, las direcciones y los teléfonos de las
