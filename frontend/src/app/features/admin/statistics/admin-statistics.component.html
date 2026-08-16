@@ -157,7 +157,7 @@
         <ul class="space-y-1.5" role="list">
           @for (f of s.supply.byFuel; track f.label) {
             <li class="flex items-center justify-between text-sm">
-              <span class="text-navy">{{ f.label }}</span>
+              <span class="text-navy">{{ fuelLabel(f.label) }}</span>
               <span class="text-navy/60 tabular-nums">{{ f.count }}</span>
             </li>
           } @empty {
@@ -170,7 +170,7 @@
         <ul class="space-y-1.5" role="list">
           @for (d of s.supply.byCustomsStatus; track d.label) {
             <li class="flex items-center justify-between text-sm">
-              <span class="text-navy">{{ d.label }}</span>
+              <span class="text-navy">{{ customsLabel(d.label) }}</span>
               <span class="text-navy/60 tabular-nums">{{ d.count }}</span>
             </li>
           } @empty {
