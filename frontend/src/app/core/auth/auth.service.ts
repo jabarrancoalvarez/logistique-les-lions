@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, map } from 'rxjs';
+import { Observable, tap, map, finalize, shareReplay } from 'rxjs';
 import { environment } from '@environments/environment';
 
 /** Tipo de cuenta declarado por el usuario. Campo informativo: no otorga permisos. */
@@ -105,14 +105,42 @@ export class AuthService {
     );
   }
 
+  /**
+   * Refresco en curso, compartido por todas las peticiones que se encuentran con un 401
+   * a la vez.
+   */
+  private refreshInFlight: Observable<string> | null = null;
+
+  /**
+   * Renueva el token de acceso.
+   *
+   * El servidor **rota** el refresh token: cada uso invalida el anterior. Por eso dos
+   * refrescos simultáneos no pueden funcionar — el segundo enviaría un token ya
+   * consumido, recibiría 401 y cerraría la sesión. Como el panel lanza varias llamadas
+   * juntas, eso expulsaba al usuario cada vez que caducaba el token.
+   *
+   * Aquí solo sale una petición: las demás se enganchan a la misma y reciben el token
+   * nuevo.
+   */
   refreshToken(): Observable<string> {
+    if (this.refreshInFlight) return this.refreshInFlight;
+
     const refreshToken = typeof localStorage !== 'undefined'
       ? localStorage.getItem('lll_refresh_token')
       : null;
-    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
-      tap(r => this.storeTokens(r.value)),
-      map(r => r.value.accessToken)
-    );
+
+    this.refreshInFlight = this.http
+      .post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken })
+      .pipe(
+        tap(r => this.storeTokens(r.value)),
+        map(r => r.value.accessToken),
+        // Se libera cuando la petición termina, con éxito o sin él: si no, un fallo
+        // dejaría la sesión sin poder refrescarse nunca más.
+        finalize(() => { this.refreshInFlight = null; }),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+
+    return this.refreshInFlight;
   }
 
   getProfile(): Observable<ProfileData> {
