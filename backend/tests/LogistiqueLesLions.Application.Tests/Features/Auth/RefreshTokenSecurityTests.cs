@@ -55,15 +55,21 @@ public class RefreshTokenSecurityTests : IDisposable
             {
                 Id = _adminId, DisplayName = "Administration", Phone = "+221770000001",
                 PasswordHash = "x", Role = UserRole.Admin,
-                RefreshToken = null, RefreshTokenExpiresAt = null
             },
             new UserProfile
             {
                 Id = _userId, DisplayName = "Mamadou Diop", Phone = "+221770000002",
                 PasswordHash = "x",
-                RefreshToken = "un-token-valide",
-                RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(20)
             });
+
+        // Las sesiones viven en su propia tabla: una fila por dispositivo. La cuenta del
+        // ataque no tiene ninguna, que es justo el caso que el fallo antiguo explotaba.
+        _context.UserRefreshTokens.Add(new UserRefreshToken
+        {
+            UserId    = _userId,
+            Token     = "un-token-valide",
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(20)
+        });
         _context.SaveChanges();
 
         var jwt = new Mock<IJwtService>();
@@ -97,15 +103,54 @@ public class RefreshTokenSecurityTests : IDisposable
     }
 
     [Fact]
-    public async Task LaCuentaSinCaducidadNoDebePoderRenovar()
+    public async Task UnaSesionCaducadaNoDebePoderRenovar()
     {
-        // Aunque se acertara el token, una fecha nula no es una fecha válida: el
-        // guardián anterior la dejaba pasar porque «null < ahora» es falso.
-        var admin = await _context.UserProfiles.FirstAsync(u => u.Id == _adminId);
-        admin.RefreshToken = "token-sans-echeance";
+        // Aunque se acierte el token, una sesión vencida no renueva. Se pregunta en
+        // positivo —que la caducidad exista y esté en el futuro— porque el guardián
+        // anterior comparaba «null < ahora», que en C# siempre es falso.
+        _context.UserRefreshTokens.Add(new UserRefreshToken
+        {
+            UserId    = _adminId,
+            Token     = "token-perime",
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(-1)
+        });
         await _context.SaveChangesAsync();
 
-        (await RefreshAsync("token-sans-echeance")).IsSuccess.Should().BeFalse();
+        (await RefreshAsync("token-perime")).IsSuccess.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task UnaSesionRevocadaNoDebePoderRenovar()
+    {
+        _context.UserRefreshTokens.Add(new UserRefreshToken
+        {
+            UserId    = _adminId,
+            Token     = "token-revoque",
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(20),
+            RevokedAt = DateTimeOffset.UtcNow
+        });
+        await _context.SaveChangesAsync();
+
+        (await RefreshAsync("token-revoque")).IsSuccess.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task CerrarUnaSesionNoDebeCerrarLasDemas()
+    {
+        // Entrar desde el móvil no puede expulsar al ordenador.
+        _context.UserRefreshTokens.Add(new UserRefreshToken
+        {
+            UserId    = _userId,
+            Token     = "session-du-mobile",
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(20)
+        });
+        await _context.SaveChangesAsync();
+
+        // Se usa —y por tanto se rota— la del ordenador.
+        (await RefreshAsync("un-token-valide")).IsSuccess.Should().BeTrue();
+
+        // La del móvil sigue valiendo.
+        (await RefreshAsync("session-du-mobile")).IsSuccess.Should().BeTrue();
     }
 
     // ─── Lo que sí debe funcionar ──────────────────────────────────────────
@@ -132,8 +177,9 @@ public class RefreshTokenSecurityTests : IDisposable
     [Fact]
     public async Task UnTokenCaducadoNoDebeRenovar()
     {
-        var user = await _context.UserProfiles.FirstAsync(u => u.Id == _userId);
-        user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(-1);
+        var sesion = await _context.UserRefreshTokens
+            .FirstAsync(t => t.Token == "un-token-valide");
+        sesion.ExpiresAt = DateTimeOffset.UtcNow.AddDays(-1);
         await _context.SaveChangesAsync();
 
         (await RefreshAsync("un-token-valide")).IsSuccess.Should().BeFalse();

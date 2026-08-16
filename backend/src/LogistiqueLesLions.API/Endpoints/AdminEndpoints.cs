@@ -1,3 +1,7 @@
+using QuestPDF.Fluent;
+using LogistiqueLesLions.API.Documents;
+using LogistiqueLesLions.Application.Features.Negotiations;
+using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Features.Admin.Commands.ApproveVehicle;
 using LogistiqueLesLions.Application.Features.Admin.Dashboard;
 using LogistiqueLesLions.Application.Features.Admin.Communications;
@@ -379,6 +383,53 @@ public static class AdminEndpoints
         .RequireAuthorization("AdminOnly")
         .WithName("InvalidateContract")
         .WithSummary("Invalidar administrativamente un contrato (situaciones excepcionales)");
+
+        // ─── POST /api/v1/admin/contracts/{id}/document ──────────────────────
+        // El PDF lleva pièces d'identité, direcciones y teléfonos: se entrega solo con
+        // motivo escrito, y la descarga queda registrada en la misma operación, igual
+        // que leer una conversación privada.
+        group.MapPost("/contracts/{id:guid}/document", async (
+            Guid id,
+            [FromBody] ContractDocumentAccessBody body,
+            ClaimsPrincipal user,
+            ISender sender,
+            IApplicationDbContext db,
+            IConfiguration configuration,
+            CancellationToken ct) =>
+        {
+            if (!TryGetUserId(user, out var adminId)) return Results.Unauthorized();
+
+            var motivo = body.Reason?.Trim();
+            if (string.IsNullOrEmpty(motivo)) return Results.BadRequest("Admin.ReasonRequired");
+
+            var result = await sender.Send(
+                new GetContractDocumentQuery(adminId, id, IsAdmin: true), ct);
+
+            if (!result.IsSuccess) return Results.BadRequest(result.Error);
+
+            db.AdminActions.Add(new AdminAction
+            {
+                AdminId    = adminId,
+                TargetType = AdminTargetType.Contract,
+                TargetId   = id,
+                Type       = AdminActionType.ContractDocumentAccessed,
+                Reason     = motivo
+            });
+            await db.SaveChangesAsync(ct);
+
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
+            var contract = result.Value!;
+            var frontend = (configuration["Frontend:Url"] ?? string.Empty).TrimEnd('/');
+            var pdf = new ContractDocument(
+                contract, $"{frontend}/verification/{contract.VerificationCode}").GeneratePdf();
+
+            return Results.File(pdf, "application/pdf",
+                fileDownloadName: $"contrat-{contract.PublicReference}.pdf");
+        })
+        .RequireAuthorization("AdminOnly")
+        .WithName("AdminContractDocument")
+        .WithSummary("Descargar el PDF de un contrato, con motivo y dejando constancia");
 
         // ─── GET /api/v1/admin/reports ───────────────────────────────────────
         group.MapGet("/reports", async (
@@ -938,3 +989,6 @@ public record CatalogEquipmentBody(
 
 public record CatalogFeatureBody(
     Guid? Id, string? Code, string? Name, string? Description, int DisplayOrder, bool IsActive);
+
+/// <summary>Por qué se descarga el PDF de un contrato desde el backoffice.</summary>
+public record ContractDocumentAccessBody(string? Reason);

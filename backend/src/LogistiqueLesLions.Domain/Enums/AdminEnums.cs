@@ -87,6 +87,11 @@ public enum AdminActionType
     NegotiationContentAccessed = 30,
     /// <summary>Contrato invalidado administrativamente.</summary>
     ContractInvalidated = 31,
+    /// <summary>
+    /// El PDF de un contrato se ha descargado desde el backoffice. Lleva pièces
+    /// d'identité, direcciones y teléfonos: se registra igual que leer una conversación.
+    /// </summary>
+    ContractDocumentAccessed = 32,
 
     /// <summary>Reporte cerrado (resuelto o rechazado).</summary>
     ReportResolved = 40,

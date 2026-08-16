@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { PlatformService } from './platform.service';
 
 const STORAGE_KEY = 'lll_comparator';
@@ -10,6 +10,12 @@ const STORAGE_KEY = 'lll_comparator';
  * necesita un número con el que arrancar en el primer render.
  */
 export const DEFAULT_MAX_COMPARED_VEHICLES = 3;
+
+/**
+ * Tope de seguridad al leer de localStorage, muy por encima de cualquier límite
+ * razonable: solo evita que un valor manipulado a mano crezca sin fin.
+ */
+const HARD_CAP = 20;
 
 export type AddToComparatorResult = 'added' | 'removed' | 'full';
 
@@ -33,6 +39,17 @@ export class ComparatorService {
   readonly max = computed(() => this.platform.settings().comparatorMaxVehicles);
 
   readonly isFull = computed(() => this._ids().length >= this.max());
+
+  constructor() {
+    // La configuración llega después del primer render. Cuando lo hace, se recorta a lo
+    // que de verdad cabe: así una selección heredada de un límite mayor no se queda
+    // por encima del actual.
+    effect(() => {
+      const limite = this.max();
+      const actuales = this._ids();
+      if (actuales.length > limite) this.persist(actuales.slice(0, limite));
+    });
+  }
 
   /** "Comparer (2/3)" */
   readonly label = computed(() => `Comparer (${this.count()}/${this.max()})`);
@@ -77,12 +94,14 @@ export class ComparatorService {
     if (!raw) return [];
     try {
       const parsed = JSON.parse(raw);
+      // ❌ Ya no se recorta con el respaldo. Lo hacía porque al arrancar todavía no ha
+      // llegado la configuración del servidor, pero con el límite en 4 el usuario perdía
+      // un vehículo en cada recarga sin que nada se lo dijera. Se guarda lo que hay,
+      // acotado por seguridad, y se ajusta al límite real cuando la configuración llega.
       return Array.isArray(parsed)
-        // Se recorta con el respaldo y no con el límite configurado: al cargar desde
-        // localStorage la configuración todavía no ha llegado del servidor.
         ? parsed
             .filter((v): v is string => typeof v === 'string')
-            .slice(0, DEFAULT_MAX_COMPARED_VEHICLES)
+            .slice(0, HARD_CAP)
         : [];
     } catch {
       localStorage.removeItem(STORAGE_KEY);

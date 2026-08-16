@@ -1,6 +1,7 @@
 using LogistiqueLesLions.Application.Common;
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Common.Models;
+using LogistiqueLesLions.Domain.Entities;
 using LogistiqueLesLions.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -38,9 +39,15 @@ public class LoginCommandHandler(
         if (user.Status == AccountStatus.Suspended)
             return Result<AuthResponseDto>.Failure("Auth.AccountSuspended");
 
-        var refreshToken           = jwt.GenerateRefreshToken();
-        user.RefreshToken          = refreshToken;
-        user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(30);
+        // Una fila por sesión: entrar desde el móvil ya no expulsa al ordenador.
+        var refreshToken = jwt.GenerateRefreshToken();
+        db.UserRefreshTokens.Add(new UserRefreshToken
+        {
+            UserId    = user.Id,
+            Token     = refreshToken,
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(30)
+        });
+
         user.LastLoginAt           = DateTimeOffset.UtcNow;
         user.LastActivityAt        = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);

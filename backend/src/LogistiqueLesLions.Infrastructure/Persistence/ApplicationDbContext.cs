@@ -73,6 +73,7 @@ public class ApplicationDbContext(
 
     // ─── M6 ────────────────────────────────────────────────────────────────
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<UserRefreshToken> UserRefreshTokens => Set<UserRefreshToken>();
     public DbSet<AdminAction> AdminActions => Set<AdminAction>();
     public DbSet<AdminNote> AdminNotes => Set<AdminNote>();
     public DbSet<Report> Reports => Set<Report>();
