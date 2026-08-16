@@ -51,7 +51,7 @@ public class CompareVehiclesQueryHandler(
                 v.Seats,
                 v.Color,
                 v.CustomsStatus,
-                v.Equipments.Where(e => e.Equipment.IsActive).Select(e => e.Equipment.Code).ToList(),
+                v.Equipments.Select(e => e.Equipment.Code).ToList(),
                 v.SellerId))
             .ToListAsync(ct);
 

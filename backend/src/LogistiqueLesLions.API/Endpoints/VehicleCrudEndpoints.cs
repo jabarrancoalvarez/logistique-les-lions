@@ -433,7 +433,14 @@ public static class VehicleCrudEndpoints
     /// </summary>
     private static bool CanSeeNonPublic(ClaimsPrincipal user, Guid? requestedSellerId)
     {
-        if (user.IsInRole("Admin")) return true;
+        // ❌ Ser administrador ya no basta. El Marketplace es el escaparate público y
+        // debe verse igual desde cualquier cuenta: antes la portada le anunciaba «51
+        // véhicules» donde había 46, colándole los pausados, los vendidos y los
+        // ocultados, y contradiciendo al propio contador. Lo no público se consulta en
+        // /admin, que es donde toca.
+        //
+        // Se conserva el caso del dueño: cada cual ve sus propios borradores en
+        // «Mes annonces», que es este mismo listado filtrado por su sellerId.
         if (requestedSellerId is null) return false;
         return TryGetUserId(user, out var userId) && userId == requestedSellerId.Value;
     }

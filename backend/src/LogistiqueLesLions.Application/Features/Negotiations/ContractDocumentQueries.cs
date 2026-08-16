@@ -13,7 +13,11 @@ namespace LogistiqueLesLions.Application.Features.Negotiations;
 /// Solo se sirve cuando el contrato está validado: el documento descargable es el
 /// contrato definitivo, no un borrador en curso de negociación.
 /// </remarks>
-public record GetContractDocumentQuery(Guid UserId, Guid ContractId)
+/// <param name="IsAdmin">
+/// El backoffice también puede consultarlo, pero solo con motivo y dejando constancia:
+/// eso lo comprueba el endpoint antes de llegar aquí.
+/// </param>
+public record GetContractDocumentQuery(Guid UserId, Guid ContractId, bool IsAdmin = false)
     : IRequest<Result<ContractDocumentDto>>;
 
 public record ContractDocumentDto(
@@ -57,8 +61,8 @@ public class GetContractDocumentQueryHandler(IApplicationDbContext db)
 
         if (contract is null) return Result<ContractDocumentDto>.Failure("Contract.NotFound");
 
-        // El contrato es de las dos partes y de nadie más.
-        if (!contract.Negotiation.Involves(request.UserId))
+        // El contrato es de las dos partes y, con motivo registrado, del backoffice.
+        if (!request.IsAdmin && !contract.Negotiation.Involves(request.UserId))
             return Result<ContractDocumentDto>.Failure("Negotiation.AccessDenied");
 
         if (contract.Status != ContractStatus.Valide || contract.VerificationCode is null)

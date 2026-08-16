@@ -1,6 +1,7 @@
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Features.Auth.Commands.Login;
 using LogistiqueLesLions.Application.Features.Auth.Commands.RefreshToken;
+using Microsoft.EntityFrameworkCore;
 using LogistiqueLesLions.Application.Features.Auth.Commands.Register;
 using LogistiqueLesLions.Application.Features.Auth.Commands.UpdateProfile;
 using LogistiqueLesLions.Application.Features.Auth.Queries.GetProfile;
@@ -77,18 +78,33 @@ public static class AuthEndpoints
         .WithSummary("Actualizar perfil del usuario autenticado");
 
         // POST /api/v1/auth/logout  (invalida el refresh token)
-        group.MapPost("/logout", async (ICurrentUser currentUser, IApplicationDbContext db, CancellationToken ct) =>
+        group.MapPost("/logout", async (
+            [FromBody] LogoutBody? body,
+            ICurrentUser currentUser,
+            IApplicationDbContext db,
+            CancellationToken ct) =>
         {
             if (!currentUser.IsAuthenticated || currentUser.UserId is null)
                 return Results.Unauthorized();
 
-            var user = await db.UserProfiles.FindAsync([currentUser.UserId.Value], ct);
-            if (user is not null)
-            {
-                user.RefreshToken          = null;
-                user.RefreshTokenExpiresAt = null;
-                await db.SaveChangesAsync(ct);
-            }
+            var userId = currentUser.UserId.Value;
+            var ahora  = DateTimeOffset.UtcNow;
+
+            // Cerrar sesión cierra ESTA sesión, no todas: si alguien sale en el
+            // ordenador, su móvil tiene que seguir dentro.
+            //
+            // Sin el token concreto no se puede saber cuál cerrar, así que se cierran
+            // todas: es lo prudente para un cliente antiguo que aún no lo envía.
+            var sesiones = db.UserRefreshTokens
+                .Where(t => t.UserId == userId && t.RevokedAt == null);
+
+            if (!string.IsNullOrWhiteSpace(body?.RefreshToken))
+                sesiones = sesiones.Where(t => t.Token == body.RefreshToken);
+
+            foreach (var sesion in await sesiones.ToListAsync(ct))
+                sesion.RevokedAt = ahora;
+
+            await db.SaveChangesAsync(ct);
             return Results.NoContent();
         })
         .RequireAuthorization()
@@ -108,3 +124,6 @@ public record UpdateProfileRequest(
     string? AvatarUrl,
     bool AllowWhatsAppContact
 );
+
+/// <summary>Cuerpo opcional de logout: qué sesión cerrar.</summary>
+public record LogoutBody(string? RefreshToken);

@@ -206,6 +206,19 @@ public class InvalidateContractCommandHandler(
         contract.Status = ContractStatus.Annule;
         contract.CancelledAt = DateTimeOffset.UtcNow;
 
+        // Si la venta deja de valer, el coche vuelve a estar en venta. Antes se quedaba
+        // en «Vendu» y su dueño solo lo recuperaba por un camino nada evidente:
+        // archivar, devolver a borrador y volver a publicar.
+        if (wasVerifiedSale)
+        {
+            var vehicle = await db.Vehicles.FirstOrDefaultAsync(v => v.Id == contract.VehicleId, ct);
+            if (vehicle is not null && vehicle.Status == VehicleStatus.Vendu)
+            {
+                vehicle.Status = VehicleStatus.Actif;
+                vehicle.SoldAt = null;
+            }
+        }
+
         // Si había venta verificada, deja de haberla: la reputación no puede sostenerse
         // sobre un contrato que se ha invalidado.
         if (wasVerifiedSale)

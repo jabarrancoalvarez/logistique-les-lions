@@ -68,7 +68,9 @@ public class GetVehicleBySlugQueryHandler(
                 .ToList()
                 .AsReadOnly(),
             v.Equipments
-                .Where(l => l.Equipment.IsActive)
+                // ❌ Sin filtrar por IsActive: retirar una entrada del catálogo la quita
+                // del formulario de publicación, pero no puede borrarla de los anuncios
+                // que ya la declaraban. Lo marcó su vendedor sobre su coche.
                 .OrderBy(l => l.Equipment.DisplayOrder)
                 .Select(l => new VehicleEquipmentDto(l.Equipment.Id, l.Equipment.Code, l.Equipment.Name))
                 .ToList()

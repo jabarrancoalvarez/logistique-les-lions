@@ -135,12 +135,9 @@ Al retirar «Climatisation» del catálogo, el anuncio `YU10025` **dejó de most
 reactivarla, volvió. La fila de enlace no se borra (la ficha filtra por `IsActive`), pero
 retirar una entrada cambia lo que dicen los anuncios vivos.
 
-- [ ] **Decisión:** ¿retirar debe (a) esconderlo solo del formulario de publicación,
-      dejando intactos los anuncios que ya lo declaraban, o (b) desaparecer de todas
-      partes, como ahora?
-
-  *Recomendación: la (a).* Un anuncio publicado describe un coche real; que el coche deje
-  de tener aire acondicionado porque un administrador tocó el catálogo es raro.
+- [x] ✅ **RESUELTO: solo se esconde del formulario.** Los anuncios que ya lo declaraban
+      lo siguen mostrando. Se quitó el filtro por `IsActive` de la ficha y del comparador;
+      se mantiene al publicar y al editar, para que no pueda elegirse en anuncios nuevos.
 
 ### 2.2 El comparador expulsa en silencio en vez de avisar
 
@@ -148,19 +145,25 @@ Con el límite lleno (4), el botón sigue activo, marca «(3/4)» —una menos d
 al pulsarlo **entra el nuevo y desaparece uno de los anteriores**, sin decir nada. El doc
 §2.9 pide avisar de que está lleno.
 
-- [ ] **Decisión:** ¿avisar y no dejar añadir (lo que pide el doc), o dejar la sustitución
-      pero contándola («se ha retirado X»)? En cualquier caso hay que corregir el contador.
+- [x] ✅ **RESUELTO: avisar y no dejar añadir** — que ya era lo que hacía.
+
+      ⚠️ **Mi diagnóstico anterior era incorrecto y conviene dejarlo escrito.** El
+      comparador **no expulsaba nada al añadir**: `toggle()` devuelve `'full'` y no toca
+      la lista, y la pantalla ya mostraba el aviso. Lo que pasaba es que `load()`
+      recortaba la selección al **valor de respaldo (3)** al leer de `localStorage`,
+      aunque el límite configurado fuera 4. Por eso se veía «(3/4)» con cuatro dentro: se
+      perdía uno en **cada recarga**, en silencio.
+
+      Corregido: se lee lo que hay, con un tope de seguridad, y se ajusta al límite real
+      en cuanto llega la configuración del servidor.
 
 ### 2.3 Invalidar un contrato: qué pasa con el anuncio y la negociación
 
 Invalidar **sí** revierte la reputación (−100 puntos sin borrar el +100, contador de ventas
 abajo, QR deja de verificar). Pero:
 
-- [ ] El **anuncio se queda en `Vendu`**. El vendedor lo recupera por un camino poco
-      evidente: Archiver → Remettre en brouillon → publicar. ¿Debería invalidar devolverlo
-      a `Actif`, u ofrecer «Remettre en vente» desde `Vendu`?
-- [ ] La **negociación se queda en `Terminée`**. Si se invalidó por fraude quizá deba
-      reabrirse; si fue un error administrativo, quizá no.
+- [x] ✅ **RESUELTO: invalidar devuelve el anuncio a `Actif`** y borra su fecha de venta.
+      La negociación se queda en `Terminée` a propósito: reabrirla es otra decisión.
 
 ### 2.4 Se puede cambiar el precio de un anuncio ya vendido
 
@@ -168,7 +171,8 @@ Las acciones «Prix» y «Kilométrage» siguen ofreciéndose sobre un anuncio `
 corrompe nada —el contrato congela el precio acordado—, pero cambia lo que ve quien abre
 un anuncio vendido.
 
-- [ ] **Decisión:** ¿se retiran esas dos acciones cuando el anuncio está `Vendu`?
+- [x] ✅ **RESUELTO: se retiran.** «Prix» y «Kilométrage» ya no se ofrecen sobre un
+      anuncio `Vendu`.
 
 ### 2.5 El administrador ve los anuncios no públicos en el Marketplace público
 
@@ -176,14 +180,19 @@ La portada le anuncia «49 véhicules disponibles» cuando hay 46: el listado le
 pausados, el vendido y el ocultado. `/vehicles/count` sí devuelve 46, así que la pantalla
 se contradice consigo misma.
 
-- [ ] **Decisión:** ¿el backoffice es el único sitio donde se ven los no públicos, o se
-      mantiene el atajo para el administrador?
+- [x] ✅ **RESUELTO: el backoffice es el único sitio.** El Marketplace se ve igual desde
+      cualquier cuenta. Se conserva el caso del dueño, que sigue viendo sus borradores en
+      «Mes annonces» porque ese listado filtra por su propio `sellerId`.
 
 ### 2.6 Una sola sesión por cuenta
 
 Pendiente nº 25: entrar desde el móvil expulsa la sesión del ordenador.
 
-- [ ] **Decisión:** ¿se acepta, o se permiten sesiones simultáneas?
+- [x] ✅ **RESUELTO: sesiones simultáneas.** El refresh token vivía en una única columna
+      de `UserProfile`, así que entrar desde el móvil sobrescribía la del ordenador. Ahora
+      hay una tabla `user_refresh_tokens` con una fila por dispositivo, rotación al usarse
+      y cierre de sesión que solo cierra la suya. La migración **traslada las sesiones
+      abiertas**, así que el despliegue no expulsa a nadie.
 
 ### 2.7b El vehículo comprado no entra solo en Mon Garage
 
@@ -195,9 +204,8 @@ comprador **decida** añadirlo, con `SourceContractId` impidiendo que entre dos 
 Comprobado el 16/08/2026: tras validar `YC00004`, el garaje del comprador seguía con cero
 vehículos. El apartado 3.7 de `flujopruebas.md` lo daba por automático.
 
-- [ ] **Decisión:** ¿se añade solo al validar, o se sigue ofreciendo al comprador?
-      *Sin recomendación fuerte:* automático es más cómodo, pero mete un coche en el
-      garaje de alguien sin que lo pida, y el garaje es suyo.
+- [x] ✅ **RESUELTO: se sigue ofreciendo.** El garaje es del comprador y nadie le mete un
+      coche sin pedirlo. Sin cambios de código.
 
 ### 2.7 Un anuncio `Réservé` sigue apareciendo en el buscador
 
@@ -205,7 +213,7 @@ Con su etiqueta. Los `Vendu`, `En pause`, `Brouillon`, `Archivé` y los ocultado
 Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parece deseable
 —lo reservado todavía está en venta—, pero conviene confirmarlo.
 
-- [ ] **Decisión:** ¿se confirma este comportamiento?
+- [x] ✅ **CONFIRMADO**: un coche reservado sigue en venta y aparece con su etiqueta.
 
 ---
 
@@ -228,9 +236,10 @@ Si estás de acuerdo, se hacen y ya. Están aquí para que las veas, no para deb
       `.gitignore`, pero **sigue en el historial de git**: hay que darla por quemada.
 - [ ] **Falta el filtro «reportadas»** en Annonces. La API acepta `Reported`; el formulario
       solo expone «Masquées» y «À réviser». El doc §6.4 lo pide.
-- [ ] **No se puede consultar el PDF del contrato ni verificar el QR desde el backoffice.**
-      La ficha enseña el código de verificación como texto, pero no hay enlace ni descarga.
-      El doc §6.7 pide ambas cosas.
+- [x] ✅ **RESUELTO.** Se añadió el enlace a la página pública del QR, y
+      `POST /admin/contracts/{id}/document` entrega el PDF **exigiendo motivo** y dejando
+      fila en `admin_actions` con el nombre del administrador — el mismo criterio que
+      leer una conversación privada. Falta el botón en la pantalla.
 - [ ] **Enums crudos en francés a medias**: el journal escribe `Dispute` en vez de «Litige
       entre les parties»; el historial de un signalement escribe `EnExamen`. Mismo fallo
       que se corrigió en la ficha de negociación (commit 239cca6).

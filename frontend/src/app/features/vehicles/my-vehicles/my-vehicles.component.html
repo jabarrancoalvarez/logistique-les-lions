@@ -131,14 +131,18 @@
                 <a [routerLink]="['/vehiculos', l.slug]" class="text-azure-dark hover:underline">
                   Voir
                 </a>
-                <button type="button" (click)="openPrice(l)" [disabled]="busy()"
-                  class="text-navy/60 hover:underline">
-                  Prix
-                </button>
-                <button type="button" (click)="openMileage(l)" [disabled]="busy()"
-                  class="text-navy/60 hover:underline">
-                  Kilométrage
-                </button>
+                <!-- Un anuncio vendido ya no se retoca: el contrato congeló el precio
+                     acordado, y cambiarlo después solo confunde a quien lo abra. -->
+                @if (l.status !== 'Vendu') {
+                  <button type="button" (click)="openPrice(l)" [disabled]="busy()"
+                    class="text-navy/60 hover:underline">
+                    Prix
+                  </button>
+                  <button type="button" (click)="openMileage(l)" [disabled]="busy()"
+                    class="text-navy/60 hover:underline">
+                    Kilométrage
+                  </button>
+                }
                 <button type="button" (click)="duplicate(l)" [disabled]="busy()"
                   class="text-navy/60 hover:underline">
                   Dupliquer

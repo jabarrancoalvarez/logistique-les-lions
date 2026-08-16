@@ -63,6 +63,7 @@ public interface IApplicationDbContext
 
     // ─── M6: Usuarios ──────────────────────────────────────────────────────
     DbSet<UserProfile> UserProfiles { get; }
+    DbSet<UserRefreshToken> UserRefreshTokens { get; }
     DbSet<AdminAction> AdminActions { get; }
     DbSet<AdminNote> AdminNotes { get; }
     DbSet<Report> Reports { get; }

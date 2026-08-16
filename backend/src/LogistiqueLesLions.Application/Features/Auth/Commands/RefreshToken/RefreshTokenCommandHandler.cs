@@ -1,5 +1,6 @@
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Common.Models;
+using LogistiqueLesLions.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,27 +41,37 @@ public class RefreshTokenCommandHandler(
 
         var token = request.RefreshToken;
 
-        var user = await db.UserProfiles
-            .FirstOrDefaultAsync(u => u.RefreshToken == token, ct);
+        var sesion = await db.UserRefreshTokens
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Token == token, ct);
 
-        // La caducidad tiene que existir y no haber pasado. Preguntarlo al revés dejaba
-        // entrar a quien la tuviera a nulo.
-        if (user is null
-            || user.RefreshTokenExpiresAt is not { } expiresAt
-            || expiresAt <= DateTimeOffset.UtcNow)
-        {
+        var user = sesion?.User;
+
+        // La sesión tiene que existir, no estar revocada y no haber caducado. Se
+        // pregunta en positivo a propósito: «que no haya pasado» dejaba entrar a quien
+        // tuviera la fecha a nulo.
+        if (sesion is null || user is null || !sesion.IsActive)
             return Result<AuthResponseDto>.Failure("Auth.InvalidRefreshToken");
-        }
 
         // Una cuenta bloqueada no renueva su sesión: si no, seguiría dentro hasta que
         // caducara el refresh token.
         if (!user.CanSignIn)
             return Result<AuthResponseDto>.Failure("Auth.InvalidRefreshToken");
 
-        var newRefresh             = jwt.GenerateRefreshToken();
-        user.RefreshToken           = newRefresh;
-        user.RefreshTokenExpiresAt  = DateTimeOffset.UtcNow.AddDays(30);
-        user.LastLoginAt            = DateTimeOffset.UtcNow;
+        // Rotación: el token usado deja de valer y se emite otro para esta misma
+        // sesión. Las demás sesiones de la cuenta no se tocan.
+        var newRefresh = jwt.GenerateRefreshToken();
+        sesion.RevokedAt = DateTimeOffset.UtcNow;
+
+        db.UserRefreshTokens.Add(new UserRefreshToken
+        {
+            UserId    = user.Id,
+            Token     = newRefresh,
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(30),
+            UserAgent = sesion.UserAgent
+        });
+
+        user.LastLoginAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
         var access    = jwt.GenerateAccessToken(user);

@@ -43,13 +43,19 @@ public class RegisterCommandHandler(
             Status       = AccountStatus.Active
         };
 
-        var refreshToken           = jwt.GenerateRefreshToken();
-        user.RefreshToken          = refreshToken;
-        user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(30);
-        user.LastLoginAt           = DateTimeOffset.UtcNow;
-        user.LastActivityAt        = DateTimeOffset.UtcNow;
+        var refreshToken    = jwt.GenerateRefreshToken();
+        user.LastLoginAt    = DateTimeOffset.UtcNow;
+        user.LastActivityAt = DateTimeOffset.UtcNow;
 
         db.UserProfiles.Add(user);
+
+        // Registrarse abre la primera sesión, como iniciar sesión abre las siguientes.
+        db.UserRefreshTokens.Add(new UserRefreshToken
+        {
+            UserId    = user.Id,
+            Token     = refreshToken,
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(30)
+        });
         await db.SaveChangesAsync(ct);
 
         var access    = jwt.GenerateAccessToken(user);
