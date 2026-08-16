@@ -631,6 +631,7 @@ español.
 | 15 | `PublicTrackingEndpoints` + `Features/PublicTracking` | Seguimiento por referencia |
 | 16 | `NewsletterEndpoints` | Suscripción por correo |
 | 17 | `ExportEndpoints` | CSV de vehículos + PDF de albarán. ⚠️ El CSV **puede reutilizarse** en Statistiques |
+| 17b | `GET /vehicles/facets` | Agregaciones tipo Amazon del producto anterior. **Devuelve 500 en producción** y el frontend no lo llama: se va con la decisión sobre el legacy |
 | 18 | `Features/Marketplace` (partners) | ⚠️ **Colisión de nombres**: aquí «Marketplace» significa *partners de servicios*, no el marketplace de vehículos |
 | 19 | **Generación de descripciones con IA** | 🔴 Ya **desactivada** en P3 (devuelve `Vehicle.AiDescriptionDisabled`). El código sigue. El doc **lo prohíbe expresamente** |
 | 20 | **Extracción IA de documentos** | Sigue **activa** en el paso 1 del formulario. El doc no la prohíbe, pero tampoco la contempla |

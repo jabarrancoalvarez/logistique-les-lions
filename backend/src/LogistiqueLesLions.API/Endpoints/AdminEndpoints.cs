@@ -751,11 +751,14 @@ public class AdminUserSearchRequest
     [FromQuery] public AccountType? AccountType { get; set; }
     [FromQuery] public bool? PhoneVerified { get; set; }
     [FromQuery] public AccountStatus? Status { get; set; }
-    [FromQuery] public int Page { get; set; } = 1;
-    [FromQuery] public int PageSize { get; set; } = 20;
+    // Anulables a propósito: en una clase [AsParameters], un int no anulable rompe el
+    // binding cuando el parámetro no viene en la query string, y el endpoint responde
+    // 400 con el cuerpo vacío. El valor por defecto se aplica en ToQuery().
+    [FromQuery] public int? Page { get; set; }
+    [FromQuery] public int? PageSize { get; set; }
 
     public GetAdminUsersQuery ToQuery() =>
-        new(Search, City, AccountType, PhoneVerified, Status, Page, PageSize);
+        new(Search, City, AccountType, PhoneVerified, Status, Page ?? 1, PageSize ?? 20);
 }
 
 public record AccountStatusBody(
@@ -785,12 +788,15 @@ public class AdminListingSearchRequest
     [FromQuery] public bool? Flagged { get; set; }
     /// <summary>Con signalements abiertos.</summary>
     [FromQuery] public bool? Reported { get; set; }
-    [FromQuery] public int Page { get; set; } = 1;
-    [FromQuery] public int PageSize { get; set; } = 20;
+    // Anulables a propósito: en una clase [AsParameters], un int no anulable rompe el
+    // binding cuando el parámetro no viene en la query string, y el endpoint responde
+    // 400 con el cuerpo vacío. El valor por defecto se aplica en ToQuery().
+    [FromQuery] public int? Page { get; set; }
+    [FromQuery] public int? PageSize { get; set; }
 
     public GetAdminListingsQuery ToQuery() => new(
         Search, MakeId, ModelId, SellerId, City, Status, CustomsStatus, SellerAccountType,
-        PriceFrom, PriceTo, CreatedFrom, CreatedTo, Hidden, Flagged, Reported, Page, PageSize);
+        PriceFrom, PriceTo, CreatedFrom, CreatedTo, Hidden, Flagged, Reported, Page ?? 1, PageSize ?? 20);
 }
 
 public record AdminListingActionBody(AdminListingAction Action, string? Reason);
@@ -807,11 +813,14 @@ public class AdminRequestSearchRequest
     [FromQuery] public Guid? AssignedAdminId { get; set; }
     /// <summary>Solo las que nadie ha tomado: la cola de trabajo del equipo.</summary>
     [FromQuery] public bool? Unassigned { get; set; }
-    [FromQuery] public int Page { get; set; } = 1;
-    [FromQuery] public int PageSize { get; set; } = 20;
+    // Anulables a propósito: en una clase [AsParameters], un int no anulable rompe el
+    // binding cuando el parámetro no viene en la query string, y el endpoint responde
+    // 400 con el cuerpo vacío. El valor por defecto se aplica en ToQuery().
+    [FromQuery] public int? Page { get; set; }
+    [FromQuery] public int? PageSize { get; set; }
 
     public GetAdminRequestsQuery ToQuery() =>
-        new(Search, Status, Origin, AssignedAdminId, Unassigned, Page, PageSize);
+        new(Search, Status, Origin, AssignedAdminId, Unassigned, Page ?? 1, PageSize ?? 20);
 }
 
 /// <summary>Filtros del listado de negociaciones.</summary>
@@ -822,11 +831,14 @@ public class AdminNegotiationSearchRequest
     [FromQuery] public Guid? VehicleId { get; set; }
     [FromQuery] public Guid? UserId { get; set; }
     [FromQuery] public bool? WithContract { get; set; }
-    [FromQuery] public int Page { get; set; } = 1;
-    [FromQuery] public int PageSize { get; set; } = 20;
+    // Anulables a propósito: en una clase [AsParameters], un int no anulable rompe el
+    // binding cuando el parámetro no viene en la query string, y el endpoint responde
+    // 400 con el cuerpo vacío. El valor por defecto se aplica en ToQuery().
+    [FromQuery] public int? Page { get; set; }
+    [FromQuery] public int? PageSize { get; set; }
 
     public GetAdminNegotiationsQuery ToQuery() =>
-        new(Search, Status, VehicleId, UserId, WithContract, Page, PageSize);
+        new(Search, Status, VehicleId, UserId, WithContract, Page ?? 1, PageSize ?? 20);
 }
 
 /// <summary>Filtros del listado de contratos.</summary>
@@ -836,11 +848,14 @@ public class AdminContractSearchRequest
     [FromQuery] public ContractStatus? Status { get; set; }
     [FromQuery] public Guid? UserId { get; set; }
     [FromQuery] public bool? VerifiedSalesOnly { get; set; }
-    [FromQuery] public int Page { get; set; } = 1;
-    [FromQuery] public int PageSize { get; set; } = 20;
+    // Anulables a propósito: en una clase [AsParameters], un int no anulable rompe el
+    // binding cuando el parámetro no viene en la query string, y el endpoint responde
+    // 400 con el cuerpo vacío. El valor por defecto se aplica en ToQuery().
+    [FromQuery] public int? Page { get; set; }
+    [FromQuery] public int? PageSize { get; set; }
 
     public GetAdminContractsQuery ToQuery() =>
-        new(Search, Status, UserId, VerifiedSalesOnly, Page, PageSize);
+        new(Search, Status, UserId, VerifiedSalesOnly, Page ?? 1, PageSize ?? 20);
 }
 
 /// <param name="Details">Por qué esta conversación concreta. Obligatorio.</param>
@@ -855,10 +870,13 @@ public class AdminReportSearchRequest
     [FromQuery] public ReportStatus? Status { get; set; }
     [FromQuery] public ReportReason? Reason { get; set; }
     [FromQuery] public ReportTargetType? TargetType { get; set; }
-    [FromQuery] public int Page { get; set; } = 1;
-    [FromQuery] public int PageSize { get; set; } = 20;
+    // Anulables a propósito: en una clase [AsParameters], un int no anulable rompe el
+    // binding cuando el parámetro no viene en la query string, y el endpoint responde
+    // 400 con el cuerpo vacío. El valor por defecto se aplica en ToQuery().
+    [FromQuery] public int? Page { get; set; }
+    [FromQuery] public int? PageSize { get; set; }
 
-    public GetReportsQuery ToQuery() => new(Search, Status, Reason, TargetType, Page, PageSize);
+    public GetReportsQuery ToQuery() => new(Search, Status, Reason, TargetType, Page ?? 1, PageSize ?? 20);
 }
 
 public record ReportStatusBody(ReportStatus Status, string? Resolution);

@@ -59,9 +59,15 @@ public class VehicleSearchRequest
     [FromQuery] public VehicleStatus? Status { get; set; }
 
     [FromQuery] public string? SortBy { get; set; }
-    [FromQuery] public bool SortDesc { get; set; } = true;
-    [FromQuery] public int Page { get; set; } = 1;
-    [FromQuery] public int PageSize { get; set; } = 20;
+
+    // Anulables a propósito: en una clase [AsParameters], un int o un bool no anulables
+    // rompen el binding cuando el parámetro no viene en la query string, y el endpoint
+    // responde 400 con el cuerpo vacío —sin llegar siquiera al handler—. Es lo que hacía
+    // fallar /vehicles/count, al que el panel de filtros llama sin paginación.
+    // El valor por defecto se aplica abajo, en ToQuery().
+    [FromQuery] public bool? SortDesc { get; set; }
+    [FromQuery] public int? Page { get; set; }
+    [FromQuery] public int? PageSize { get; set; }
 
     /// <param name="includeNonPublic">
     /// Lo decide el endpoint a partir del token; nunca llega en la query string.
@@ -103,8 +109,8 @@ public class VehicleSearchRequest
         SellerId          = SellerId,
         Status            = Status,
         SortBy            = SortBy ?? "createdAt",
-        SortDesc          = SortDesc,
-        Page              = Page,
-        PageSize          = PageSize
+        SortDesc          = SortDesc ?? true,
+        Page              = Page ?? 1,
+        PageSize          = PageSize ?? 20
     };
 }

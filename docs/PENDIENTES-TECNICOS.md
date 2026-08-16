@@ -35,6 +35,7 @@
 
 | # | Asunto | Detalle | Origen |
 |---|---|---|---|
+| 21 | **No hay tests de la capa API** | Los 476 tests son de Application: nadie prueba el binding de la query string ni las rutas. El fallo de `[AsParameters]` con `int` no anulable (400 con cuerpo vacío en `/vehicles/count`) llegó a producción por esto. Haría falta `WebApplicationFactory` | Detectado probando en producción |
 | 9 | **El frontend no tiene ni un test** | Carencia anterior a la migración. `ng test` además necesita un navegador instalado | Anterior |
 | 10 | **Namespaces `LogistiqueLesLions.*`** | Renombrado a `YoonUAuto.*` aplazado a propósito hasta el final | Decisión del usuario, P1 |
 | ~~11~~ | ~~**Menú de usuario en español**~~ | ✅ **Resuelto en P25**: navegación, menú del avatar y panel personal en francés | P25 |
