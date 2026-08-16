@@ -8,7 +8,9 @@ import {
   AdminNegotiationStatus, AdminContractStatus, ContentAccessReason, AdminActionEntry,
   CONTENT_ACCESS_LABELS, ADMIN_ACTION_LABELS
 } from '@core/services/admin.service';
-import { NEGOTIATION_STATUS_LABELS, CONTRACT_STATUS_LABELS } from '@core/services/negotiation.service';
+import {
+  NEGOTIATION_STATUS_LABELS, CONTRACT_STATUS_LABELS, NEGOTIATION_EVENT_LABELS
+} from '@core/services/negotiation.service';
 import { FcfaPipe } from '@shared/pipes/fcfa.pipe';
 
 /** Motivos que justifican leer una conversación privada. */
@@ -52,7 +54,26 @@ export class AdminNegotiationsComponent implements OnInit {
 
   negotiationStatusLabel = (s: AdminNegotiationStatus) => NEGOTIATION_STATUS_LABELS[s];
   contractStatusLabel = (s: AdminContractStatus) => CONTRACT_STATUS_LABELS[s];
-  accessReasonLabel = (r: ContentAccessReason) => CONTENT_ACCESS_LABELS[r];
+  reasonOptionLabel = (r: ContentAccessReason) => CONTENT_ACCESS_LABELS[r];
+  /**
+   * Los códigos llegan del servidor tal cual —«OfferMade», «Dispute»—, que es lo
+   * correcto: son estables e independientes del idioma. Traducirlos es cosa de la
+   * pantalla, y los diccionarios ya existían sin usarse aquí.
+   */
+  eventLabel(type: string): string {
+    return (NEGOTIATION_EVENT_LABELS as Record<string, string>)[type] ?? type;
+  }
+
+  accessReasonLabel(reason: string | null): string | null {
+    if (!reason) return reason;
+
+    // El motivo se guarda como «Dispute — texto escrito por la persona».
+    const [code, ...resto] = reason.split(' — ');
+    const label = (CONTENT_ACCESS_LABELS as Record<string, string>)[code];
+
+    return label ? [label, ...resto].join(' — ') : reason;
+  }
+
   actionLabel = (a: AdminActionEntry) => ADMIN_ACTION_LABELS[a.type];
 
   ngOnInit(): void {

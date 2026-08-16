@@ -229,7 +229,7 @@
             <ol class="text-sm space-y-1" role="list">
               @for (e of d.timeline; track e.createdAt + e.type) {
                 <li class="flex justify-between gap-3">
-                  <span class="text-navy/70">{{ e.type }}</span>
+                  <span class="text-navy/70">{{ eventLabel(e.type) }}</span>
                   <span class="text-xs text-navy/40">{{ e.createdAt | date:'dd/MM/yyyy' }}</span>
                 </li>
               }
@@ -252,7 +252,7 @@
             <select id="c-reason" [(ngModel)]="accessReason"
               class="w-full rounded-lg border border-navy/15 px-3 py-2 text-sm">
               @for (r of accessReasons; track r) {
-                <option [ngValue]="r">{{ accessReasonLabel(r) }}</option>
+                <option [ngValue]="r">{{ reasonOptionLabel(r) }}</option>
               }
             </select>
           </div>
@@ -303,7 +303,7 @@
               <li class="flex items-start justify-between gap-3">
                 <div>
                   <p class="text-navy">{{ actionLabel(a) }}</p>
-                  @if (a.reason) { <p class="text-xs text-navy/60">{{ a.reason }}</p> }
+                  @if (a.reason) { <p class="text-xs text-navy/60">{{ accessReasonLabel(a.reason) }}</p> }
                 </div>
                 <p class="text-xs text-navy/40 whitespace-nowrap">
                   {{ a.adminName }} · {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}
@@ -435,7 +435,7 @@
               <li class="flex items-start justify-between gap-3">
                 <div>
                   <p class="text-navy">{{ actionLabel(a) }}</p>
-                  @if (a.reason) { <p class="text-xs text-navy/60">{{ a.reason }}</p> }
+                  @if (a.reason) { <p class="text-xs text-navy/60">{{ accessReasonLabel(a.reason) }}</p> }
                 </div>
                 <p class="text-xs text-navy/40 whitespace-nowrap">
                   {{ a.adminName }} · {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}
