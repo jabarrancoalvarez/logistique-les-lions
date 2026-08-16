@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '@environments/environment';
@@ -59,7 +59,28 @@ export class MessagingService {
 
   private startPromise?: Promise<void>;
 
-  constructor(private http: HttpClient, private auth: AuthService) {}
+  constructor(private http: HttpClient, private auth: AuthService) {
+    // Al renovarse el token —cada 15 minutos— hay que rehacer la conexión: si el hub se
+    // cayó con un 401, SignalR no lo reintenta solo y el chat se queda mudo sin avisar.
+    effect(() => {
+      const token = this.auth.accessToken();
+
+      if (!token) {
+        this.stopConnection();
+        return;
+      }
+
+      if (this.hubConnection &&
+          this.hubConnection.state !== signalR.HubConnectionState.Connected) {
+        const previa = this.hubConnection;
+        this.hubConnection = undefined;
+        this.startPromise = undefined;
+        this.isConnected.set(false);
+        previa.stop().catch(() => {});
+        void this.startConnection();
+      }
+    });
+  }
 
   // ─── REST ────────────────────────────────────────────────────────────────
 
@@ -84,13 +105,14 @@ export class MessagingService {
   startConnection(): Promise<void> {
     if (this.startPromise) return this.startPromise;
 
-    const token = this.auth.accessToken();
-    if (!token) return Promise.resolve();
+    if (!this.auth.accessToken()) return Promise.resolve();
 
     const hubUrl = environment.apiUrl.replace('/api', '') + '/hubs/chat';
 
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl, { accessTokenFactory: () => token })
+      // Se lee en cada negociación, no se captura al conectar: el token caduca a los 15
+      // minutos y el interceptor lo renueva, así que capturarlo dejaba el chat mudo.
+      .withUrl(hubUrl, { accessTokenFactory: () => this.auth.accessToken() ?? '' })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Warning)
       .build();
