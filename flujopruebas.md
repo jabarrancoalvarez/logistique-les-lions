@@ -769,6 +769,15 @@ hacen mejor a mano.
       y sin descripción**
 - [ ] Fotos del vehículo (⚠️ se perderán al reiniciar Render, pendiente nº 2)
 
+### 12.6b Observaciones de Mes annonces
+
+- [ ] ⚠️ **Se puede cambiar el precio de un anuncio ya vendido**. La acción «Prix» sigue
+      ofreciéndose sobre un anuncio en estado `Vendu`. No corrompe nada —el contrato
+      congela el precio acordado y las estadísticas solo miran los activos— pero cambia
+      lo que ve quien abre un anuncio vendido. Decidir si se retira la acción
+- [ ] ⚠️ La cuenta de pruebas `+221770000101` **posee 3 anuncios del catálogo sembrado**,
+      porque existía antes de que corriera el reseed. Tenerlo en cuenta al limpiar
+
 ### 12.6 Mes annonces — sin probar
 
 - [ ] Los seis estados y sus cambios desde la lista

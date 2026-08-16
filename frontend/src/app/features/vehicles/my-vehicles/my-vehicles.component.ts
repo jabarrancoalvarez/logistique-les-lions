@@ -235,8 +235,13 @@ export class MyVehiclesComponent implements OnInit {
         ? 'Localisation complète' : 'Localisation à compléter',
       Specifications: item.status === 'Complete'
         ? 'Fiche technique complète' : 'Fiche technique à compléter',
+      // Como en «Photos»: cuando falta, se dice qué falta. Un recuento a secas junto a
+      // un ⚠ se lee como si tener tres equipamientos fuera el problema.
       Equipment: item.status === 'Complete'
-        ? `${n} équipements` : n > 0 ? `${n} équipement${n > 1 ? 's' : ''}` : 'Aucun équipement'
+        ? `${n} équipements`
+        : n > 0
+          ? `${n} équipement${n > 1 ? 's' : ''} — cochez-en davantage`
+          : 'Aucun équipement'
     };
 
     return texts[item.check];
