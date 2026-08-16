@@ -86,18 +86,25 @@ public static class DependencyInjection
             string.Equals(proveedor, "s3", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(proveedor, "r2", StringComparison.OrdinalIgnoreCase);
 
+        // Guarda los archivos en la propia base (Neon). Es la opción de la demo: el disco
+        // de Render es efímero y R2 exige cuenta y claves; en la base los bytes sobreviven
+        // a los despliegues sin ningún servicio externo. No pide más configuración.
+        var pideBaseDeDatos = string.Equals(proveedor, "database", StringComparison.OrdinalIgnoreCase);
+
         // Si se pide el almacenamiento de objetos pero falta alguna clave, se vuelve al
         // disco en lugar de impedir el arranque: preferimos un despliegue vivo que pierde
         // archivos a una API que no levanta. Es el mismo criterio que con el correo.
-        var configurado = pideObjetos
+        var objetosConfigurados = pideObjetos
             && !string.IsNullOrWhiteSpace(configuration["Storage:Bucket"])
             && !string.IsNullOrWhiteSpace(configuration["Storage:ServiceUrl"])
             && !string.IsNullOrWhiteSpace(configuration["Storage:AccessKey"])
             && !string.IsNullOrWhiteSpace(configuration["Storage:SecretKey"])
             && !string.IsNullOrWhiteSpace(configuration["Storage:PublicBaseUrl"]);
 
-        if (configurado)
+        if (objetosConfigurados)
             services.AddScoped<IStorageService, ObjectStorageService>();
+        else if (pideBaseDeDatos)
+            services.AddScoped<IStorageService, DatabaseStorageService>();
         else
             services.AddScoped<IStorageService, LocalStorageService>();
 

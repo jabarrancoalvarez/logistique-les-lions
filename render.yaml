@@ -35,13 +35,17 @@ services:
         sync: false
       - key: Frontend__Url
         sync: false
-      # El disco de Render es efímero: en producción los archivos van a Cloudflare R2.
-      # Mientras Storage__Provider siga en «local», se escriben en disco y se pierden
-      # en cada reinicio.
-      # ⚠️ Cambiar a «r2» SOLO cuando el bucket y las cuatro claves de abajo estén
-      # puestas. Con «local» los archivos se pierden en cada reinicio.
+      # El disco de Render es efímero: lo escrito en «local» se pierde en cada reinicio.
+      # Para la demo usamos «database»: los archivos que suben los usuarios (fotos de
+      # anuncio, documentos de Mon Garage) se guardan en Neon y sobreviven a los
+      # despliegues sin ningún servicio externo. Es una tabla `stored_files` con los bytes.
+      # Las fotos del catálogo sembrado no dependen de esto: son estáticos del frontend.
+      #
+      # ⚠️ Con un catálogo grande esto comparte espacio con los datos y sirve las imágenes
+      # más despacio que un CDN. Cuando llegue ese momento, se pasa a «r2» rellenando el
+      # bucket y las cuatro claves de abajo: el resto de la app no cambia.
       - key: Storage__Provider
-        value: local
+        value: database
       - key: Storage__LocalPath
         value: /app/uploads
       - key: Storage__Bucket

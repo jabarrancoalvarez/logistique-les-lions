@@ -77,6 +77,9 @@ public class ApplicationDbContext(
     public DbSet<UpcomingFeature> UpcomingFeatures => Set<UpcomingFeature>();
     public DbSet<FeatureInterest> FeatureInterests => Set<FeatureInterest>();
 
+    // ─── Almacenamiento en base de datos (Storage:Provider=database) ─────────
+    public DbSet<StoredFile> StoredFiles => Set<StoredFile>();
+
     // ─── Newsletter ─────────────────────────────────────────────────────────
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
