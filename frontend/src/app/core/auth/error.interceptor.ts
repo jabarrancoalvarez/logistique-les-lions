@@ -26,14 +26,14 @@ function extractErrorMessage(error: HttpErrorResponse): string {
   if (typeof error.error === 'string') return error.error;
 
   switch (error.status) {
-    case 0:    return 'Sin conexión con el servidor. Verifica tu conexión a internet.';
-    case 400:  return 'Solicitud incorrecta.';
-    case 403:  return 'No tienes permisos para realizar esta acción.';
-    case 404:  return 'El recurso solicitado no existe.';
-    case 409:  return 'Conflicto con el estado actual del recurso.';
-    case 422:  return 'Los datos enviados no son válidos.';
-    case 429:  return 'Demasiadas solicitudes. Espera un momento.';
-    case 500:  return 'Error interno del servidor. Inténtalo más tarde.';
-    default:   return `Error inesperado (${error.status}).`;
+    case 0:    return 'Pas de connexion au serveur. Vérifiez votre connexion Internet.';
+    case 400:  return 'Requête incorrecte.';
+    case 403:  return "Vous n'avez pas les droits pour effectuer cette action.";
+    case 404:  return "La ressource demandée n'existe pas.";
+    case 409:  return "Conflit avec l'état actuel de la ressource.";
+    case 422:  return 'Les données envoyées ne sont pas valides.';
+    case 429:  return 'Trop de requêtes. Patientez un instant.';
+    case 500:  return 'Erreur interne du serveur. Réessayez plus tard.';
+    default:   return `Erreur inattendue (${error.status}).`;
   }
 }

@@ -1236,6 +1236,64 @@ no encontró **ningún otro** texto visible sin traducir.
 > Único error de consola durante el barrido: un `Failed to start the connection` de SignalR,
 > provocado por mi propia navegación al abortar la negociación. No es un fallo de la aplicación.
 
+### 12.12 Tiempo real con dos identidades (2026-08-16)
+
+Montaje: la aplicación real en el navegador como **QA Particulier** (`+221771234501`,
+vendedor), y **QA Professionnel** (`+221771234502`, comprador) actuando desde fuera. Como
+dos pestañas del mismo navegador comparten `localStorage` y no pueden tener dos sesiones,
+el segundo usuario se conectó al hub por **WebSocket crudo**, hablando el protocolo de
+SignalR a mano. Anuncio de apoyo: **YU10029**, negociación `b08596a5`.
+
+**El servidor funciona. Entrega los tres eventos:**
+
+| Invocación de B | Recibido por A | |
+|---|---|---|
+| `SendMessage` | `ReceiveMessage` con cuerpo, emisor y fecha | ✅ |
+| `StartTyping` | `UserTyping` | ✅ |
+| `MarkAsRead` | `MessageRead` con `readAt` | ✅ |
+
+Además `MessageSent` vuelve al emisor. La autenticación por WebSocket con el token en la
+query funciona, y el hub reparte por `Clients.User(...)`, así que llega esté donde esté
+la otra parte.
+
+**En pantalla, el resultado depende de cuál de las dos se mire:**
+
+| | `/mensajes/:id` | `/mis-negociaciones/:id` |
+|---|---|---|
+| Mensaje entrante sin recargar | ✅ aparece | ❌ **nada** |
+| Indicador «está escribiendo» | ✅ aparece y se va a los 3 s | ❌ nada |
+| Acuse de lectura | ✅ pasa de ✓ a ✓✓ | ❌ nada |
+
+🔴 **La pantalla de la Etapa 2 no tiene tiempo real.** Y es la que manda la
+especificación: la negociación es el agregado raíz y el chat cuelga de ella. Son dos
+fallos que se suman:
+
+1. `negotiation-detail.component.ts` **no se suscribe a nada**. Llama a
+   `joinConversation()` —que lo mete en un grupo del hub— pero no escucha
+   `incomingMessage`, `typingNotification` ni `readReceipt`. Ese `JoinConversation` no
+   sirve de nada: el hub reparte por usuario, no por grupo.
+2. Envía con `sendMessageRest()`, y **`SendMessageCommandHandler` no empuja nada**: guarda
+   el mensaje y devuelve. El camino que sí avisa es `SendMessage` del hub, que solo usa la
+   pantalla antigua.
+
+Medido: mensaje enviado por B, **9 segundos** sin que la pantalla de A se inmutara; tras
+recargar, ahí estaba. O sea que se guarda bien y lo que falla es el aviso.
+
+🔴 **Un mensaje nuevo tampoco genera notificación.** La campana de A siguió a **cero**.
+La categoría `NotificationCategories.Message` existe, pero el único sitio que la usa es la
+respuesta del administrador a una *demande*. Entre particulares no se notifica nada: ni en
+vivo, ni en la campana, ni por correo —que además está sin configurar—. Quien recibe un
+mensaje solo se entera si vuelve a entrar y mira.
+
+**Textos en español encontrados aquí** (ya corregidos): «Cargando mensajes...», «Escribe
+un mensaje...», «Enviar mensaje», los rótulos «Leído» y «Enviado» de los tics, «El usuario
+está escribiendo…», el título «Mensajes» del buzón, el mensaje de error al procesar un
+documento y **las nueve respuestas del interceptor global de errores** —que son las que ve
+cualquiera ante cualquier fallo HTTP de toda la aplicación—.
+
+> ⚠️ El barrido de §12.11 no los vio porque buscaba etiqueta y texto en la misma línea, y
+> casi todo el marcado los tiene en líneas distintas. Repetido sin esa limitación.
+
 ### 12.9 Limpieza pendiente de las pruebas
 
 Estas cuentas y datos los he creado yo probando. **Conviene retirarlos antes de abrir al

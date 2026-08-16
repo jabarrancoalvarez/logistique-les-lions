@@ -4,7 +4,7 @@
   <div #messagesList class="flex-1 overflow-y-auto p-4 space-y-3 bg-navy/3">
     @if (loading()) {
       <div class="flex items-center justify-center h-full text-navy/40">
-        Cargando mensajes...
+        Chargement des messages…
       </div>
     } @else {
       @for (msg of messages(); track msg.id; let last = $last) {
@@ -19,9 +19,9 @@
             <p class="text-xs mt-1 opacity-60 text-right flex items-center justify-end gap-1">
               <span>{{ msg.createdAt | date:'HH:mm' }}</span>
               @if (msg.senderId === auth.user()?.id && last && lastReadAt()) {
-                <span class="text-navy/70" title="Leído">✓✓</span>
+                <span class="text-navy/70" title="Lu">✓✓</span>
               } @else if (msg.senderId === auth.user()?.id) {
-                <span class="text-navy/40" title="Enviado">✓</span>
+                <span class="text-navy/40" title="Envoyé">✓</span>
               }
             </p>
           </div>
@@ -31,7 +31,7 @@
       @if (otherTyping()) {
         <div class="flex justify-start">
           <div class="bg-white border border-navy/10 rounded-2xl px-4 py-2 text-xs text-navy/60 italic">
-            {{ conversation()?.otherUserName ?? 'El usuario' }} está escribiendo…
+            {{ conversation()?.otherUserName ?? 'Votre interlocuteur' }} est en train d'écrire…
           </div>
         </div>
       }
@@ -59,7 +59,7 @@
       <input
         type="text"
         [formControl]="bodyCtrl"
-        placeholder="Escribe un mensaje..."
+        placeholder="Écrivez un message…"
         (input)="onInput()"
         (keydown.enter)="send()"
         class="flex-1 px-4 py-2.5 rounded-full border border-navy/20 focus:border-azure focus:ring-2 focus:ring-azure/20 outline-none text-navy text-sm"
@@ -68,7 +68,7 @@
         (click)="send()"
         [disabled]="!bodyCtrl.value?.trim() || sending() || !conversation()"
         class="btn-azure px-4 py-2.5 rounded-full disabled:opacity-40"
-        aria-label="Enviar mensaje"
+        aria-label="Envoyer le message"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>

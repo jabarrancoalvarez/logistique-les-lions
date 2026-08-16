@@ -338,7 +338,7 @@ export class VehicleFormComponent {
       },
       error: () => {
         this.isExtractingDoc.set(false);
-        this.extractError.set('No se pudo procesar el documento. Inténtalo de nuevo.');
+        this.extractError.set('Impossible de traiter le document. Réessayez.');
         input.value = '';
       }
     });
