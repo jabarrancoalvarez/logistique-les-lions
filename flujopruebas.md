@@ -759,13 +759,38 @@ hacen mejor a mano.
 - [x] Que el **teléfono del vendedor esté oculto** para quien no tiene cuenta
       *(el DTO del anuncio no trae ningún teléfono, ni siquiera autenticado)*
 
-### 12.4 Etapa 2 — sin probar
+### 12.4 Etapa 2
 
-- [ ] **Pedir una modificación** del contrato, corregirlo y reenviarlo
-- [ ] **Anular** un contrato y comprobar que se puede crear otro en la misma negociación
-      (índice único parcial `contracts.negotiation_id`, que los tests no validan)
-- [ ] Plantillas de respuesta rápida del vendedor
-- [ ] Rechazar una oferta
+Probada el 16/08/2026 con dos cuentas reales, `+221771234501` (vendedor) y
+`+221771234500` (comprador), en cuanto se recuperó un administrador con contraseña
+conocida.
+
+- [x] **Rechazar una oferta**: pasa a `Refusee` y la negociación sigue abierta
+- [x] Contraoferta del vendedor y aceptación del comprador: la aceptada queda `Acceptee`
+      y la anterior conserva su `Refusee` en el histórico
+- [x] **Crear el contrato** y enviarlo a la otra parte
+- [x] ⚠️ **Quien redacta no puede validar lo suyo**: el vendedor recibe
+      `Contract.NotValidator` (400) al intentarlo
+- [x] **Pedir una modificación**, corregir y reenviar: los tres pasos, con sus estados
+- [x] 🔑 **Anular un contrato y crear otro en la misma negociación**: funciona. Es la
+      primera vez que se valida el **índice único parcial `contracts.negotiation_id`**
+      contra PostgreSQL — el proveedor en memoria de los tests no lo comprueba
+- [x] **Validación por la otra parte** y venta verificada completa:
+      anuncio `YU10028` → **`Vendu`**, negociación → **`Terminee`**, contrato `YC00004`
+      → **`Valide`**, vendedor → **1 vente vérifiée** con sus puntos
+- [ ] Plantillas de respuesta rápida del vendedor — sin probar
+
+**Lo que no cuadra con el plan:**
+
+- [ ] ⚠️ **El vehículo comprado NO entra solo en Mon Garage.** El apartado 3.7 de este
+      documento lo daba por hecho, pero `ValidateContractCommandHandler` solo mueve el
+      anuncio a `Vendu`, cierra la negociación, suma la venta verificada y los puntos.
+      Lo que existe es `GET /garage/from-contract/{id}`, que devuelve la ficha
+      **precargada** con `alreadyAdded: false` para que **el comprador decida** añadirlo,
+      con `SourceContractId` como guardia para que no entre dos veces.
+      Comprobado: tras validar, el garaje del comprador seguía con **0 vehículos** y el
+      prefill respondía 200. Es una decisión de producto, no un fallo: hay que elegir si
+      se añade solo o se sigue ofreciendo.
 
 ### 12.5 Mon Garage
 

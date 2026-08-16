@@ -189,6 +189,20 @@ Pendiente nº 25: entrar desde el móvil expulsa la sesión del ordenador.
 
 - [ ] **Decisión:** ¿se acepta, o se permiten sesiones simultáneas?
 
+### 2.7b El vehículo comprado no entra solo en Mon Garage
+
+Validar el contrato mueve el anuncio a `Vendu`, cierra la negociación, suma la venta
+verificada y los puntos — pero **no crea el vehículo en el garaje del comprador**. Lo que
+hay es `GET /garage/from-contract/{id}`, que devuelve la ficha precargada para que el
+comprador **decida** añadirlo, con `SourceContractId` impidiendo que entre dos veces.
+
+Comprobado el 16/08/2026: tras validar `YC00004`, el garaje del comprador seguía con cero
+vehículos. El apartado 3.7 de `flujopruebas.md` lo daba por automático.
+
+- [ ] **Decisión:** ¿se añade solo al validar, o se sigue ofreciendo al comprador?
+      *Sin recomendación fuerte:* automático es más cómodo, pero mete un coche en el
+      garaje de alguien sin que lo pida, y el garaje es suyo.
+
 ### 2.7 Un anuncio `Réservé` sigue apareciendo en el buscador
 
 Con su etiqueta. Los `Vendu`, `En pause`, `Brouillon`, `Archivé` y los ocultados, no.
@@ -269,3 +283,15 @@ para marcar **eliminar / adaptar / conservar**. Lo urgente de allí:
       caliente: nada por encima de 350 ms. Eso **no** responde al pendiente nº 19
       (agregaciones de Statistiques en memoria) ni al arranque en frío de Render, que es lo
       que se lleva el primer visitante del día.
+
+---
+
+## 6. Encontrado después
+
+- [ ] ⚠️ **Tras cada despliegue, las pestañas abiertas se rompen.** Angular carga las
+      pantallas por trozos (`chunk-*.js`) y, al desplegar, los del build anterior dejan de
+      existir: la pestañá abierta pide uno, recibe HTML y falla con
+      «Failed to fetch dynamically imported module». El usuario ve una pantalla rota y
+      solo lo arregla recargando a mano.
+      Se corrige capturando ese fallo de carga y recargando la página una vez.
+      Visto en producción el 16/08/2026 tras cinco despliegues seguidos.
