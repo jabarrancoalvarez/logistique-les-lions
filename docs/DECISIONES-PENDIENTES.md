@@ -268,10 +268,47 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
       negociaciones huérfanas, y lo creado en las pruebas (marca `Kia`, modelo `Sportage`,
       equipamiento `SIEGES_CHAUFF`, signalement `SG00001`, demande `YD00001`, anuncios
       `YU10026` y `YU10027` —ambos archivados—, y un vehículo de Mon Garage).
-- [ ] **Medir con volumen real.** Todo se midió con 10 usuarios y 49 anuncios, y con la API
-      caliente: nada por encima de 350 ms. Eso **no** responde al pendiente nº 19
-      (agregaciones de Statistiques en memoria) ni al arranque en frío de Render, que es lo
-      que se lleva el primer visitante del día.
+- [ ] 🔴 **El arranque en frío de Render es de 47 segundos. Es una decisión de negocio.**
+      Medido el 16/08/2026 dejando la API sin una sola petición durante 17 minutos:
+
+      | Petición | En frío | En caliente |
+      |---|---|---|
+      | `health/live` | **47,4 s** | 127 ms |
+      | siguiente `health/live` | 0,2 s | — |
+      | `vehicles/count` | 1,0 s | 126 ms |
+      | listado de 12 anuncios | 2,9 s | 181 ms |
+
+      El plan gratuito **suspende el servicio tras ~15 minutos sin tráfico**. Quien llega
+      el primero se encuentra la página cargada —eso lo sirve Vercel al instante— y el
+      catálogo vacío durante casi un minuto. En un país donde mucha gente entra desde el
+      móvil con datos, eso es un abandono, no una espera.
+
+      Ojo: no es solo el contenedor. La API **aplica las migraciones al arrancar** y Neon
+      también suspende su cómputo, lo que explica que las dos primeras consultas de datos
+      sigan tardando 1 y 2,9 segundos con el servicio ya despierto.
+
+      Opciones, de más a menos recomendable:
+      1. **Plan de pago en Render** (~7 $/mes). Quita la suspensión. Es la única que
+         resuelve el problema de verdad.
+      2. **Mantenerlo despierto con un ping** cada 10 minutos. El plan gratuito da 750
+         horas al mes y un servicio continuo consume ~744, así que cabe justo. Frágil: si
+         el ping falla una noche, el primer visitante paga los 47 segundos igual.
+      3. **Asumirlo.** Defendible mientras solo entren personas avisadas; insostenible el
+         día que llegue tráfico real.
+- [x] ✅ **Pendiente nº 19 resuelto el 16/08/2026: las estadísticas agregan en SQL.**
+      Cargaban en memoria todos los anuncios activos para calcular medias, medianas y
+      rankings. Ahora es `GROUP BY` con `LIMIT`, y la mediana se resuelve contando y
+      pidiendo solo las filas centrales.
+- [ ] **Medir con volumen real** sigue pendiente en lo demás. Todo se ha medido con 10
+      usuarios y 49 anuncios: los tiempos en caliente no dicen nada sobre cómo se comporta
+      con un catálogo grande.
+- [ ] **El indicador de precio se trae a memoria todos los anuncios activos de las marcas
+      que aparezcan en la página**, y filtra por modelo y año en C#
+      (`PriceIndicatorService.CalculateManyAsync`). El viaje único a la base está bien
+      pensado —evita N+1—, pero el cubo sobra: se puede acotar además por los modelos
+      concretos de la página y la franja de años, que es justo lo que luego se filtra.
+      Ocurre en **cada carga del listado público**, no en el backoffice. ⚠️ Cuidado con
+      los anuncios sin modelo, que hoy se comparan entre sí.
 - [x] ✅ **RESUELTO el 16/08/2026: el dominio público ya es `yoon-u-auto.vercel.app`.**
       Verificado de punta a punta sobre él: catálogo, fotos, login, llamada autenticada,
       backoffice y SignalR.
