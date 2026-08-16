@@ -49,3 +49,6 @@ logs/
 uploads/
 # Documentación privada de Mon Garage: fuera del directorio servido estáticamente.
 private-uploads/
+
+# Capturas de Playwright durante las pruebas
+.playwright-mcp/
