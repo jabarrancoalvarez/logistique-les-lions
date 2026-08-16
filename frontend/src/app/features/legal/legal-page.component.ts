@@ -16,155 +16,186 @@ interface LegalContent {
   sections: LegalSection[];
 }
 
+/**
+ * Aviso que encabeza las cinco páginas legales.
+ *
+ * Estos textos son **provisionales**: sustituyen a unos anteriores que describían una
+ * sociedad española con domicilio en Madrid y citaban la Ley 34/2002 y el RGPD, que no
+ * aplican a una plataforma senegalesa. Están redactados en francés y apuntan a la
+ * normativa de Senegal, pero **no los ha revisado un abogado** y los datos de la empresa
+ * siguen sin rellenar: aparecen como «[à compléter]» a propósito, para que nadie los
+ * confunda con información real.
+ */
+const PROVISIONAL =
+  'Ce texte est provisoire et doit être validé par un conseil juridique au Sénégal ' +
+  'avant l’ouverture au public. Les mentions « [à compléter] » attendent les ' +
+  'informations officielles de la société.';
+
 const LEGAL_CONTENT: Record<string, LegalContent> = {
   'aviso-legal': {
-    heading: 'Aviso Legal',
-    lastUpdate: 'Enero 2025',
-    intro: 'En cumplimiento con el deber de información recogido en el artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico (LSSI-CE), a continuación se reflejan los datos identificativos de la empresa titular de este sitio web.',
+    heading: 'Mentions légales',
+    lastUpdate: 'Août 2026',
+    intro: PROVISIONAL,
     sections: [
       {
-        title: '1. Datos del titular',
-        body: 'Yoon U Auto, S.L. (en adelante, "la Empresa") es titular del sitio web yoonuauto.com. Domicilio social: Calle de ejemplo, 123, 28001 Madrid, España. NIF: B-12345678. Registro Mercantil de Madrid, Tomo XXXXX, Folio XXX, Hoja M-XXXXXX.'
+        title: '1. Éditeur du site',
+        body: 'Le présent site est édité par Yoon u Auto. Forme juridique : [à compléter]. Siège social : [à compléter], Sénégal. Numéro d’identification (NINEA) : [à compléter]. Registre du Commerce et du Crédit Mobilier (RCCM) : [à compléter]. Contact : [à compléter].'
       },
       {
-        title: '2. Objeto y ámbito de aplicación',
-        body: 'El presente Aviso Legal regula el acceso y uso del sitio web yoonuauto.com, plataforma dedicada a la compraventa e importación de vehículos de origen europeo y mundial. El acceso a este sitio web implica la aceptación plena y sin reservas de las presentes condiciones de uso.'
+        title: '2. Objet de la plateforme',
+        body: 'Yoon u Auto est une plateforme sénégalaise de petites annonces de véhicules d’occasion. Elle met en relation des personnes qui vendent et des personnes qui achètent, met à leur disposition un espace de négociation et un contrat de vente, et permet à chacun de tenir le carnet d’entretien de son véhicule. L’accès au site vaut acceptation des présentes mentions.'
       },
       {
-        title: '3. Propiedad intelectual e industrial',
-        body: 'Todos los contenidos de este sitio web —textos, fotografías, gráficos, imágenes, iconos, tecnología, software, marcas, denominaciones comerciales y demás elementos susceptibles de protección— son titularidad de la Empresa o de terceros que han autorizado su uso. Queda expresamente prohibida su reproducción, distribución, comunicación pública o transformación sin autorización expresa.'
+        title: '3. Rôle de Yoon u Auto',
+        body: 'Yoon u Auto n’est ni vendeur, ni acheteur, ni mandataire des parties. Elle n’est pas partie au contrat de vente conclu entre elles et ne détient pas les fonds. Les véhicules, leur état, leur situation douanière et les informations publiées relèvent de la seule responsabilité de la personne qui publie l’annonce.'
       },
       {
-        title: '4. Exclusión de garantías y responsabilidad',
-        body: 'La Empresa no garantiza la ausencia de errores en el acceso al sitio web ni en los contenidos. No se responsabiliza de los daños o perjuicios que pudieran derivarse del uso del sitio web, de errores en los contenidos, ni de la presencia de virus u otros elementos dañinos. La información contenida en los anuncios de vehículos es responsabilidad exclusiva de los anunciantes.'
+        title: '4. Propriété intellectuelle',
+        body: 'La marque Yoon u Auto, le logo, la charte graphique et les développements du site sont protégés. Les photographies et les textes des annonces restent la propriété de leurs auteurs, qui concèdent à Yoon u Auto le droit de les afficher sur la plateforme le temps de la publication.'
       },
       {
-        title: '5. Legislación aplicable y jurisdicción',
-        body: 'Las relaciones entre la Empresa y el usuario se regirán por la legislación española. Para la resolución de cualquier controversia, las partes se someten a los Juzgados y Tribunales de Madrid, con renuncia expresa a cualquier otro fuero que pudiera corresponderles.'
+        title: '5. Hébergement',
+        body: 'Le site et ses données sont hébergés par des prestataires situés hors du Sénégal. Le détail des prestataires et des pays d’hébergement figure dans la politique de confidentialité.'
+      },
+      {
+        title: '6. Droit applicable',
+        body: 'Les présentes mentions sont régies par le droit sénégalais. À défaut de règlement amiable, les tribunaux compétents de Dakar seront saisis.'
       }
     ]
   },
   'privacidad': {
-    heading: 'Política de Privacidad',
-    lastUpdate: 'Enero 2025',
-    intro: 'Yoon U Auto, S.L. se compromete a proteger y respetar su privacidad. Esta política explica cuándo y por qué recopilamos información personal, cómo la usamos y en qué condiciones podemos compartirla con terceros.',
+    heading: 'Politique de confidentialité',
+    lastUpdate: 'Août 2026',
+    intro: PROVISIONAL,
     sections: [
       {
-        title: '1. Responsable del tratamiento',
-        body: 'Yoon U Auto, S.L., NIF B-12345678, con domicilio en Calle de ejemplo, 123, 28001 Madrid. Email de contacto: privacidad@yoonuauto.com.'
+        title: '1. Responsable du traitement',
+        body: 'Yoon u Auto, [à compléter], Sénégal. Pour toute question relative à vos données : [à compléter].'
       },
       {
-        title: '2. Datos que recopilamos',
-        body: 'Recopilamos datos que usted nos proporciona directamente (nombre, email, teléfono al registrarse o contactar), datos de uso del sitio web (páginas visitadas, búsquedas realizadas, vehículos consultados) y datos técnicos (dirección IP, tipo de navegador, dispositivo). En ningún caso recopilamos datos especialmente protegidos.'
+        title: '2. Cadre légal',
+        body: 'Les traitements sont réalisés conformément à la loi n° 2008-12 du 25 janvier 2008 sur la protection des données à caractère personnel, sous le contrôle de la Commission de Protection des Données Personnelles (CDP) du Sénégal.'
       },
       {
-        title: '3. Finalidades del tratamiento',
-        body: 'Sus datos son utilizados para: gestionar su cuenta de usuario; facilitar la comunicación entre compradores y vendedores; mejorar nuestros servicios y personalizar su experiencia; enviar comunicaciones comerciales, si lo ha consentido expresamente; cumplir obligaciones legales aplicables.'
+        title: '3. Données collectées',
+        body: 'Le numéro de téléphone, qui identifie le compte ; le nom affiché ; l’adresse e-mail, facultative et utilisée uniquement pour les notifications ; la ville et la région ; les annonces publiées et leurs photographies ; les messages et les offres échangés dans une négociation ; le contenu de Mon Garage ; et des données techniques de connexion.'
       },
       {
-        title: '4. Base jurídica',
-        body: 'El tratamiento de sus datos se basa en: la ejecución del contrato de uso de la plataforma (art. 6.1.b RGPD); el consentimiento expreso para comunicaciones comerciales (art. 6.1.a RGPD); el interés legítimo para mejorar nuestros servicios (art. 6.1.f RGPD).'
+        title: '4. Finalités',
+        body: 'Tenir votre compte, publier vos annonces, vous mettre en relation avec l’autre partie, produire le contrat de vente, vous avertir de ce qui vous concerne (baisse de prix, nouvelle annonce correspondant à une recherche enregistrée, échéance d’entretien), et prévenir la fraude.'
       },
       {
-        title: '5. Conservación de datos',
-        body: 'Conservaremos sus datos mientras mantenga su cuenta activa y durante los plazos legalmente establecidos. Puede solicitar la supresión de su cuenta en cualquier momento, lo que conllevará la eliminación de sus datos personales, salvo los que deban conservarse por obligación legal.'
+        title: '5. Ce que nous ne faisons pas',
+        body: 'Nous ne vendons pas vos données. Nous n’affichons jamais votre numéro de téléphone à une personne non inscrite. Le contenu de Mon Garage est privé : ni les autres utilisateurs ni l’administration n’y accèdent, et seul ce que vous cochez expressément apparaît sur une annonce. Le contenu de vos conversations n’est consultable par l’administration que pour un motif justifié, qui est enregistré avec le nom de l’administrateur.'
       },
       {
-        title: '6. Sus derechos',
-        body: 'Tiene derecho a acceder a sus datos, rectificarlos, suprimirlos, oponerse al tratamiento, solicitar la limitación del tratamiento y la portabilidad de los datos. Puede ejercer estos derechos escribiendo a privacidad@yoonuauto.com, adjuntando copia de su DNI. Tiene derecho a presentar reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).'
+        title: '6. Durée de conservation',
+        body: 'Vos données sont conservées tant que votre compte existe. Après suppression, seules sont conservées les informations que la loi impose de garder, notamment celles rattachées à un contrat de vente déjà conclu.'
       },
       {
-        title: '7. Transferencias internacionales',
-        body: 'Algunos de nuestros proveedores de servicios (alojamiento en la nube, analítica web) pueden encontrarse fuera del Espacio Económico Europeo. En tal caso, garantizamos que se aplican las salvaguardas adecuadas conforme al RGPD (cláusulas contractuales tipo u otras garantías).'
+        title: '7. Vos droits',
+        body: 'Vous pouvez demander l’accès à vos données, leur rectification, leur effacement, ou vous opposer à un traitement, en écrivant à [à compléter]. Vous pouvez également saisir la Commission de Protection des Données Personnelles (CDP).'
+      },
+      {
+        title: '8. Transferts hors du Sénégal',
+        body: 'Nos prestataires techniques (hébergement, base de données, envoi de notifications) sont situés hors du Sénégal. Les transferts sont limités à ce qui est nécessaire au fonctionnement du service.'
       }
     ]
   },
   'cookies': {
-    heading: 'Política de Cookies',
-    lastUpdate: 'Enero 2025',
-    intro: 'Este sitio web utiliza cookies propias y de terceros para mejorar la experiencia de navegación, analizar el tráfico y personalizar el contenido. A continuación le explicamos qué cookies usamos y para qué.',
+    heading: 'Politique de cookies',
+    lastUpdate: 'Août 2026',
+    intro: PROVISIONAL,
     sections: [
       {
-        title: '¿Qué son las cookies?',
-        body: 'Las cookies son pequeños archivos de texto que se almacenan en su navegador cuando visita un sitio web. Permiten que el sitio recuerde sus acciones y preferencias durante un período de tiempo, para que no tenga que volver a introducirlas cada vez que visite el sitio o navegue de una página a otra.'
+        title: 'Ce qu’est un cookie',
+        body: 'Un cookie est un petit fichier déposé par le site dans votre navigateur. Il lui permet de se souvenir de certaines choses d’une page à l’autre, par exemple que vous êtes connecté.'
       },
       {
-        title: 'Cookies estrictamente necesarias',
-        body: 'Estas cookies son imprescindibles para el funcionamiento del sitio. Incluyen cookies de sesión para mantener su estado de autenticación, cookies CSRF para protección de seguridad, y cookies de preferencias básicas. No pueden desactivarse sin afectar al funcionamiento del sitio.'
+        title: 'Cookies strictement nécessaires',
+        body: 'Ils font fonctionner le site et ne peuvent pas être désactivés : maintien de votre session une fois connecté, mémorisation de votre choix concernant les cookies, et sécurité des formulaires.'
       },
       {
-        title: 'Cookies analíticas',
-        body: 'Utilizamos cookies analíticas (Google Analytics) para entender cómo los visitantes interactúan con nuestro sitio: páginas más visitadas, tiempo de permanencia, fuentes de tráfico. Esta información se utiliza para mejorar el sitio web. Los datos son anónimos y agregados.'
+        title: 'Stockage local',
+        body: 'Votre sélection du comparateur est conservée dans votre navigateur, et non sur nos serveurs. Elle ne vous suit donc pas d’un appareil à l’autre, et disparaît si vous effacez les données du site.'
       },
       {
-        title: 'Cookies de funcionalidad',
-        body: 'Estas cookies permiten que el sitio web recuerde las elecciones que ha realizado (idioma preferido, región, etc.) para ofrecerle una experiencia más personalizada.'
+        title: 'Mesure d’audience',
+        body: 'Aucune mesure d’audience tierce n’est active à ce jour. Si elle le devenait, cette page serait mise à jour et votre consentement vous serait demandé au préalable.'
       },
       {
-        title: 'Gestión de cookies',
-        body: 'Puede controlar y/o eliminar las cookies cuando desee. Puede eliminar todas las cookies que ya estén en su equipo y configurar la mayoría de los navegadores para que no las acepten. Sin embargo, si lo hace, es posible que tenga que ajustar manualmente algunas preferencias cada vez que visite un sitio web.'
+        title: 'Gérer vos cookies',
+        body: 'Vous pouvez à tout moment supprimer les cookies déposés et configurer votre navigateur pour les refuser. En refusant les cookies nécessaires, vous ne pourrez plus rester connecté.'
       }
     ]
   },
   'terminos': {
-    heading: 'Términos y Condiciones',
-    lastUpdate: 'Enero 2025',
-    intro: 'Los presentes Términos y Condiciones regulan el uso de la plataforma Yoon U Auto y los servicios ofrecidos a través de ella. Al registrarse o utilizar nuestra plataforma, usted acepta estos términos en su totalidad.',
+    heading: 'Conditions générales d’utilisation',
+    lastUpdate: 'Août 2026',
+    intro: PROVISIONAL,
     sections: [
       {
-        title: '1. Descripción del servicio',
-        body: 'Yoon U Auto es una plataforma online que conecta a compradores y vendedores de vehículos de origen internacional, facilitando además servicios de tramitación documental, homologación e importación. Actuamos como intermediarios y no somos parte en las transacciones entre usuarios.'
+        title: '1. Objet',
+        body: 'Les présentes conditions régissent l’utilisation de Yoon u Auto. En créant un compte, vous les acceptez.'
       },
       {
-        title: '2. Registro y cuenta de usuario',
-        body: 'Para acceder a determinadas funcionalidades es necesario registrarse. Usted es responsable de mantener la confidencialidad de sus credenciales de acceso y de todas las actividades realizadas desde su cuenta. Debe notificarnos inmediatamente cualquier uso no autorizado de su cuenta.'
+        title: '2. Un service gratuit',
+        body: 'Publier une annonce, la mettre en avant, chercher, négocier, établir un contrat et utiliser Mon Garage sont gratuits et sans limite de nombre. Aucun abonnement n’est proposé. Le fait de se déclarer particulier ou professionnel n’ouvre aucun droit supplémentaire.'
       },
       {
-        title: '3. Publicación de anuncios',
-        body: 'Los usuarios pueden publicar anuncios de vehículos en la plataforma. Al publicar un anuncio, garantiza que la información es veraz y que tiene derecho a vender el vehículo. Queda prohibida la publicación de anuncios fraudulentos, duplicados o que incumplan la legislación aplicable. Nos reservamos el derecho a retirar anuncios que incumplan estas normas.'
+        title: '3. Compte',
+        body: 'Le compte est identifié par un numéro de téléphone sénégalais. Vous êtes responsable de votre mot de passe et de ce qui est fait depuis votre compte. Signalez-nous sans délai toute utilisation que vous n’auriez pas autorisée.'
       },
       {
-        title: '4. Tarifas y pagos',
-        body: 'La publicación básica de anuncios es gratuita. Existen planes de destacado y servicios premium con coste, detallados en nuestra página de precios. Los pagos se procesan a través de plataformas seguras de pago. No almacenamos datos de tarjetas de crédito.'
+        title: '4. Vos annonces',
+        body: 'Vous garantissez que le véhicule existe, qu’il vous appartient ou que vous êtes autorisé à le vendre, et que les informations publiées — kilométrage, année, état douanier, prix — sont exactes. Chaque changement de prix est conservé dans l’historique de l’annonce.'
       },
       {
-        title: '5. Limitación de responsabilidad',
-        body: 'Yoon U Auto no asume responsabilidad por el estado real de los vehículos anunciados, la veracidad de la información proporcionada por los usuarios, ni por las transacciones realizadas entre compradores y vendedores. Recomendamos siempre verificar el vehículo antes de la compra.'
+        title: '5. Modération',
+        body: 'Une annonce peut être masquée, signalée pour révision ou archivée si elle enfreint ces conditions ; la mesure est motivée et vous en êtes informé. L’administration ne modifie jamais elle-même le titre, le prix ni la description d’une annonce : elle vous demande de les corriger.'
       },
       {
-        title: '6. Modificaciones',
-        body: 'Nos reservamos el derecho de modificar estos Términos en cualquier momento. Le notificaremos los cambios significativos mediante email o mediante aviso prominente en la plataforma. El uso continuado de la plataforma tras la notificación implica la aceptación de los nuevos términos.'
+        title: '6. Négociation et contrat',
+        body: 'La négociation, les offres et le contrat se déroulent entre les deux parties. Le contrat est rédigé par l’une et validé par l’autre : personne ne peut valider son propre contrat, et l’administration ne valide jamais à la place des parties. Yoon u Auto ne garantit ni le paiement, ni la remise du véhicule, ni la régularité des documents.'
+      },
+      {
+        title: '7. Responsabilité',
+        body: 'Yoon u Auto met un outil à disposition. Elle ne répond pas de l’état réel des véhicules, de l’exactitude des annonces ni de l’issue des transactions. Vérifiez le véhicule et ses papiers avant de payer.'
+      },
+      {
+        title: '8. Modification des conditions',
+        body: 'Ces conditions peuvent évoluer. Tout changement de version est daté et vous en êtes informé sur la plateforme. Continuer à utiliser le service vaut acceptation de la nouvelle version.'
       }
     ]
   },
   'rgpd': {
-    heading: 'Protección de Datos (RGPD)',
-    lastUpdate: 'Enero 2025',
-    intro: 'Información sobre el tratamiento de datos personales de conformidad con el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo (RGPD) y la Ley Orgánica 3/2018, de 5 de diciembre, de Protección de Datos Personales y garantía de los derechos digitales (LOPDGDD).',
+    heading: 'Protection des données',
+    lastUpdate: 'Août 2026',
+    intro: PROVISIONAL,
     sections: [
       {
-        title: 'Base de legitimación',
-        body: 'Los tratamientos de datos personales realizados por Yoon U Auto tienen como base jurídica: (a) el consentimiento del interesado para el envío de comunicaciones comerciales; (b) la ejecución del contrato de uso de la plataforma; (c) el cumplimiento de obligaciones legales; (d) el interés legítimo de la empresa en la mejora de sus servicios y la prevención del fraude.'
+        title: 'Texte applicable',
+        body: 'Yoon u Auto est une plateforme sénégalaise : les données personnelles y sont traitées selon la loi n° 2008-12 du 25 janvier 2008, sous le contrôle de la Commission de Protection des Données Personnelles (CDP). Le règlement européen (RGPD) ne s’applique pas à ce service ; il ne concernerait que des personnes résidant dans l’Union européenne.'
       },
       {
-        title: 'Categorías de datos tratados',
-        body: 'Tratamos datos identificativos (nombre, apellidos, NIF/NIE), datos de contacto (email, teléfono, dirección), datos de perfil (fotografía de perfil, preferencias), datos de uso de la plataforma, y datos de transacciones. No tratamos categorías especiales de datos (datos de salud, origen étnico, creencias religiosas, etc.).'
+        title: 'Base des traitements',
+        body: 'Les traitements reposent sur l’exécution du service que vous demandez en créant un compte, sur le respect des obligations légales, et sur votre consentement pour ce qui est facultatif, comme les notifications par e-mail.'
       },
       {
-        title: 'Destinatarios',
-        body: 'Sus datos podrán ser comunicados a: proveedores de servicios técnicos que actúan como encargados del tratamiento (hosting, email, análisis); entidades del grupo empresarial; Administración Pública y autoridades competentes en los casos legalmente previstos. No cedemos datos a terceros con fines comerciales sin su consentimiento.'
+        title: 'Catégories de données',
+        body: 'Données d’identification (téléphone, nom affiché, e-mail facultatif), de localisation déclarée (région et ville), d’activité sur la plateforme (annonces, favoris, recherches enregistrées, négociations, contrats) et le contenu privé de Mon Garage. Aucune donnée sensible n’est demandée.'
       },
       {
-        title: 'Plazo de conservación',
-        body: 'Los datos se conservarán mientras dure la relación comercial o hasta que el interesado solicite su supresión, y posteriormente durante los plazos legalmente establecidos (4 años para obligaciones fiscales, 3 años para datos comerciales, etc.).'
+        title: 'Destinataires',
+        body: 'Nos prestataires techniques, dans la stricte mesure nécessaire au fonctionnement du service, et les autorités compétentes lorsque la loi l’impose. Aucune cession commerciale à des tiers.'
       },
       {
-        title: 'Ejercicio de derechos',
-        body: 'El interesado tiene derecho a: acceso, rectificación, supresión ("derecho al olvido"), limitación del tratamiento, portabilidad, oposición, y a no ser objeto de decisiones individualizadas automatizadas. Para ejercer estos derechos, dirija una solicitud a: dpo@yoonuauto.com. Tiene derecho a presentar reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).'
+        title: 'Exercer vos droits',
+        body: 'Accès, rectification, effacement, opposition et limitation : écrivez à [à compléter]. Une réclamation peut être adressée à la Commission de Protection des Données Personnelles (CDP) du Sénégal.'
       },
       {
-        title: 'Delegado de Protección de Datos',
-        body: 'Si tiene cualquier consulta sobre el tratamiento de sus datos personales o el ejercicio de sus derechos, puede contactar con nuestro Delegado de Protección de Datos (DPO) en: dpo@yoonuauto.com.'
+        title: 'Sécurité',
+        body: 'Les mots de passe sont stockés sous forme chiffrée, les échanges avec le site sont protégés, et les documents de Mon Garage ne sont accessibles qu’à leur propriétaire, authentifié.'
       }
     ]
   }
@@ -184,16 +215,22 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
-            Volver al inicio
+            Retour à l’accueil
           </a>
           <h1 class="font-heading text-3xl lg:text-4xl font-bold text-frost mb-3">{{ content().heading }}</h1>
-          <p class="text-frost/50 text-sm">Última actualización: {{ content().lastUpdate }}</p>
+          <p class="text-frost/50 text-sm">Dernière mise à jour : {{ content().lastUpdate }}</p>
         </div>
       </div>
 
       <!-- Content -->
       <div class="container mx-auto max-w-3xl px-4 py-12">
-        <p class="text-navy/70 leading-relaxed mb-10 text-base">{{ content().intro }}</p>
+        <!-- El aviso de provisionalidad no puede leerse como un párrafo más: mientras los
+             datos de la sociedad estén sin rellenar, tiene que verse antes que el texto. -->
+        <p class="mb-10 rounded-xl border-l-4 border-azure-dark bg-frost-dark px-5 py-4
+                  text-base leading-relaxed text-navy">
+          <span class="font-semibold">Document provisoire.</span>
+          {{ content().intro }}
+        </p>
 
         <div class="space-y-8">
           @for (section of content().sections; track section.title) {
@@ -205,8 +242,8 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
         </div>
 
         <div class="mt-12 pt-8 border-t border-navy/10 flex gap-4">
-          <a routerLink="/" class="btn-primary py-2.5 px-5 text-sm">Volver al inicio</a>
-          <a routerLink="/vehiculos" class="btn-outline py-2.5 px-5 text-sm">Ver vehículos</a>
+          <a routerLink="/" class="btn-primary py-2.5 px-5 text-sm">Retour à l’accueil</a>
+          <a routerLink="/vehiculos" class="btn-outline py-2.5 px-5 text-sm">Voir les annonces</a>
         </div>
       </div>
     </div>
