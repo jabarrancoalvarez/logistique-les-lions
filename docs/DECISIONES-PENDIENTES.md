@@ -40,8 +40,9 @@ que no es la suya, en un país que no es el suyo, bajo una ley que no le aplica.
 - [x] ✅ **RESUELTO el 16/08/2026: textos provisionales en francés.** Reescritas las cinco
       apuntando a la normativa senegalesa (loi n° 2008-12 y la CDP), con los datos de la
       sociedad como «[à compléter]» y un aviso destacado de que son provisionales.
-- [ ] ⏳ **Queda**: rellenar razón social, domicilio, RCCM y NINEA reales, y que lo revise
-      un abogado en Senegal antes de abrir al público.
+- [ ] ⏸️ **APLAZADO — estamos en fase de demo de pruebas** (decidido el 16/08/2026). No se
+      toca nada de lo legal por ahora. Rellenar razón social, domicilio, RCCM y NINEA
+      reales, y que lo revise un abogado en Senegal, se hará antes de abrir al público.
 
 ### 1.2 🔴 Las fotos de Mon Garage se sirven sin autenticación
 
@@ -85,33 +86,36 @@ Es el pendiente nº 22, ahora medido.
 
 Ya estaban documentados, pero ahora hay datos reales encima.
 
-- [x] ✅ **Disco de Render efímero** (pendiente nº 2) — **código listo el 16/08/2026,
-      esperando el bucket.** Los archivos nunca estuvieron en Neon: la base guarda las
-      filas y el contenedor de Render los ficheros, y ese contenedor se recrea en cada
-      despliegue. Se ha implementado `ObjectStorageService`, compatible con S3, contra
-      **Cloudflare R2** (10 GB gratis y sin coste de descarga).
+- [x] ✅ **Disco de Render efímero** (pendiente nº 2) — **RESUELTO para la demo el
+      16/08/2026: los archivos se guardan en Neon.** El disco de Render se recrea en cada
+      despliegue, así que lo que subían los usuarios (fotos de anuncio, documentos de Mon
+      Garage) se perdía. Para la demo, con pocos ejemplos, se guardan los bytes en la
+      propia base: una tabla `stored_files` y un tercer proveedor de `IStorageService`,
+      `DatabaseStorageService`, activado con **`Storage:Provider=database`** (ya puesto en
+      `render.yaml`). Cero servicios externos, cero claves, y sobreviven a los despliegues.
+      Las fotos públicas se sirven por `GET /files/{clave}`.
 
-      **Sigue desactivado**: mientras falte cualquiera de las claves, la aplicación vuelve
-      sola al disco en lugar de no arrancar. Para encenderlo hacen falta cuatro pasos
-      tuyos, en Cloudflare y en Render:
+      ⚠️ **No es la solución para un catálogo grande**: comparte el medio giga con los
+      datos y sirve las imágenes más despacio que un CDN. Cuando crezca, se pasa a
+      Cloudflare R2 —`ObjectStorageService` ya está escrito— cambiando el proveedor a `r2`
+      y rellenando el bucket y las cinco claves. El resto de la app no cambia, porque todo
+      pasa por `IStorageService`. Pasos de R2, para ese día:
 
       1. Crear un bucket en Cloudflare R2.
-      2. Exponer **solo el prefijo `public/`** (dominio público o dominio propio).
-         ⚠️ Si se abre el bucket entero, la documentación privada de Mon Garage queda al
-         alcance de cualquiera: el servicio separa `public/` y `private/` por prefijo.
-      3. Crear un token de API con permiso de lectura y escritura sobre ese bucket.
-      4. En Render → Environment, rellenar y cambiar el proveedor:
-         - `Storage__Provider` → `r2`
-         - `Storage__Bucket` → nombre del bucket
-         - `Storage__ServiceUrl` → `https://<account-id>.r2.cloudflarestorage.com`
-         - `Storage__AccessKey` y `Storage__SecretKey` → las del token
-         - `Storage__PublicBaseUrl` → la URL pública del bucket
+      2. Exponer **solo el prefijo `public/`**. ⚠️ Si se abre el bucket entero, la
+         documentación privada de Mon Garage queda al alcance de cualquiera.
+      3. Token de API con lectura y escritura sobre el bucket.
+      4. En Render → Environment: `Storage__Provider=r2`, `Storage__Bucket`,
+         `Storage__ServiceUrl`, `Storage__AccessKey`, `Storage__SecretKey`,
+         `Storage__PublicBaseUrl`.
 
-      ⚠️ Lo ya subido al disco **no se migra solo**: son datos de prueba y se vuelven a
-      subir.
-- [ ] ⏸️ **Correo — APLAZADO al final** (pendiente nº 3). Sin `Email__ApiKey` no sale
-      ningún correo; las comunicaciones del backoffice solo llegan como notificación
-      interna. Se retoma cuando exista la cuenta de Yoon u Auto.
+      ⚠️ Si `Storage__Provider` está definido **a mano en el panel de Render**, manda el
+      panel sobre `render.yaml`: hay que ponerlo a `database` allí también.
+- [ ] ⏸️ **Correo — APLAZADO, esperando datos** (pendiente nº 3; confirmado el 16/08/2026:
+      el dominio propio para el correo lo tienen que pasar, así que está parado). Sin
+      `Email__ApiKey` no sale ningún correo; las comunicaciones del backoffice solo llegan
+      como notificación interna. ⚠️ Desde un Gmail no se puede enviar: hace falta dominio
+      propio para el remitente.
 
       Ya corregido lo que sí bloqueaba: el remitente por defecto era
       `Logistique Les Lions <no-reply@logistiqueleslions.com>`, la marca anterior y un
@@ -303,14 +307,16 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
       también suspende su cómputo, lo que explica que las dos primeras consultas de datos
       sigan tardando 1 y 2,9 segundos con el servicio ya despierto.
 
-      Opciones, de más a menos recomendable:
+      ⏸️ **APLAZADO para la demo** (decidido el 16/08/2026): no se cambia el plan de Render
+      porque esto es una demo. Se decidirá el servidor real de producción más adelante, y
+      entonces se elige entre estas opciones:
       1. **Plan de pago en Render** (~7 $/mes). Quita la suspensión. Es la única que
          resuelve el problema de verdad.
       2. **Mantenerlo despierto con un ping** cada 10 minutos. El plan gratuito da 750
          horas al mes y un servicio continuo consume ~744, así que cabe justo. Frágil: si
          el ping falla una noche, el primer visitante paga los 47 segundos igual.
-      3. **Asumirlo.** Defendible mientras solo entren personas avisadas; insostenible el
-         día que llegue tráfico real.
+      3. **Otro proveedor.** Al elegir el alojamiento real de producción se resuelve de
+         raíz.
 - [x] ✅ **Pendiente nº 19 resuelto el 16/08/2026: las estadísticas agregan en SQL.**
       Cargaban en memoria todos los anuncios activos para calcular medias, medianas y
       rankings. Ahora es `GROUP BY` con `LIMIT`, y la mediana se resuelve contando y
@@ -363,8 +369,8 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
       `chunk-*.js` del build anterior. Ahora se detecta el fallo de carga y se recarga una
       sola vez (corrección nº 13).
 
-- [ ] ⏸️ **El chat con IA sobre el anuncio queda oculto y aplazado** (decidido el
-      16/08/2026). Es `POST /vehicles/{id}/ai/ask`
+- [ ] ⏸️ **El chat con IA sobre el anuncio queda oculto y aplazado a una fase mucho más
+      avanzada de la app** (decidido el 16/08/2026). Es `POST /vehicles/{id}/ai/ask`
       (`IAiContentService.AnswerVehicleQuestionAsync`). No es generación de descripciones
       —retirada— ni extracción de documentos —que se conserva porque sí está en el
       documento y sí se usa—. **No aparece en el documento funcional.**

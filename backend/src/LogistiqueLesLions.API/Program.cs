@@ -400,6 +400,27 @@ try
         .WithTags("Notificaciones")
         .MapNotificationsEndpoints();
 
+    // ─── Archivos públicos guardados en base de datos (Storage:Provider=database) ─
+    // Cuando los archivos viven en la base no hay carpeta estática que servir: las fotos
+    // de anuncio se entregan leyendo su fila. Solo sirve las públicas por su clave; los
+    // documentos privados siguen su propio endpoint autenticado. Con los otros
+    // proveedores esta tabla está vacía y responde 404, lo cual es inocuo.
+    app.MapGet("/files/{**key}", async (
+        string key,
+        LogistiqueLesLions.Application.Common.Interfaces.IApplicationDbContext db,
+        CancellationToken ct) =>
+    {
+        var file = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions
+            .FirstOrDefaultAsync(
+                System.Linq.Queryable.Where(db.StoredFiles.AsNoTracking(),
+                    f => f.StorageKey == key && f.IsPublic), ct);
+
+        if (file is null) return Results.NotFound();
+
+        return Results.File(file.Content, file.ContentType, lastModified: file.CreatedAt,
+            enableRangeProcessing: true);
+    }).AllowAnonymous().WithTags("Fichiers");
+
     // SignalR hubs
     app.MapHub<LogistiqueLesLions.API.Hubs.ChatHub>("/hubs/chat")
         .RequireAuthorization();

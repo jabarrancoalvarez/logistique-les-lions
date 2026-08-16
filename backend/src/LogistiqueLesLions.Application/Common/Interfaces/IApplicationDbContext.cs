@@ -66,6 +66,8 @@ public interface IApplicationDbContext
     DbSet<UpcomingFeature> UpcomingFeatures { get; }
     DbSet<FeatureInterest> FeatureInterests { get; }
 
+    // ─── Almacenamiento en base de datos (Storage:Provider=database) ─────────
+    DbSet<StoredFile> StoredFiles { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
