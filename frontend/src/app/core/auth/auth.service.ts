@@ -1,5 +1,6 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable, tap, map, finalize, shareReplay } from 'rxjs';
 import { environment } from '@environments/environment';
 
@@ -88,6 +89,8 @@ export class AuthService {
     return !!role && roles.includes(role);
   }
 
+  private readonly router = inject(Router);
+
   constructor(private http: HttpClient) {}
 
   register(payload: RegisterPayload): Observable<AuthUser> {
@@ -156,6 +159,9 @@ export class AuthService {
   logout(): void {
     this.http.post(`${this.apiUrl}/logout`, {}).subscribe({ error: () => {} });
     this.clearSession();
+    // Llevar a la portada: si no, el usuario se queda en una pantalla protegida
+    // (perfil, garaje…) ya sin sesión, y parece que la aplicación se ha congelado.
+    void this.router.navigate(['/']);
   }
 
   clearSession(): void {
