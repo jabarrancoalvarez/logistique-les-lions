@@ -257,27 +257,35 @@ export class VehicleFormComponent {
     this.selectedImages.update(imgs => imgs.filter((_, i) => i !== index));
   }
 
+  // Los valores son los del enum del dominio, ni uno más: «Lpg» no existe en FuelType
+  // y publicar con él devolvía 400, y «Semiautomatique» tampoco existe en
+  // TransmissionType, donde solo hay Manuel y Automatique.
   readonly fuelTypes = [
-    { value: 'Essence', label: 'Gasolina' },
-    { value: 'Diesel', label: 'Diésel' },
-    { value: 'Electrique', label: 'Eléctrico' },
-    { value: 'Hybride', label: 'Híbrido' },
-    { value: 'HybrideRechargeable', label: 'Híbrido enchufable' },
-    { value: 'Lpg', label: 'GLP' },
+    { value: 'Diesel', label: 'Diesel' },
+    { value: 'Essence', label: 'Essence' },
+    { value: 'Hybride', label: 'Hybride' },
+    { value: 'HybrideRechargeable', label: 'Hybride rechargeable' },
+    { value: 'Electrique', label: 'Électrique' },
+    { value: 'Autre', label: 'Autre' },
   ];
+
   readonly transmissions = [
-    { value: 'Manuel', label: 'Manuel' },
-    { value: 'Automatique', label: 'Automático' },
-    { value: 'Automatique', label: 'Semiautomático' },
+    { value: 'Manuel', label: 'Manuelle' },
+    { value: 'Automatique', label: 'Automatique' },
   ];
+
+  // Pick-up y monospace faltaban: sin ellos no se podía publicar un Hilux, que es
+  // justo lo que más se vende en Senegal.
   readonly bodyTypes = [
-    { value: 'Berline', label: 'Sedán' },
     { value: 'Citadine', label: 'Citadine' },
-    { value: 'Suv', label: 'SUV' },
+    { value: 'Berline', label: 'Berline' },
+    { value: 'Break', label: 'Break' },
+    { value: 'Suv', label: 'SUV / 4x4' },
     { value: 'Coupe', label: 'Coupé' },
-    { value: 'Cabriolet', label: 'Descapotable' },
-    { value: 'Break', label: 'Familiar' },
-    { value: 'Utilitaire', label: 'Furgoneta' },
+    { value: 'Cabriolet', label: 'Cabriolet' },
+    { value: 'Monospace', label: 'Monospace' },
+    { value: 'PickUp', label: 'Pick-up' },
+    { value: 'Utilitaire', label: 'Utilitaire' },
   ];
   readonly countries = [
     { code: 'ES', name: 'España' }, { code: 'DE', name: 'Alemania' },

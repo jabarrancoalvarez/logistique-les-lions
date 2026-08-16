@@ -115,21 +115,21 @@
           <div>
             <label class="block text-sm font-medium text-navy mb-1.5">Carburant</label>
             <select formControlName="fuelType" class="input">
-              <option value="">Sin especificar</option>
+              <option value="">Non précisé</option>
               @for (f of fuelTypes; track f.value) { <option [value]="f.value">{{ f.label }}</option> }
             </select>
           </div>
           <div>
             <label class="block text-sm font-medium text-navy mb-1.5">Boîte de vitesses</label>
             <select formControlName="transmission" class="input">
-              <option value="">Sin especificar</option>
+              <option value="">Non précisé</option>
               @for (t of transmissions; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
             </select>
           </div>
           <div>
             <label class="block text-sm font-medium text-navy mb-1.5">Carrosserie</label>
             <select formControlName="bodyType" class="input">
-              <option value="">Sin especificar</option>
+              <option value="">Non précisé</option>
               @for (b of bodyTypes; track b.value) { <option [value]="b.value">{{ b.label }}</option> }
             </select>
           </div>
