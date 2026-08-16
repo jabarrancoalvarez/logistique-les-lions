@@ -116,7 +116,7 @@
           <!-- ─── Photographies ───────────────────────────────────────────── -->
           <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
             <div class="flex items-center justify-between gap-3 mb-3">
-              <h2 class="font-heading font-semibold text-navy">Photographies</h2>
+              <h2 class="font-heading font-semibold text-navy text-lg">Photographies</h2>
               <label class="btn-outline text-sm cursor-pointer">
                 {{ uploading() ? 'Envoi…' : 'Ajouter une photo' }}
                 <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
@@ -154,7 +154,7 @@
 
           <!-- ─── Vendre ce véhicule ──────────────────────────────────────── -->
           <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
-            <h2 class="font-heading font-semibold text-navy mb-1">Vendre ce véhicule</h2>
+            <h2 class="font-heading font-semibold text-navy text-lg mb-1">Vendre ce véhicule</h2>
 
             @if (!isListed()) {
               <p class="text-sm text-navy/60 mb-4">
@@ -208,7 +208,7 @@
           <!-- ─── Transparence du véhicule ────────────────────────────────── -->
           @if (transparency(); as t) {
             <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
-              <h2 class="font-heading font-semibold text-navy mb-1">Transparence du véhicule</h2>
+              <h2 class="font-heading font-semibold text-navy text-lg mb-1">Transparence du véhicule</h2>
               <p class="text-xs text-navy/50 mb-4">
                 Choisissez ce que vous souhaitez montrer dans l'annonce. Vos documents
                 restent privés&nbsp;: <strong>rien n'est publié sans votre accord
@@ -290,7 +290,7 @@
           @if (completeness(); as c) {
             <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
               <div class="flex items-baseline justify-between gap-3 mb-1">
-                <h2 class="font-heading font-semibold text-navy">Complétude du dossier</h2>
+                <h2 class="font-heading font-semibold text-navy text-lg">Complétude du dossier</h2>
                 <p class="font-heading font-bold text-navy text-lg">
                   {{ c.score }} %
                   <span class="text-sm font-normal text-navy/60">
@@ -326,7 +326,7 @@
           <!-- ─── Valeur estimée ──────────────────────────────────────────── -->
           @if (valuation(); as val) {
             <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
-              <h2 class="font-heading font-semibold text-navy mb-3">Valeur estimée</h2>
+              <h2 class="font-heading font-semibold text-navy text-lg mb-3">Valeur estimée</h2>
 
               @if (!val.hasEstimate) {
                 <p class="text-sm text-navy/60">
@@ -393,7 +393,7 @@
           <!-- ─── Rappels ─────────────────────────────────────────────────── -->
           <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
             <div class="flex items-center justify-between gap-3 mb-1">
-              <h2 class="font-heading font-semibold text-navy">Rappels</h2>
+              <h2 class="font-heading font-semibold text-navy text-lg">Rappels</h2>
               @if (!reminderFormOpen()) {
                 <button type="button" (click)="openReminderForm()" class="btn-outline text-sm">
                   Ajouter un rappel
@@ -534,7 +534,7 @@
           <!-- ─── Entretien ───────────────────────────────────────────────── -->
           <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
             <div class="flex items-center justify-between gap-3 mb-1">
-              <h2 class="font-heading font-semibold text-navy">Entretien</h2>
+              <h2 class="font-heading font-semibold text-navy text-lg">Entretien</h2>
               @if (!maintenanceFormOpen()) {
                 <button type="button" (click)="openMaintenanceForm()" class="btn-outline text-sm">
                   Ajouter une intervention
@@ -745,7 +745,7 @@
           <!-- ─── Documents ───────────────────────────────────────────────── -->
           <div class="bg-white rounded-xl border border-navy/10 p-5 mb-4">
             <div class="flex items-center justify-between gap-3 mb-1">
-              <h2 class="font-heading font-semibold text-navy">Documents</h2>
+              <h2 class="font-heading font-semibold text-navy text-lg">Documents</h2>
               @if (!documentFormOpen()) {
                 <button type="button" (click)="openDocumentForm()" class="btn-outline text-sm">
                   Ajouter un document

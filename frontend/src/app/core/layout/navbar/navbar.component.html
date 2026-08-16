@@ -86,6 +86,9 @@
                 <p class="text-sm font-medium text-frost truncate">{{ auth.user()!.displayName }}</p>
                 <p class="text-xs text-frost/50 truncate">{{ auth.user()!.phone ?? auth.user()!.email }}</p>
               </div>
+              <a routerLink="/dashboard" class="flex items-center gap-2 px-4 py-2.5 text-sm text-frost/80 hover:text-azure-light hover:bg-white/5 transition-colors">
+                Mon tableau de bord
+              </a>
               <a routerLink="/perfil" class="flex items-center gap-2 px-4 py-2.5 text-sm text-frost/80 hover:text-azure-light hover:bg-white/5 transition-colors">
                 Mon profil
               </a>
@@ -163,6 +166,12 @@
             <a routerLink="/mis-negociaciones" (click)="closeMobileMenu()"
               class="block px-4 py-3 text-base font-medium text-frost/80 hover:text-azure-light hover:bg-white/5 rounded-lg transition-colors">
               Messages
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dashboard" (click)="closeMobileMenu()"
+              class="block px-4 py-3 text-base font-medium text-frost/80 hover:text-azure-light hover:bg-white/5 rounded-lg transition-colors">
+              Mon tableau de bord
             </a>
           </li>
           <li>
