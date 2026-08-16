@@ -35,6 +35,9 @@
 
 | # | Asunto | Detalle | Origen |
 |---|---|---|---|
+| 22 | **SignalR no se rehace al refrescar el token** | El interceptor renueva el token de acceso y las llamadas HTTP se reintentan, pero la conexión del hub se queda caída hasta recargar la página: las notificaciones en vivo dejan de llegar a los 15 minutos | Detectado probando en producción |
+| 23 | **Negociaciones huérfanas del seed anterior** | El tableau de bord cuenta 11 negociaciones abiertas que apuntan a los anuncios europeos ya retirados. No estorban, pero falsean la actividad | Detectado probando en producción |
+| 24 | **Contraseña de demostración en el historial de git** | El primer commit del reseed sembró las cuentas de vendedor con una contraseña fija en un repositorio público. Ya no abre ninguna cuenta —ahora son aleatorias— pero el commit sigue ahí | Introducido y corregido en las pruebas |
 | 21 | **No hay tests de la capa API** | Los 476 tests son de Application: nadie prueba el binding de la query string ni las rutas. El fallo de `[AsParameters]` con `int` no anulable (400 con cuerpo vacío en `/vehicles/count`) llegó a producción por esto. Haría falta `WebApplicationFactory` | Detectado probando en producción |
 | 9 | **El frontend no tiene ni un test** | Carencia anterior a la migración. `ng test` además necesita un navegador instalado | Anterior |
 | 10 | **Namespaces `LogistiqueLesLions.*`** | Renombrado a `YoonUAuto.*` aplazado a propósito hasta el final | Decisión del usuario, P1 |

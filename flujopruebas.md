@@ -673,3 +673,36 @@ está en [`docs/PENDIENTES-TECNICOS.md`](docs/PENDIENTES-TECNICOS.md).
 | 2 | **Almacenamiento efímero en Render** | Fotos y documentos **se pierden** en cada reinicio |
 | 3 | **Correo sin configurar** | **No sale ningún correo** |
 | — | **Frontend sin tests** | Todo el frontend se valida a mano |
+
+---
+
+## 11. Registro de la primera sesión de pruebas (2026-08-16)
+
+Lo encontrado probando contra producción con Playwright, por orden de gravedad. Todo
+está corregido y desplegado salvo donde se indique.
+
+| # | Fallo | Qué rompía |
+|---|---|---|
+| 1 | **Cultura `de-DE` en imagen alpine** | La imagen corre en modo *globalization-invariant*, donde pedir cualquier cultura lanza. Tumbaba **las ofertas, las alertas de bajada de precio, los recordatorios de Mon Garage y el PDF del contrato**, todos con 500. Invisible en local |
+| 2 | **Refresco de token en carrera** | El servidor rota el refresh token y el interceptor lanzaba uno por petición fallida: dos a la vez ⇒ el segundo usaba un token consumido ⇒ **cierre de sesión cada 15 minutos** |
+| 3 | **Binding de `[AsParameters]`** | Un `int` o `bool` no anulable es obligatorio en las minimal APIs: `/vehicles/count` y `/notifications` devolvían 400 con cuerpo vacío. **Campana muerta y contador de resultados roto** |
+| 4 | **Sin selector de modelo al publicar** | Todo anuncio salía con `modelId` nulo ⇒ **nunca podía tener indicador de precio** ni aparecer en filtros por modelo |
+| 5 | **Sin selector de equipamiento** | Los anuncios se publicaban con `equipmentIds` vacío ⇒ el filtro por equipamiento no podía dar resultados |
+| 6 | **Faltaban Pick-up y Monospace** | No se podía publicar un Hilux, el vehículo más vendido en Senegal |
+| 7 | **`Lpg` inexistente en `FuelType`** | 400 al publicar un vehículo de gas |
+| 8 | **`fontconfig` ausente en la imagen** | El PDF del contrato habría fallado igualmente tras corregir el nº 1 |
+| 9 | **Interfaz en español** | Banner de cookies, formulario de publicación completo, títulos de pestaña, «Vehículos destacados», enum crudos en Statistiques |
+| 10 | **`BodyType.Pickup` mal escrito** | El filtro de pick-up de la portada no devolvía nada |
+| 11 | **Datos europeos heredados** | 20 anuncios con precios en euros etiquetados FCFA. Sustituidos por 48 senegaleses |
+
+### Verificado funcionando
+
+- Las 31 migraciones aplicadas y PostgreSQL sano
+- Registro por teléfono, con correo opcional y las 14 regiones
+- Publicación completa de un anuncio, con referencia `YU10025`
+- **Indicador de precio en sus dos mitades**: con ≥5 comparables muestra la etiqueta y
+  de cuántos sale; por debajo **no muestra nada**
+- Búsqueda, filtros, contador, orden por precio, encadenado región → ciudad
+- Ficha del anuncio con estado aduanero y su aviso de no verificación
+- Backoffice: tableau de bord y **Statistiques con mediana (7.600.000) frente a media
+  (8.761.224)**, y «—» donde no hay datos
