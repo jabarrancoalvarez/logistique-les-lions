@@ -3,8 +3,8 @@
 
     <!-- Cabecera -->
     <div class="mb-8">
-      <h1 class="font-heading text-navy text-3xl font-bold">Publicar vehículo</h1>
-      <p class="text-navy/60 mt-1">Completa los 4 pasos para publicar tu anuncio.</p>
+      <h1 class="font-heading text-navy text-3xl font-bold">Publier une annonce</h1>
+      <p class="text-navy/60 mt-1">Quatre étapes, et votre annonce est en ligne. C’est gratuit.</p>
     </div>
 
     <!-- Barra de progreso -->
@@ -35,15 +35,15 @@
 
       <!-- Step 1: Datos básicos -->
       @if (currentStep() === 1) {
-        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Datos básicos</h2>
+        <h2 class="font-heading text-xl font-semibold text-navy mb-6">L’essentiel</h2>
 
         <!-- IA: extraer datos de documento -->
         <div class="mb-6 p-4 rounded-xl border border-azure/30 bg-azure/5">
           <p class="text-sm font-medium text-navy mb-2">
-            ✨ ¿Tienes la ficha técnica o el COC?
+            ✨ Vous avez la carte grise du véhicule&nbsp;?
           </p>
           <p class="text-xs text-navy/60 mb-3">
-            Sube una foto y la IA extraerá marca, año, VIN, color, kilometraje y combustible automáticamente.
+            Photographiez-la et les champs marque, année, VIN, couleur, kilométrage et carburant se remplissent tout seuls.
           </p>
           <label class="btn-outline py-2 px-4 text-sm cursor-pointer inline-flex items-center gap-2">
             @if (isExtractingDoc()) {
@@ -51,9 +51,9 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
               </svg>
-              Procesando…
+              Traitement en cours…
             } @else {
-              📄 Subir documento
+              📄 Envoyer le document
             }
             <input type="file" accept="image/jpeg,image/png,image/webp"
               (change)="onDocumentSelected($event)" class="hidden" [disabled]="isExtractingDoc()">
@@ -68,28 +68,28 @@
 
         <form [formGroup]="step1" class="space-y-5">
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Marca *</label>
+            <label class="block text-sm font-medium text-navy mb-1.5">Marque *</label>
             <select formControlName="makeId" class="input">
-              <option value="">Selecciona una marca</option>
+              <option value="">Choisir une marque</option>
               @for (make of makes(); track make.id) {
                 <option [value]="make.id">{{ make.name }}</option>
               }
             </select>
             @if (step1.get('makeId')?.touched && step1.get('makeId')?.errors?.['required']) {
-              <p class="text-xs text-red-600 mt-1">La marca es obligatoria.</p>
+              <p class="text-xs text-red-600 mt-1">La marque est obligatoire.</p>
             }
           </div>
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Año *</label>
+            <label class="block text-sm font-medium text-navy mb-1.5">Année *</label>
             <select formControlName="year" class="input">
-              <option value="">Selecciona el año</option>
+              <option value="">Choisir l’année</option>
               @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Estado *</label>
+            <label class="block text-sm font-medium text-navy mb-1.5">État *</label>
             <div class="grid grid-cols-3 gap-3">
-              @for (opt of [{v:'Used',l:'Segunda mano'},{v:'New',l:'Nuevo'},{v:'Km0',l:'Km 0'}]; track opt.v) {
+              @for (opt of [{v:'Used',l:'Occasion'},{v:'New',l:'Neuf'},{v:'Km0',l:'0 km'}]; track opt.v) {
                 <label class="flex items-center gap-2 cursor-pointer border rounded-xl p-3 transition-colors"
                   [ngClass]="step1.get('condition')?.value === opt.v
                     ? 'border-azure bg-azure/5'
@@ -102,54 +102,82 @@
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">VIN (opcional)</label>
-            <input type="text" formControlName="vin" class="input font-mono" placeholder="17 caracteres" maxlength="17">
+            <label class="block text-sm font-medium text-navy mb-1.5">VIN (facultatif)</label>
+            <input type="text" formControlName="vin" class="input font-mono" placeholder="17 caractères" maxlength="17">
           </div>
         </form>
       }
 
       <!-- Step 2: Especificaciones -->
       @if (currentStep() === 2) {
-        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Especificaciones técnicas</h2>
+        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Fiche technique</h2>
         <form [formGroup]="step2" class="space-y-5">
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Combustible</label>
+            <label class="block text-sm font-medium text-navy mb-1.5">Carburant</label>
             <select formControlName="fuelType" class="input">
               <option value="">Sin especificar</option>
               @for (f of fuelTypes; track f.value) { <option [value]="f.value">{{ f.label }}</option> }
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Transmisión</label>
+            <label class="block text-sm font-medium text-navy mb-1.5">Boîte de vitesses</label>
             <select formControlName="transmission" class="input">
               <option value="">Sin especificar</option>
               @for (t of transmissions; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Carrocería</label>
+            <label class="block text-sm font-medium text-navy mb-1.5">Carrosserie</label>
             <select formControlName="bodyType" class="input">
               <option value="">Sin especificar</option>
               @for (b of bodyTypes; track b.value) { <option [value]="b.value">{{ b.label }}</option> }
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Kilometraje</label>
-            <input type="number" formControlName="mileage" class="input" placeholder="ej: 45000" min="0">
+            <label class="block text-sm font-medium text-navy mb-1.5">Kilométrage</label>
+            <input type="number" formControlName="mileage" class="input" placeholder="ex : 45000" min="0">
           </div>
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Color</label>
-            <input type="text" formControlName="color" class="input" placeholder="ej: Azul metalizado">
+            <label class="block text-sm font-medium text-navy mb-1.5">Couleur</label>
+            <input type="text" formControlName="color" class="input" placeholder="ex : Bleu métallisé">
           </div>
         </form>
+
+        <!-- Equipements: catalogue en base, jamais du texte libre. C est ce qui
+             permet de filtrer par equipement dans le Marketplace. -->
+        @if (equipments().length > 0) {
+          <div class="mt-6 pt-6 border-t border-navy/10">
+            <label class="block text-sm font-medium text-navy mb-1">Équipements</label>
+            <p class="text-xs text-navy/50 mb-3">
+              Cochez ce que le véhicule possède. Une annonce complète est plus consultée.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              @for (e of equipments(); track e.id) {
+                <label class="flex items-center gap-2 cursor-pointer border rounded-lg px-3 py-2 transition-colors"
+                  [ngClass]="isEquipmentSelected(e.id)
+                    ? 'border-azure bg-azure/5'
+                    : 'border-navy/15 hover:border-navy/30'">
+                  <input type="checkbox" [checked]="isEquipmentSelected(e.id)"
+                    (change)="toggleEquipment(e.id)" class="w-4 h-4">
+                  <span class="text-sm text-navy">{{ e.name }}</span>
+                </label>
+              }
+            </div>
+            @if (selectedEquipmentIds().length > 0) {
+              <p class="text-xs text-navy/50 mt-2">
+                {{ selectedEquipmentIds().length }} équipement(s) sélectionné(s).
+              </p>
+            }
+          </div>
+        }
       }
 
       <!-- Step 3: Precio y ubicación -->
       @if (currentStep() === 3) {
-        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Precio y ubicación</h2>
+        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Prix et lieu</h2>
         <form [formGroup]="step3" class="space-y-5">
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Precio *</label>
+            <label class="block text-sm font-medium text-navy mb-1.5">Prix *</label>
             <div class="relative">
               <input type="number" formControlName="price" class="input pr-16" placeholder="0" min="1">
               <span class="absolute inset-y-0 right-3 flex items-center text-sm font-medium text-navy/50 pointer-events-none">
@@ -159,7 +187,7 @@
           </div>
           <div class="flex items-center gap-2">
             <input type="checkbox" formControlName="priceNegotiable" id="negotiable" class="w-4 h-4">
-            <label for="negotiable" class="text-sm text-navy">Precio negociable</label>
+            <label for="negotiable" class="text-sm text-navy">Prix négociable</label>
           </div>
           <!-- Statut douanier: bloque destacado de la ficha en Senegal -->
           <div>
@@ -195,11 +223,11 @@
 
       <!-- Step 4: Fotos y descripción -->
       @if (currentStep() === 4) {
-        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Fotos y descripción</h2>
+        <h2 class="font-heading text-xl font-semibold text-navy mb-6">Photos et description</h2>
 
         <!-- Upload de fotos -->
         <div class="mb-6">
-          <label class="block text-sm font-medium text-navy mb-2">Fotos del vehículo</label>
+          <label class="block text-sm font-medium text-navy mb-2">Photos du véhicule</label>
           <div class="border-2 border-dashed border-navy/20 rounded-xl p-6 text-center hover:border-azure transition-colors">
             <input type="file" id="vehicle-images" accept="image/*" multiple
               (change)="onImagesSelected($event)" class="hidden">
@@ -207,8 +235,8 @@
               <svg class="w-10 h-10 text-navy/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
               </svg>
-              <p class="text-sm text-navy font-medium">Haz clic para seleccionar fotos</p>
-              <p class="text-xs text-navy/50">JPG, PNG o WEBP · puedes subir varias</p>
+              <p class="text-sm text-navy font-medium">Cliquez pour choisir vos photos</p>
+              <p class="text-xs text-navy/50">JPG, PNG ou WEBP · plusieurs à la fois</p>
             </label>
           </div>
           @if (selectedImages().length > 0) {
@@ -218,23 +246,23 @@
                   <img [src]="img.preview" alt="" class="w-full h-full object-cover">
                   <button type="button" (click)="removeImage(i)"
                     class="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-600 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label="Eliminar foto">×</button>
+                    aria-label="Retirer la photo">×</button>
                 </div>
               }
             </div>
-            <p class="text-xs text-navy/50 mt-2">{{ selectedImages().length }} foto(s) seleccionada(s). Se subirán al publicar.</p>
+            <p class="text-xs text-navy/50 mt-2">{{ selectedImages().length }} photo(s) choisie(s). Elles seront envoyées à la publication.</p>
           }
         </div>
 
         <form [formGroup]="step4" class="space-y-5">
           <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Título del anuncio *</label>
+            <label class="block text-sm font-medium text-navy mb-1.5">Titre de l’annonce *</label>
             <input type="text" formControlName="title" class="input"
-              placeholder="ej: BMW Serie 3 320d 2022 — Estado impecable">
+              placeholder="ex : Toyota Hilux 2019 — très bon état, dédouanée">
             @if (step4.get('title')?.touched && step4.get('title')?.errors?.['required']) {
-              <p class="text-xs text-red-600 mt-1">El título es obligatorio.</p>
+              <p class="text-xs text-red-600 mt-1">Le titre est obligatoire.</p>
             }
-            <p class="text-xs text-navy/40 mt-1">{{ step4.get('title')?.value?.length ?? 0 }}/200 caracteres</p>
+            <p class="text-xs text-navy/40 mt-1">{{ step4.get('title')?.value?.length ?? 0 }}/200 caractères</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-navy mb-1.5">Description du vendeur</label>
@@ -258,12 +286,12 @@
         [class.invisible]="currentStep() === 1"
         class="btn-outline py-3 px-6"
       >
-        ← Atrás
+        ← Retour
       </button>
 
       @if (currentStep() < 4) {
         <button (click)="next()" class="btn-azure py-3 px-8">
-          Siguiente →
+          Suivant →
         </button>
       } @else {
         <button
@@ -277,7 +305,7 @@
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
             </svg>
           }
-          Publicar vehículo
+          Publier l’annonce
         </button>
       }
     </div>

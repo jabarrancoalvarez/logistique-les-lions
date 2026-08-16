@@ -45,10 +45,10 @@ export class VehicleFormComponent {
   readonly uploadingImages = signal(false);
 
   readonly steps = [
-    { number: 1, label: 'Datos básicos' },
-    { number: 2, label: 'Especificaciones' },
-    { number: 3, label: 'Precio y ubicación' },
-    { number: 4, label: 'Fotos y descripción' },
+    { number: 1, label: 'L’essentiel' },
+    { number: 2, label: 'Fiche technique' },
+    { number: 3, label: 'Prix et lieu' },
+    { number: 4, label: 'Photos et description' },
   ];
 
   // Step 1: Basic
@@ -59,6 +59,21 @@ export class VehicleFormComponent {
     condition:   ['Used', Validators.required],
     vin:         ['', [Validators.minLength(17), Validators.maxLength(17)]],
   });
+
+  // ─── Équipements ──────────────────────────────────────────────────────
+  // Catálogo en base de datos, nunca texto libre: es lo que permite filtrar por
+  // equipamiento en el Marketplace.
+  readonly equipments = signal<{ id: string; code: string; name: string }[]>([]);
+  readonly selectedEquipmentIds = signal<string[]>([]);
+
+  toggleEquipment(id: string): void {
+    this.selectedEquipmentIds.update(ids =>
+      ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]);
+  }
+
+  isEquipmentSelected(id: string): boolean {
+    return this.selectedEquipmentIds().includes(id);
+  }
 
   // Step 2: Specs
   readonly step2 = this.fb.group({
@@ -110,6 +125,11 @@ export class VehicleFormComponent {
 
   constructor() {
     this.vehicleService.getMakes(false).subscribe(m => this.makes.set(m));
+    this.vehicleService.getFilterOptions().subscribe({
+      next: o => this.equipments.set(o.equipments),
+      // Sin catálogo el resto del formulario sigue siendo utilizable.
+      error: () => this.equipments.set([])
+    });
   }
 
   next(): void {
@@ -169,7 +189,7 @@ export class VehicleFormComponent {
       region:         nz(s3.region),
       city:           nz(s3.city),
       district:       null,
-      equipmentIds:   [],
+      equipmentIds:   this.selectedEquipmentIds(),
       publish:        true,
       // El backend lo sustituye por el usuario del token; se envía solo para
       // cumplir el contrato del comando.
