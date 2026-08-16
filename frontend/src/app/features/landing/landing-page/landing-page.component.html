@@ -111,8 +111,10 @@
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
       @for (a of advantages; track a.title) {
         <div class="bg-white rounded-xl border border-navy/8 p-6">
-          <div class="text-3xl" [attr.aria-hidden]="true">{{ a.emoji }}</div>
-          <h3 class="font-heading font-semibold text-navy mt-3">{{ a.title }}</h3>
+          <div class="w-12 h-12 rounded-xl bg-azure/10 border border-azure/20 flex items-center justify-center text-azure-dark">
+            <lll-icon [name]="a.icon" [size]="26" />
+          </div>
+          <h3 class="font-heading font-semibold text-navy text-lg mt-4">{{ a.title }}</h3>
           <p class="text-sm text-navy/60 mt-2">{{ a.text }}</p>
         </div>
       }

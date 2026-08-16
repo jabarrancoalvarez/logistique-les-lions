@@ -7,6 +7,7 @@ import { HeroSearchComponent } from '../hero-search/hero-search.component';
 import { FeaturedVehiclesComponent } from '../featured-vehicles/featured-vehicles.component';
 import { HowItWorksComponent } from '../how-it-works/how-it-works.component';
 import { AuthService } from '@core/auth/auth.service';
+import { IconComponent } from '@shared/components/icon/icon.component';
 
 /**
  * Portada de Yoon u Auto.
@@ -24,7 +25,8 @@ import { AuthService } from '@core/auth/auth.service';
     RouterLink,
     HeroSearchComponent,
     FeaturedVehiclesComponent,
-    HowItWorksComponent
+    HowItWorksComponent,
+    IconComponent
   ],
   templateUrl: './landing-page.component.html'
 })
@@ -85,25 +87,25 @@ export class LandingPageComponent implements OnInit {
    */
   readonly advantages = [
     {
-      emoji: '🇸🇳',
+      icon: 'location',
       title: 'Pensé pour le Sénégal',
       text: 'Les 14 régions, les prix en FCFA et le statut douanier affiché sur ' +
             'chaque annonce.'
     },
     {
-      emoji: '🆓',
+      icon: 'gift',
       title: 'Entièrement gratuit',
       text: 'Publier, chercher, négocier et acheter ne coûte rien. Sans limite ' +
             'd’annonces ni abonnement.'
     },
     {
-      emoji: '📄',
+      icon: 'document',
       title: 'Contrat et vente vérifiée',
       text: 'Un contrat validé par l’acheteur et le vendeur, avec PDF et code QR ' +
             'de vérification.'
     },
     {
-      emoji: '📊',
+      icon: 'chart',
       title: 'Indicateur de prix',
       text: 'Une comparaison statistique avec les véhicules semblables. Sans ' +
             'intelligence artificielle, sans invention.'
