@@ -130,22 +130,21 @@ public class GetStatisticsQueryHandler(IApplicationDbContext db)
     {
         var users = db.UserProfiles.AsNoTracking();
 
-        // Se agrupa en memoria: el proveedor en memoria de los tests no traduce
-        // GroupBy con proyección, y el reparto por región cabe de sobra.
-        var regions = await users
+        // Se agrupa en la base: son 14 regiones, pero el recuento lo hace el motor en vez
+        // de traerse una fila por usuario.
+        var regiones = await users
             .Where(u => u.Region != null)
-            .Select(u => u.Region!)
-            .ToListAsync(ct);
-
-        var byRegion = regions
-            .GroupBy(r => r)
-            .Select(g => new LabelCountDto(g.Key, g.Count()))
+            .GroupBy(u => u.Region!)
+            .Select(g => new { Label = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count)
             .ThenBy(x => x.Label)
-            .ToList();
+            .ToListAsync(ct);
 
-        // Las altas se agrupan en memoria: la agrupación por fecha depende del proveedor
-        // y aquí son pocas filas.
+        var byRegion = regiones.Select(r => new LabelCountDto(r.Label, r.Count)).ToList();
+
+        // Las altas por día siguen agrupándose en memoria: recortar un DateTimeOffset a
+        // fecha depende del proveedor, y aquí la consulta ya está acotada al periodo, así
+        // que lo que viaja son las altas de esos días y no la tabla entera.
         var signups = await users
             .Where(u => u.CreatedAt >= since)
             .Select(u => u.CreatedAt)
@@ -175,33 +174,29 @@ public class GetStatisticsQueryHandler(IApplicationDbContext db)
             .AsNoTracking()
             .Where(v => v.Status == VehicleStatus.Actif || v.Status == VehicleStatus.Reserve);
 
-        var listings = await active
-            .Select(v => new
-            {
-                MakeName = v.Make.Name,
-                ModelName = v.Model != null ? v.Model.Name : null,
-                v.Price, v.Mileage, v.Year, v.City, v.FuelType, v.CustomsStatus
-            })
-            .ToListAsync(ct);
+        var precios     = active.Where(v => v.Price > 0).Select(v => v.Price);
+        var kilometrajes = active.Where(v => v.Mileage > 0).Select(v => (decimal)v.Mileage!.Value);
+        var anios       = active.Select(v => (decimal)v.Year);
 
-        var prices = listings.Select(l => l.Price).Where(p => p > 0).ToList();
-        var mileages = listings.Where(l => l.Mileage is > 0).Select(l => l.Mileage!.Value).ToList();
-        var years = listings.Select(l => l.Year).ToList();
+        var hayPrecios = await precios.AnyAsync(ct);
 
         return new StatsSupplyDto(
             await db.Vehicles.AsNoTracking().CountAsync(v => v.PublishedAt >= since, ct),
-            listings.Count,
-            prices.Count > 0 ? Math.Round(prices.Average(), 0) : null,
-            Median(prices),
-            mileages.Count > 0 ? (int)Median(mileages.Select(m => (decimal)m).ToList())! : null,
-            years.Count > 0 ? (int)Median(years.Select(y => (decimal)y).ToList())! : null,
-            Top(listings.Select(l => l.MakeName)),
-            Top(listings.Where(l => l.ModelName is not null)
-                .Select(l => $"{l.MakeName} {l.ModelName}")),
-            Top(listings.Where(l => l.City is not null).Select(l => l.City!)),
-            Top(listings.Where(l => l.FuelType is not null).Select(l => l.FuelType!.ToString()!)),
-            Top(listings.Where(l => l.CustomsStatus is not null)
-                .Select(l => l.CustomsStatus!.ToString()!)));
+            await active.CountAsync(ct),
+            hayPrecios ? Math.Round(await precios.AverageAsync(ct), 0) : null,
+            await MedianAsync(precios, ct),
+            (int?)await MedianAsync(kilometrajes, ct),
+            (int?)await MedianAsync(anios, ct),
+            await TopAsync(active.Select(v => v.Make.Name), ct),
+            await TopAsync(active.Where(v => v.Model != null)
+                .Select(v => v.Make.Name + " " + v.Model!.Name), ct),
+            await TopAsync(active.Where(v => v.City != null).Select(v => v.City!), ct),
+            // Los enums se agrupan por su valor y se rotulan después: así el GROUP BY no
+            // depende de cómo esté guardado el enum en la columna.
+            await TopEnumAsync(active.Where(v => v.FuelType != null)
+                .Select(v => v.FuelType!.Value), ct),
+            await TopEnumAsync(active.Where(v => v.CustomsStatus != null)
+                .Select(v => v.CustomsStatus!.Value), ct));
     }
 
     private async Task<StatsDemandDto> DemandAsync(CancellationToken ct)
@@ -238,14 +233,11 @@ public class GetStatisticsQueryHandler(IApplicationDbContext db)
             .Select(p => p.Filters.PriceTo!.Value)
             .ToList();
 
-        var favoritedLabels = await db.SavedVehicles
+        var favoritedModels = await TopAsync(db.SavedVehicles
             .AsNoTracking()
             .Join(db.Vehicles.AsNoTracking(), s => s.VehicleId, v => v.Id, (s, v) => v)
             .Where(v => v.ModelId != null)
-            .Select(v => v.Make.Name + " " + v.Model!.Name)
-            .ToListAsync(ct);
-
-        var favoritedModels = Top(favoritedLabels);
+            .Select(v => v.Make.Name + " " + v.Model!.Name), ct);
 
         var gaps = await GapsAsync(parsed.Select(p => (p.UserId, p.Filters.ModelId)), modelLabels, ct);
 
@@ -279,26 +271,32 @@ public class GetStatisticsQueryHandler(IApplicationDbContext db)
             // Una persona con tres búsquedas del mismo modelo sigue siendo una persona.
             .ToDictionary(g => g.Key, g => g.Select(x => x.UserId).Distinct().Count());
 
-        // Las solicitudes guardan el modelo como texto libre: se cruzan por nombre.
+        // Las solicitudes guardan el modelo como texto libre: se cruzan por nombre. Se
+        // agrupa por marca y modelo en la base, que devuelve una fila por combinación
+        // distinta en vez de una por solicitud.
         var requests = await db.VehicleRequests
             .AsNoTracking()
             .Where(r => r.ModelName != null)
-            .Select(r => new { MakeName = r.Make != null ? r.Make.Name : r.MakeName, r.ModelName })
+            .GroupBy(r => new { MakeName = r.Make != null ? r.Make.Name : r.MakeName, r.ModelName })
+            .Select(g => new { g.Key.MakeName, g.Key.ModelName, Count = g.Count() })
             .ToListAsync(ct);
 
+        // El rótulo se compone fuera: concatenar dentro del GROUP BY ata la consulta al
+        // proveedor, y aquí ya son pocas filas.
         var requestsByLabel = requests
-            .GroupBy(r => $"{r.MakeName} {r.ModelName}".Trim())
-            .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+            .GroupBy(r => $"{r.MakeName} {r.ModelName}".Trim(), StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.Sum(x => x.Count), StringComparer.OrdinalIgnoreCase);
 
-        var supplyLabels = await db.Vehicles
+        var supply = await db.Vehicles
             .AsNoTracking()
             .Where(v => v.Status == VehicleStatus.Actif && v.ModelId != null)
-            .Select(v => v.Make.Name + " " + v.Model!.Name)
+            .GroupBy(v => new { Make = v.Make.Name, Model = v.Model!.Name })
+            .Select(g => new { g.Key.Make, g.Key.Model, Count = g.Count() })
             .ToListAsync(ct);
 
-        var supplyByLabel = supplyLabels
-            .GroupBy(l => l, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+        var supplyByLabel = supply
+            .GroupBy(v => $"{v.Make} {v.Model}".Trim(), StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.Sum(x => x.Count), StringComparer.OrdinalIgnoreCase);
 
         var labels = searchers.Keys
             .Select(id => modelLabels.GetValueOrDefault(id))
@@ -358,6 +356,72 @@ public class GetStatisticsQueryHandler(IApplicationDbContext db)
             .ThenBy(x => x.Label)
             .Take(TopSize)
             .ToList();
+
+    /// <summary>Ranking resuelto por el motor: vuelven ocho filas, no la tabla.</summary>
+    /// <remarks>
+    /// ⚠️ Se ordena sobre un tipo anónimo y el DTO se construye al final, ya en memoria.
+    /// Proyectar a <see cref="LabelCountDto"/> antes de ordenar rompe la traducción:
+    /// EF no sabe ordenar por una propiedad de un tipo que él mismo acaba de proyectar.
+    /// </remarks>
+    private static async Task<List<LabelCountDto>> TopAsync(
+        IQueryable<string> values, CancellationToken ct)
+    {
+        var filas = await values
+            .GroupBy(v => v)
+            .Select(g => new { Label = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .ThenBy(x => x.Label)
+            .Take(TopSize)
+            .ToListAsync(ct);
+
+        return filas.Select(f => new LabelCountDto(f.Label, f.Count)).ToList();
+    }
+
+    /// <summary>
+    /// Igual, para columnas de enum: se agrupa por el valor y se rotula al salir.
+    /// </summary>
+    private static async Task<List<LabelCountDto>> TopEnumAsync<TEnum>(
+        IQueryable<TEnum> values, CancellationToken ct) where TEnum : struct, Enum
+    {
+        var filas = await values
+            .GroupBy(v => v)
+            .Select(g => new { g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(TopSize)
+            .ToListAsync(ct);
+
+        return filas
+            .Select(f => new LabelCountDto(f.Key.ToString()!, f.Count))
+            .OrderByDescending(x => x.Count)
+            .ThenBy(x => x.Label)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Mediana calculada en la base: se cuenta y se piden solo las filas centrales.
+    /// </summary>
+    /// <remarks>
+    /// Son dos consultas y como mucho dos filas, en vez de traerse todos los valores para
+    /// ordenarlos aquí. Se evita a propósito <c>percentile_cont</c>, que resolvería en una
+    /// sola consulta pero solo existe en PostgreSQL y dejaría estas estadísticas sin
+    /// poder probarse.
+    ///
+    /// Devuelve <c>null</c> si no hay datos: no se inventa un valor central donde no hay
+    /// valores.
+    /// </remarks>
+    private static async Task<decimal?> MedianAsync(IQueryable<decimal> values, CancellationToken ct)
+    {
+        var total = await values.CountAsync(ct);
+        if (total == 0) return null;
+
+        var ordenados = values.OrderBy(v => v);
+
+        if (total % 2 == 1)
+            return await ordenados.Skip(total / 2).FirstAsync(ct);
+
+        var centrales = await ordenados.Skip(total / 2 - 1).Take(2).ToListAsync(ct);
+        return Math.Round((centrales[0] + centrales[1]) / 2m, 0);
+    }
 
     /// <summary>Qué filtros usó una búsqueda guardada, por su nombre.</summary>
     private static IEnumerable<string> FilterNames(
