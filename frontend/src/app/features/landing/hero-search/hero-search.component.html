@@ -7,13 +7,20 @@
        Degradado océano de base + tres blobs de color que derivan lentamente
        (aurora) + un brillo diagonal que lo cruza. Da vida al hero sin recargar,
        todo en CSS y respetando prefers-reduced-motion. -->
-  <div class="absolute inset-0 z-0" aria-hidden="true">
+  <div class="absolute inset-0 z-0 hero-intro" aria-hidden="true">
     <div class="absolute inset-0 bg-gradient-to-br from-navy-dark via-navy to-navy-light"></div>
 
-    <!-- Aurora: blobs de color en movimiento -->
-    <div class="hero-aurora hero-aurora-a absolute -top-32 -right-24 w-[38rem] h-[38rem] rounded-full bg-azure opacity-25 blur-3xl"></div>
-    <div class="hero-aurora hero-aurora-b absolute top-1/3 -left-32 w-[32rem] h-[32rem] rounded-full bg-azure-light opacity-20 blur-3xl"></div>
-    <div class="hero-aurora hero-aurora-c absolute -bottom-32 right-1/4 w-[30rem] h-[30rem] rounded-full bg-navy-light opacity-30 blur-3xl"></div>
+    <!-- Aurora: blobs de color en movimiento, cada uno en su capa de parallax.
+         --depth marca cuánto sigue al cursor: los más grandes/lejanos, menos. -->
+    <div class="hero-parallax absolute inset-0" style="--depth: 34">
+      <div class="hero-aurora hero-aurora-a absolute -top-32 -right-24 w-[38rem] h-[38rem] rounded-full bg-azure opacity-25 blur-3xl"></div>
+    </div>
+    <div class="hero-parallax absolute inset-0" style="--depth: 22">
+      <div class="hero-aurora hero-aurora-b absolute top-1/3 -left-32 w-[32rem] h-[32rem] rounded-full bg-azure-light opacity-20 blur-3xl"></div>
+    </div>
+    <div class="hero-parallax absolute inset-0" style="--depth: 46">
+      <div class="hero-aurora hero-aurora-c absolute -bottom-32 right-1/4 w-[30rem] h-[30rem] rounded-full bg-navy-light opacity-30 blur-3xl"></div>
+    </div>
 
     <!-- Rejilla sutil por encima del color -->
     <svg class="absolute inset-0 w-full h-full opacity-[0.06]" xmlns="http://www.w3.org/2000/svg">
@@ -39,8 +46,7 @@
 
       <h1
         id="hero-heading"
-        class="font-heading text-frost text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fadeInUp"
-        style="animation-delay: 0.1s"
+        class="font-heading text-frost text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 hero-title-in"
       >
         Achetez et vendez votre voiture<br>
         <span class="text-azure transition-all duration-500">{{ currentHeroWord() }}</span>
