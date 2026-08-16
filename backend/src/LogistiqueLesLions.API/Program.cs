@@ -24,7 +24,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Information("🦁 Iniciando Logistique Les Lions API...");
+    Log.Information("🦁 Iniciando Yoon u Auto API...");
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -81,7 +81,7 @@ try
         {
             document.Info = new()
             {
-                Title = "Logistique Les Lions — API",
+                Title = "Yoon u Auto — API",
                 Version = "v1",
                 Description = "Plataforma SaaS de compraventa internacional de vehículos con gestión documental transfronteriza."
             };
@@ -303,7 +303,7 @@ try
         app.MapOpenApi();
         app.MapScalarApiReference(opts =>
         {
-            opts.Title = "Logistique Les Lions — API Docs";
+            opts.Title = "Yoon u Auto — API Docs";
             opts.Theme = Scalar.AspNetCore.ScalarTheme.DeepSpace;
         });
     }
