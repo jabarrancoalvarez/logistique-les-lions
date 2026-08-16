@@ -219,57 +219,39 @@ Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parec
 
 ## 3. Correcciones menores, sin decisión de fondo
 
-Si estás de acuerdo, se hacen y ya. Están aquí para que las veas, no para debatirlas.
+- [x] ✅ **RESUELTAS LAS TRECE el 16/08/2026** (commit `e5d2331`): el 500 de `/auth/login`
+      sin `identifier`, los rechazos que no se explicaban, el filtro «Signalées», el enlace
+      al QR desde el backoffice, los enums crudos `Dispute` y `EnExamen`, «Signalement
+      clôturé» al ponerlo solo en examen, el buscador de propuestas que ofrecía vendidos,
+      las URL en `http://` detrás del proxy de Render, el panel de complétude que no se
+      refrescaba, el aviso de error pegado, «Anexer» → «Rattacher», «Jusqu'à trois
+      véhicules» escrito a mano, y las pestañas que se rompían tras cada despliegue.
 
-- [ ] **Los rechazos no se explican.** Suspender sin motivo, leer una conversación sin
-      justificarla, ajustar puntos sin motivo o bajar el kilometraje **no hacen nada y no
-      dicen por qué**: el botón sigue activo y no aparece mensaje. La API sí devuelve el
-      error (`Admin.ReasonRequired`, `GarageVehicle.MileageWentBackwards`).
-      ⚠️ **El patrón correcto ya existe**: publicar un borrador sin precio responde
-      «Publication impossible. Vérifiez que l'annonce a un prix.» Hay que replicarlo.
-- [ ] 🔴 **`POST /auth/login` devuelve 500 si el cuerpo no trae `identifier`.** Con la
-      contraseña equivocada responde 401, que es lo correcto; pero si falta el campo,
-      revienta. Es un endpoint **anónimo y con límite de peticiones**, o sea el primero
-      que va a recibir basura desde fuera. Debería contestar 400.
-- [ ] ⚠️ **`credenciales.txt` estaba versionado en un repositorio público** con la
+**Lo que quedó fuera de esas trece:**
+
+- [ ] ⚠️ **`credenciales.txt` estuvo versionado en un repositorio público** con la
       contraseña `Test1234!` en claro. Ya está fuera del control de versiones y en
       `.gitignore`, pero **sigue en el historial de git**: hay que darla por quemada.
-- [ ] **Falta el filtro «reportadas»** en Annonces. La API acepta `Reported`; el formulario
-      solo expone «Masquées» y «À réviser». El doc §6.4 lo pide.
-- [x] ✅ **RESUELTO.** Se añadió el enlace a la página pública del QR, y
-      `POST /admin/contracts/{id}/document` entrega el PDF **exigiendo motivo** y dejando
-      fila en `admin_actions` con el nombre del administrador — el mismo criterio que
-      leer una conversación privada. Falta el botón en la pantalla.
-- [ ] **Enums crudos en francés a medias**: el journal escribe `Dispute` en vez de «Litige
-      entre les parties»; el historial de un signalement escribe `EnExamen`. Mismo fallo
-      que se corrigió en la ficha de negociación (commit 239cca6).
-- [ ] **El historial de un signalement rotula «Signalement clôturé» también al ponerlo en
-      examen**, que no lo cierra.
-- [ ] **Al proponer un vehículo interno, el buscador ofrece anuncios vendidos** (`YU10025`,
-      en `Vendu`, aparece entre las propuestas posibles).
-- [ ] **La API devuelve las URLs de fichero en `http://`**, no `https://`. Chrome deja
-      avisos de «Mixed Content» y las eleva él solo.
-- [ ] **El panel de complétude no se refresca**: al cerrar un recordatorio sigue diciendo
-      «2 rappels en retard» hasta recargar.
-- [ ] **El aviso de error de catálogo se queda pegado** en pantalla aunque la acción
-      siguiente funcione.
-- [ ] **Falta de ortografía**: «**Anexer** une annonce Yoon u Auto» → *Annexer*.
-- [ ] **«Jusqu'à trois véhicules» está escrito a mano** en `/mis-busquedas`, con el límite
-      configurado en 4. El resto de la aplicación lee el ajuste.
+      No tiene arreglo por código; es cambiar esas contraseñas.
+- [ ] **Falta el botón de descargar el PDF del contrato** en la pantalla del backoffice.
+      El endpoint existe y está bien hecho (`POST /admin/contracts/{id}/document`, exige
+      motivo y deja fila en `admin_actions`), pero nadie lo llama todavía desde el
+      frontend. Se dejó aparte porque el PDF lleva pièces d'identité y direcciones: si
+      prefieres que el administrador **no** pueda descargarlo, se retira el endpoint en
+      vez de añadir el botón.
 
 ---
 
 ## 4. Módulos del producto anterior
 
-Todo eso vive en [`MODULOS-LEGACY.md`](MODULOS-LEGACY.md), módulo a módulo y con casilla
-para marcar **eliminar / adaptar / conservar**. Lo urgente de allí:
+- [x] ✅ **RESUELTO el 16/08/2026** (commit `9f57667`): retirados según las 25 decisiones
+      marcadas en [`MODULOS-LEGACY.md`](MODULOS-LEGACY.md) — 124 ficheros fuera y 11 tablas
+      eliminadas. Con ello desaparecen los importes en **€** de `/precios`, `/transporte` y
+      `/financiacion`, y las entradas `Processus`, `Incidents` y `Partenaires` del menú del
+      backoffice.
 
-- [ ] **Quedan euros en producción**: `/precios`, `/transporte` y `/financiacion` muestran
-      importes en **€**. Solo se llega por URL directa, pero están vivas y contradicen
-      «solo FCFA».
-- [ ] **El menú del backoffice sigue enseñando `Processus`, `Incidents` y `Partenaires`**,
-      en español y con datos europeos («Gestoría Iberia», «Carfax Europe Inspectors»).
-      Es lo primero que ve un administrador.
+      Verificado en el barrido de enlaces del 16/08/2026 (`flujopruebas.md` §12.11): las 17
+      rutas retiradas devuelven 404 y **ningún enlace vivo apunta a ellas**.
 
 ---
 
@@ -287,21 +269,31 @@ para marcar **eliminar / adaptar / conservar**. Lo urgente de allí:
       caliente: nada por encima de 350 ms. Eso **no** responde al pendiente nº 19
       (agregaciones de Statistiques en memoria) ni al arranque en frío de Render, que es lo
       que se lleva el primer visitante del día.
+- [ ] **Renombrar los servicios a `yoon-u-auto`.** Las URL siguen siendo
+      `logistique-les-lions.vercel.app` y `logistique-les-lions-api.onrender.com`, la marca
+      anterior. **El renombrado lo tienes que hacer tú** en los paneles de Render y Vercel;
+      en cuanto estén los nombres nuevos hay que tocar tres sitios del código:
+      `environment.production.ts`, `render.yaml` y el valor por defecto de `Frontend:Url`
+      del reseeder. Los namespaces `LogistiqueLesLions.*` se dejan para el final, aparte.
+- [ ] **Probar el tiempo real con dos pestañas** (chat, indicador de escritura y acuses de
+      lectura). Es lo único de `flujopruebas.md` §12.1 que sigue sin comprobarse; ya es
+      posible desde que una cuenta admite sesiones simultáneas.
 
 ---
 
 ## 6. Encontrado después
 
-- [ ] ⚠️ **Tras cada despliegue, las pestañas abiertas se rompen.** Angular carga las
-      pantallas por trozos (`chunk-*.js`) y, al desplegar, los del build anterior dejan de
-      existir: la pestañá abierta pide uno, recibe HTML y falla con
-      «Failed to fetch dynamically imported module». El usuario ve una pantalla rota y
-      solo lo arregla recargando a mano.
-      Se corrige capturando ese fallo de carga y recargando la página una vez.
-      Visto en producción el 16/08/2026 tras cinco despliegues seguidos.
+- [x] ✅ **RESUELTO**: tras cada despliegue las pestañas abiertas se rompían al pedir un
+      `chunk-*.js` del build anterior. Ahora se detecta el fallo de carga y se recarga una
+      sola vez (corrección nº 13).
 
 - [ ] ⚠️ **Hay un tercer uso de IA que no estaba en la hoja del legacy**: un chat
       contextual sobre el anuncio (`POST /vehicles/{id}/ai/ask`,
       `IAiContentService.AnswerVehicleQuestionAsync`). No es generación de descripciones
       —que ya se retiró— ni extracción de documentos —que se conserva—. **No aparece en
       el documento funcional.** Queda en pie a la espera de tu decisión.
+
+- [x] ✅ **RESUELTO**: la página de 404 estaba en español y con el león del producto
+      anterior, y quedaban textos sin traducir en el buzón vacío y en las preguntas
+      rápidas del chat (una preguntaba por la **exportación**, concepto del producto
+      anterior). Corregido el 16/08/2026; ver `flujopruebas.md` §12.11.
