@@ -78,7 +78,28 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUser, CurrentUserService>();
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPublicReferenceGenerator, PublicReferenceGenerator>();
-        services.AddScoped<IStorageService, LocalStorageService>();
+        // El disco de Render es efímero: en producción los archivos van a un
+        // almacenamiento de objetos (Cloudflare R2). En local sigue bastando el disco.
+        // Se elige con Storage:Provider; mientras no esté configurado, no cambia nada.
+        var proveedor = configuration["Storage:Provider"];
+        var pideObjetos =
+            string.Equals(proveedor, "s3", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(proveedor, "r2", StringComparison.OrdinalIgnoreCase);
+
+        // Si se pide el almacenamiento de objetos pero falta alguna clave, se vuelve al
+        // disco en lugar de impedir el arranque: preferimos un despliegue vivo que pierde
+        // archivos a una API que no levanta. Es el mismo criterio que con el correo.
+        var configurado = pideObjetos
+            && !string.IsNullOrWhiteSpace(configuration["Storage:Bucket"])
+            && !string.IsNullOrWhiteSpace(configuration["Storage:ServiceUrl"])
+            && !string.IsNullOrWhiteSpace(configuration["Storage:AccessKey"])
+            && !string.IsNullOrWhiteSpace(configuration["Storage:SecretKey"])
+            && !string.IsNullOrWhiteSpace(configuration["Storage:PublicBaseUrl"]);
+
+        if (configurado)
+            services.AddScoped<IStorageService, ObjectStorageService>();
+        else
+            services.AddScoped<IStorageService, LocalStorageService>();
 
         // ─── Email transaccional ─────────────────────────────────────────────
         // Provider seleccionado en runtime desde Email:Provider.
