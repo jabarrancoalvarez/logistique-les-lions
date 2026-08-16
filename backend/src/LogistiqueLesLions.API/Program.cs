@@ -58,6 +58,8 @@ try
                                LogistiqueLesLions.API.Hubs.SignalRNotificationService>();
     builder.Services.AddScoped<LogistiqueLesLions.Application.Common.Interfaces.INotificationPusher,
                                LogistiqueLesLions.API.Hubs.SignalRNotificationPusher>();
+    builder.Services.AddScoped<LogistiqueLesLions.Application.Common.Interfaces.IChatPusher,
+                               LogistiqueLesLions.API.Hubs.SignalRChatPusher>();
     builder.Services.AddScoped<LogistiqueLesLions.Infrastructure.Persistence.Seeding.YoonUAutoReseeder>();
 
     // ─── OpenTelemetry ──────────────────────────────────────────────────────────

@@ -159,8 +159,8 @@ export class FavoritesComponent implements OnInit {
       `Bonjour, je suis intéressé par votre ${v.makeName} ${v.modelName ?? ''} ` +
       `(Réf. ${v.publicReference}).`
     ).subscribe({
-      next: () => this.router.navigate(['/mensajes']),
-      error: () => this.router.navigate(['/mensajes'])
+      next: () => this.router.navigate(['/mis-negociaciones']),
+      error: () => this.router.navigate(['/mis-negociaciones'])
     });
   }
 

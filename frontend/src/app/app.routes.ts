@@ -17,11 +17,10 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./features/vehicles/vehicles.routes').then(m => m.VEHICLES_ROUTES)
   },
-  {
-    path: 'mensajes',
-    loadChildren: () =>
-      import('./features/messaging/messaging.routes').then(m => m.MESSAGING_ROUTES)
-  },
+  // El chat cuelga de la negociación, que es el agregado raíz: no hay buzón aparte.
+  // Los enlaces antiguos a /mensajes siguen funcionando y llevan al hilo correspondiente.
+  { path: 'mensajes', pathMatch: 'full', redirectTo: 'mis-negociaciones' },
+  { path: 'mensajes/:id', redirectTo: 'mis-negociaciones/:id' },
   {
     path: 'mis-vehiculos',
     canActivate: [authGuard],

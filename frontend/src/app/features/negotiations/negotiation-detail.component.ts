@@ -1,5 +1,5 @@
 import {
-  Component, ChangeDetectionStrategy, OnInit, OnDestroy, signal, computed, inject
+  Component, ChangeDetectionStrategy, OnInit, OnDestroy, signal, computed, inject, effect
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -56,6 +56,51 @@ export class NegotiationDetailComponent implements OnInit, OnDestroy {
 
   readonly myId = computed(() => this.auth.user()?.id ?? '');
 
+  // ─── Tiempo real ─────────────────────────────────────────────────────────
+  /** La otra parte está escribiendo ahora mismo. Se apaga sola. */
+  readonly otherTyping = signal(false);
+
+  /** Cuándo leyó la otra parte lo último que escribí. Null mientras no conste. */
+  readonly lastReadAt = signal<string | null>(null);
+
+  private typingTimer?: ReturnType<typeof setTimeout>;
+  private lastTypingEmit = 0;
+
+  constructor() {
+    // Mensaje entrante: se recarga el hilo en vez de insertar el que llega, porque la
+    // lista necesita el nombre del emisor y el estado de lectura, que el aviso no trae.
+    effect(() => {
+      const entrante = this.messaging.incomingMessage();
+      const n = this.negotiation();
+      if (!entrante || !n) return;
+      if (entrante.senderId !== n.otherUserId || entrante.vehicleId !== n.vehicleId) return;
+
+      this.loadMessages(n.id);
+      // Se está mirando la conversación: avisar de que queda leído.
+      void this.messaging.markAsRead(n.otherUserId, n.vehicleId);
+    });
+
+    effect(() => {
+      const t = this.messaging.typingNotification();
+      const n = this.negotiation();
+      if (!t || !n) return;
+      if (t.senderId !== n.otherUserId || t.vehicleId !== n.vehicleId) return;
+
+      this.otherTyping.set(true);
+      if (this.typingTimer) clearTimeout(this.typingTimer);
+      // Solo llega el «empieza», nunca el «para»: se apaga por tiempo.
+      this.typingTimer = setTimeout(() => this.otherTyping.set(false), 3000);
+    });
+
+    effect(() => {
+      const r = this.messaging.readReceipt();
+      const n = this.negotiation();
+      if (!r || !n) return;
+      if (r.readerId !== n.otherUserId || r.vehicleId !== n.vehicleId) return;
+      this.lastReadAt.set(r.readAt);
+    });
+  }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
@@ -63,12 +108,12 @@ export class NegotiationDetailComponent implements OnInit, OnDestroy {
       this.loading.set(false);
       return;
     }
+    this.messaging.startConnection();
     this.load(id);
   }
 
   ngOnDestroy(): void {
-    const id = this.negotiation()?.id;
-    if (id) void this.messaging.leaveConversation(id);
+    if (this.typingTimer) clearTimeout(this.typingTimer);
   }
 
   private load(id: string): void {
@@ -79,8 +124,8 @@ export class NegotiationDetailComponent implements OnInit, OnDestroy {
         this.negotiation.set(n);
         this.loading.set(false);
         this.loadMessages(n.id);
-        // El identificador de la negociación es también el del hilo de chat.
-        void this.messaging.joinConversation(n.id);
+        // Abrir la negociación es haberla leído: se avisa a la otra parte.
+        void this.messaging.markAsRead(n.otherUserId, n.vehicleId);
       },
       error: () => {
         this.error.set('Négociation introuvable.');
@@ -114,10 +159,28 @@ export class NegotiationDetailComponent implements OnInit, OnDestroy {
       next: () => {
         this.sending.set(false);
         this.messageBody = '';
+        // Lo nuevo aún no está leído: el acuse anterior ya no vale.
+        this.lastReadAt.set(null);
         this.loadMessages(n.id);
       },
       error: () => this.sending.set(false)
     });
+  }
+
+  /**
+   * Avisa de que se está escribiendo, como mucho una vez cada dos segundos: el evento se
+   * emite en cada tecla y no hace falta repetirlo, porque al otro lado se apaga solo a
+   * los tres segundos.
+   */
+  onTyping(): void {
+    const n = this.negotiation();
+    if (!n) return;
+
+    const ahora = Date.now();
+    if (ahora - this.lastTypingEmit < 2000) return;
+    this.lastTypingEmit = ahora;
+
+    void this.messaging.startTyping(n.otherUserId, n.vehicleId);
   }
 
   isMine(m: MessageItem): boolean {

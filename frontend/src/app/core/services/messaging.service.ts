@@ -5,19 +5,6 @@ import { environment } from '@environments/environment';
 import * as signalR from '@microsoft/signalr';
 import { AuthService } from '@core/auth/auth.service';
 
-export interface ConversationSummary {
-  id: string;
-  otherUserId: string;
-  otherUserName: string;
-  otherUserAvatar?: string;
-  vehicleId: string;
-  vehicleTitle: string;
-  vehicleThumbnail?: string;
-  lastMessage?: string;
-  lastMessageAt?: string;
-  unreadCount: number;
-}
-
 export interface MessageItem {
   id: string;
   senderId: string;
@@ -30,6 +17,8 @@ export interface MessageItem {
 
 export interface IncomingMessage {
   messageId: string;
+  /** Hilo al que pertenece: sirve para saber si es de la negociación abierta. */
+  negotiationId: string;
   senderId: string;
   vehicleId: string;
   body: string;
@@ -83,12 +72,6 @@ export class MessagingService {
   }
 
   // ─── REST ────────────────────────────────────────────────────────────────
-
-  getConversations(): Observable<ConversationSummary[]> {
-    return this.http.get<{ isSuccess: boolean; value: ConversationSummary[] }>(`${this.apiUrl}/conversations`).pipe(
-      map(r => r.value)
-    );
-  }
 
   getMessages(conversationId: string, page = 1): Observable<{ items: MessageItem[]; totalCount: number }> {
     return this.http.get<{ isSuccess: boolean; value: { items: MessageItem[]; totalCount: number } }>(
@@ -151,24 +134,6 @@ export class MessagingService {
       this.isConnected.set(false);
       this.startPromise = undefined;
     });
-  }
-
-  async sendMessageHub(recipientId: string, vehicleId: string, body: string): Promise<void> {
-    if (await this.ensureConnected()) {
-      await this.hubConnection!.invoke('SendMessage', recipientId, vehicleId, body);
-    }
-  }
-
-  async joinConversation(conversationId: string): Promise<void> {
-    if (await this.ensureConnected()) {
-      await this.hubConnection!.invoke('JoinConversation', conversationId);
-    }
-  }
-
-  async leaveConversation(conversationId: string): Promise<void> {
-    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('LeaveConversation', conversationId);
-    }
   }
 
   async startTyping(recipientId: string, vehicleId: string): Promise<void> {

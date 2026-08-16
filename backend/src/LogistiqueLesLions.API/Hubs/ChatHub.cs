@@ -1,56 +1,26 @@
 using LogistiqueLesLions.Application.Common.Interfaces;
-using LogistiqueLesLions.Application.Features.Messaging.Commands.SendMessage;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace LogistiqueLesLions.API.Hubs;
 
+/// <summary>
+/// Señales efímeras del chat: quién está escribiendo y quién ha leído.
+/// </summary>
+/// <remarks>
+/// Lo que se guarda no pasa por aquí. Enviar un mensaje es
+/// <c>POST /messaging/send</c>, y es su handler quien avisa a la otra parte con
+/// <see cref="IChatPusher"/>.
+///
+/// ⚠️ Antes el hub tenía su propio <c>SendMessage</c>, que ejecutaba el comando y
+/// notificaba él mismo. Convivía con el envío por REST, que no notificaba a nadie: según
+/// por dónde entrara el mensaje, el destinatario se enteraba o no. La lógica de negocio
+/// vive en el handler y el aviso sale de allí; el hub solo transporta lo que no se
+/// persiste.
+/// </remarks>
 [Authorize]
-public class ChatHub(ISender sender, ICurrentUser currentUser) : Hub
+public class ChatHub(ICurrentUser currentUser) : Hub
 {
-    /// <summary>
-    /// Enviar mensaje a través de SignalR.
-    /// El cliente llama a: connection.invoke("SendMessage", recipientId, vehicleId, body)
-    /// </summary>
-    public async Task SendMessage(Guid recipientId, Guid vehicleId, string body)
-    {
-        if (!currentUser.IsAuthenticated || currentUser.UserId is null)
-        {
-            throw new HubException("No autenticado.");
-        }
-
-        var command = new SendMessageCommand(currentUser.UserId.Value, recipientId, vehicleId, body);
-        var result  = await sender.Send(command);
-
-        if (!result.IsSuccess)
-            throw new HubException(result.Error);
-
-        // Notificar al destinatario si está conectado
-        await Clients.User(recipientId.ToString()).SendAsync("ReceiveMessage", new
-        {
-            MessageId     = result.Value,
-            SenderId      = currentUser.UserId.Value,
-            VehicleId     = vehicleId,
-            Body          = body,
-            CreatedAt     = DateTimeOffset.UtcNow
-        });
-
-        // Confirmar al emisor
-        await Clients.Caller.SendAsync("MessageSent", result.Value);
-    }
-
-    /// <summary>Unirse al grupo de la conversación para recibir mensajes de ese hilo.</summary>
-    public async Task JoinConversation(Guid negotiationId)
-    {
-        await Groups.AddToGroupAsync(Context.ConnectionId, negotiationId.ToString());
-    }
-
-    public async Task LeaveConversation(Guid negotiationId)
-    {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, negotiationId.ToString());
-    }
-
     /// <summary>
     /// Indicar que el usuario está escribiendo. Se reenvía al destinatario.
     /// Cliente llama: connection.invoke("StartTyping", recipientId, vehicleId)
@@ -67,9 +37,13 @@ public class ChatHub(ISender sender, ICurrentUser currentUser) : Hub
     }
 
     /// <summary>
-    /// Marcar mensajes como leídos. Notifica al emisor con el evento MessageRead.
+    /// Avisar a quien escribió de que se han leído sus mensajes.
     /// Cliente llama: connection.invoke("MarkAsRead", senderId, vehicleId)
     /// </summary>
+    /// <remarks>
+    /// Solo emite la señal. Marcar en la base de datos ocurre al pedir los mensajes de la
+    /// conversación, que es cuando se sabe de verdad que se han visto.
+    /// </remarks>
     public async Task MarkAsRead(Guid senderId, Guid vehicleId)
     {
         if (!currentUser.IsAuthenticated || currentUser.UserId is null) return;

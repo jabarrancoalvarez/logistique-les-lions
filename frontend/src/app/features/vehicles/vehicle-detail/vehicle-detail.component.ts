@@ -491,12 +491,12 @@ export class VehicleDetailComponent implements OnInit {
       next: () => {
         this.contacting.set(false);
         if (requestLabel) this.requestSent.set(requestLabel);
-        this.router.navigate(['/mensajes']);
+        this.router.navigate(['/mis-negociaciones']);
       },
       error: () => {
         // La conversación puede existir ya: se abre igualmente la bandeja.
         this.contacting.set(false);
-        this.router.navigate(['/mensajes']);
+        this.router.navigate(['/mis-negociaciones']);
       }
     });
   }
