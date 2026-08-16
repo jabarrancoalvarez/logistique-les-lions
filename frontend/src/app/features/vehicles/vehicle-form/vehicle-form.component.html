@@ -69,7 +69,7 @@
         <form [formGroup]="step1" class="space-y-5">
           <div>
             <label class="block text-sm font-medium text-navy mb-1.5">Marque *</label>
-            <select formControlName="makeId" class="input">
+            <select formControlName="makeId" (change)="onMakeChange($event)" class="input">
               <option value="">Choisir une marque</option>
               @for (make of makes(); track make.id) {
                 <option [value]="make.id">{{ make.name }}</option>
@@ -78,6 +78,25 @@
             @if (step1.get('makeId')?.touched && step1.get('makeId')?.errors?.['required']) {
               <p class="text-xs text-red-600 mt-1">La marque est obligatoire.</p>
             }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-navy mb-1.5">Modèle</label>
+            <select formControlName="modelId" class="input"
+              [disabled]="models().length === 0">
+              <option value="">
+                @if (loadingModels()) { Chargement… }
+                @else if (models().length === 0) { Choisissez d'abord une marque }
+                @else { Choisir un modèle }
+              </option>
+              @for (model of models(); track model.id) {
+                <option [value]="model.id">{{ model.name }}</option>
+              }
+            </select>
+            <p class="text-xs text-navy/50 mt-1">
+              Sans modèle, votre annonce n'apparaîtra pas dans les recherches par modèle
+              et n'aura pas d'indicateur de prix.
+            </p>
           </div>
           <div>
             <label class="block text-sm font-medium text-navy mb-1.5">Année *</label>

@@ -4,7 +4,9 @@ import {
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { VehicleService, VehicleMake, VehicleAiContext, AiDocumentExtraction } from '@core/services/vehicle.service';
+import {
+  VehicleService, VehicleMake, VehicleModelOption, VehicleAiContext, AiDocumentExtraction
+} from '@core/services/vehicle.service';
 import { AuthService } from '@core/auth/auth.service';
 import { YOON_CURRENCY_CODE } from '@shared/pipes/fcfa.pipe';
 import { SENEGAL_REGIONS, citiesOfRegion } from '@shared/data/senegal-geo';
@@ -34,6 +36,29 @@ export class VehicleFormComponent {
   readonly isSubmitting = signal(false);
   readonly submitError = signal<string | null>(null);
   readonly makes = signal<VehicleMake[]>([]);
+
+  // El modelo importa más de lo que parece: el indicador de precio busca los
+  // comparables por modelo, así que un anuncio sin él nunca puede mostrarlo, y
+  // tampoco aparece al filtrar por modelo.
+  readonly models = signal<VehicleModelOption[]>([]);
+  readonly loadingModels = signal(false);
+
+  onMakeChange(event: Event): void {
+    const makeId = (event.target as HTMLSelectElement).value;
+
+    this.step1.patchValue({ modelId: '' });
+    this.models.set([]);
+
+    if (!makeId) return;
+
+    this.loadingModels.set(true);
+    this.vehicleService.getModels(makeId).subscribe({
+      next: m => { this.models.set(m); this.loadingModels.set(false); },
+      // Sin catálogo de modelos el anuncio se puede publicar igual: el campo es
+      // opcional en el dominio.
+      error: () => { this.models.set([]); this.loadingModels.set(false); }
+    });
+  }
 
   // ─── Estado IA ────────────────────────────────────────────────────────
   readonly isExtractingDoc = signal(false);
