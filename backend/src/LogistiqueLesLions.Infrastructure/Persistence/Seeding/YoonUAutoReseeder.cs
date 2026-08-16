@@ -138,10 +138,14 @@ public class YoonUAutoReseeder(
         ["Renault|Duster"]         = ["renault-duster-1", "renault-duster-2"]
     };
 
-    /// <summary>Raíz de los estáticos del frontend, sin barra final.</summary>
-    private string MediaRoot =>
-        (configuration["Frontend:Url"] ?? "https://logistique-les-lions.vercel.app")
-            .TrimEnd('/') + "/assets/vehicles";
+    /// <summary>Raíz de los estáticos del frontend. Relativa a propósito.</summary>
+    /// <remarks>
+    /// ⚠️ Antes se componía con <c>Frontend:Url</c> y quedaba una URL absoluta guardada en
+    /// la base de datos. Al renombrar el dominio el 16/08/2026, las 48 fotos del catálogo
+    /// de demostración se quedaron apuntando a un dominio que ya devolvía 404. Guardarlas
+    /// relativas hace que sigan al dominio que sirva la página, sea cual sea.
+    /// </remarks>
+    private const string MediaRoot = "/assets/vehicles";
 
     /// <summary>
     /// Foto que le toca a un anuncio. <paramref name="variant"/> reparte los ejemplares de
@@ -161,6 +165,7 @@ public class YoonUAutoReseeder(
         await RetireLegacyCatalogueAsync(ct);
         await RehomeListingsAsync(ct);
         await ReplaceRandomPhotosAsync(ct);
+        await RelativizeFrontendPhotosAsync(ct);
         await EnsureAdminAsync(ct);
     }
 
@@ -204,6 +209,50 @@ public class YoonUAutoReseeder(
         logger.LogInformation(
             "✓ {Cambiadas} fotografías aleatorias sustituidas por la del modelo del anuncio",
             cambiadas);
+    }
+
+    /// <summary>
+    /// Deja relativas las fotos del catálogo que quedaron con el dominio del frontend
+    /// escrito dentro.
+    /// </summary>
+    /// <remarks>
+    /// Al renombrar el dominio, las 48 fotos de demostración se quedaron apuntando a
+    /// <c>logistique-les-lions.vercel.app</c>, que devuelve 404: el listado se veía sin
+    /// una sola imagen. Corregir el sembrador no basta, porque esos anuncios ya están en
+    /// la base y nadie vuelve a sembrarlos.
+    ///
+    /// Solo toca lo que apunta a <c>/assets/vehicles/</c>, que son los estáticos del
+    /// frontend: nunca una foto subida por una persona, que vive en el almacenamiento de
+    /// la API y necesita su URL absoluta. Repetirlo no hace nada.
+    /// </remarks>
+    private async Task RelativizeFrontendPhotosAsync(CancellationToken ct)
+    {
+        const string marca = MediaRoot + "/";
+
+        var absolutas = await db.VehicleImages
+            .Where(i => i.Url.Contains(marca) && !i.Url.StartsWith(marca))
+            .ToListAsync(ct);
+
+        if (absolutas.Count == 0) return;
+
+        foreach (var imagen in absolutas)
+        {
+            imagen.Url          = Relativizar(imagen.Url, marca) ?? imagen.Url;
+            imagen.ThumbnailUrl = Relativizar(imagen.ThumbnailUrl, marca);
+        }
+
+        await db.SaveChangesAsync(ct);
+        logger.LogInformation(
+            "✓ {Total} fotografías del catálogo pasadas a ruta relativa", absolutas.Count);
+    }
+
+    /// <summary>Se queda con la ruta a partir de la carpeta de estáticos.</summary>
+    private static string? Relativizar(string? url, string marca)
+    {
+        if (string.IsNullOrEmpty(url)) return url;
+
+        var corte = url.IndexOf(marca, StringComparison.Ordinal);
+        return corte < 0 ? url : url[corte..];
     }
 
     /// <summary>
