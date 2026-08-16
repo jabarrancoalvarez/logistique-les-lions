@@ -113,8 +113,21 @@ Ya estaban documentados, pero ahora hay datos reales encima.
 
       ⚠️ Lo ya subido al disco **no se migra solo**: son datos de prueba y se vuelven a
       subir.
-- [ ] **Sin `Email__ApiKey`** (pendiente nº 3): no sale ningún correo. Las comunicaciones
-      del backoffice solo llegan como notificación interna. ¿Se configura antes de abrir?
+- [ ] ⏸️ **Correo — APLAZADO al final** (pendiente nº 3). Sin `Email__ApiKey` no sale
+      ningún correo; las comunicaciones del backoffice solo llegan como notificación
+      interna. Se retoma cuando exista la cuenta de Yoon u Auto.
+
+      Ya corregido lo que sí bloqueaba: el remitente por defecto era
+      `Logistique Les Lions <no-reply@logistiqueleslions.com>`, la marca anterior y un
+      dominio ajeno.
+
+      Al retomarlo, dos cosas que decidirán la solución:
+      - ⚠️ **Desde un Gmail no se puede enviar.** El proveedor exige verificar el dominio
+        y `gmail.com` no es nuestro. Hace falta un dominio propio para el `FromAddress`;
+        el Gmail vale como dirección de contacto y recepción.
+      - ❓ **¿Lee el correo el público senegalés?** La cuenta va por teléfono y el correo
+        es opcional. Si la gente no lo usa, quizá el canal deba ser SMS o WhatsApp —que
+        el documento no contempla— en vez de correo.
 
 ---
 
