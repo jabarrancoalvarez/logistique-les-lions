@@ -175,8 +175,8 @@ export type AdminActionType =
   | 'ListingArchived' | 'ListingDeleted' | 'ListingCorrectionRequested'
   | 'RequestAssigned' | 'RequestStatusChanged'
   | 'RequestProposalAdded' | 'RequestProposalRemoved'
-  | 'NegotiationContentAccessed' | 'ContractInvalidated'
-  | 'ReportResolved' | 'UserWarned' | 'ReportInfoRequested'
+  | 'NegotiationContentAccessed' | 'ContractInvalidated' | 'ContractDocumentAccessed'
+  | 'ReportResolved' | 'UserWarned' | 'ReportInfoRequested' | 'ReportUnderReview'
   | 'PointsAdjusted' | 'SettingsChanged' | 'FeatureFlagToggled' | 'CatalogChanged';
 
 export const ADMIN_ACTION_LABELS: Record<AdminActionType, string> = {
@@ -195,9 +195,11 @@ export const ADMIN_ACTION_LABELS: Record<AdminActionType, string> = {
   RequestProposalRemoved: 'Proposition retirée',
   NegotiationContentAccessed: 'Conversation consultée',
   ContractInvalidated:        'Contrat invalidé',
+  ContractDocumentAccessed:   'Document du contrat téléchargé',
   ReportResolved:             'Signalement clôturé',
   UserWarned:                 'Avertissement envoyé',
   ReportInfoRequested:        'Complément demandé',
+  ReportUnderReview:          "Signalement mis à l'examen",
   PointsAdjusted:      'Points ajustés',
   SettingsChanged:     'Paramètres modifiés',
   FeatureFlagToggled:  'Fonctionnalité activée/désactivée',
@@ -1003,6 +1005,16 @@ export class AdminService {
   /** Lo único que se puede hacer a un contrato: la validación pertenece a las partes. */
   invalidateContract(id: string, reason: string): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/contracts/${id}/invalidate`, { reason });
+  }
+
+  /**
+   * Descarga el PDF del contrato. Va por POST porque **exige motivo**: el documento lleva
+   * las pièces d'identité, las direcciones y los teléfonos de las dos partes, y la
+   * descarga deja fila en `admin_actions` en la misma operación que la entrega.
+   */
+  downloadContractDocument(id: string, reason: string): Observable<Blob> {
+    return this.http.post(`${this.apiUrl}/contracts/${id}/document`, { reason },
+      { responseType: 'blob' });
   }
 
   // ─── Modération ──────────────────────────────────────────────────────────

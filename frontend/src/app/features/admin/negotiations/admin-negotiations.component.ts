@@ -215,4 +215,56 @@ export class AdminNegotiationsComponent implements OnInit {
       error: () => { this.busy.set(false); this.error.set('Invalidation impossible.'); }
     });
   }
+
+  // ─── Document du contrat ─────────────────────────────────────────────────
+  /**
+   * El PDF lleva las pièces d'identité, las direcciones y los teléfonos de las dos
+   * partes: es lo más sensible de la plataforma. Por eso se pide el motivo antes —igual
+   * que para leer una conversación— y se avisa de que la descarga queda registrada.
+   */
+  readonly documentFormOpen = signal(false);
+  documentReason = '';
+
+  toggleDocumentForm(): void {
+    this.documentFormOpen.update(v => !v);
+    if (!this.documentFormOpen()) this.documentReason = '';
+  }
+
+  downloadDocument(): void {
+    const d = this.contractDetail();
+    if (!d || this.busy()) return;
+
+    if (!this.documentReason.trim()) {
+      this.error.set('Indiquez le motif du téléchargement.');
+      return;
+    }
+
+    this.busy.set(true);
+    this.error.set(null);
+
+    this.admin.downloadContractDocument(d.contract.id, this.documentReason.trim()).subscribe({
+      next: blob => {
+        this.guardar(blob, `contrat-${d.contract.publicReference}.pdf`);
+        this.documentReason = '';
+        this.documentFormOpen.set(false);
+        this.busy.set(false);
+        // La descarga es una acción con motivo: aparece en el journal al recargar la ficha.
+        this.admin.getContract(d.contract.id).subscribe({
+          next: refreshed => this.contractDetail.set(refreshed),
+          error: () => {}
+        });
+      },
+      error: () => { this.busy.set(false); this.error.set('Téléchargement impossible.'); }
+    });
+  }
+
+  private guardar(blob: Blob, nombre: string): void {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombre;
+    a.click();
+    // Sin esto el blob se queda en memoria hasta recargar la pestaña.
+    URL.revokeObjectURL(url);
+  }
 }
