@@ -27,7 +27,7 @@
             ? 'bg-navy text-frost'
             : 'text-navy hover:bg-navy/5'"
         >
-          🛒 J’achète
+<lll-icon name="cart" [size]="18" class="inline-block align-text-bottom mr-1.5" /> J’achète
         </button>
         <button
           role="tab"
@@ -38,7 +38,7 @@
             ? 'bg-navy text-frost'
             : 'text-navy hover:bg-navy/5'"
         >
-          🏷️ Je vends
+<lll-icon name="tag" [size]="18" class="inline-block align-text-bottom mr-1.5" /> Je vends
         </button>
       </div>
     </div>
@@ -69,7 +69,7 @@
               <div class="w-10 h-10 rounded-full bg-azure/10 border border-azure/25 flex items-center justify-center flex-shrink-0">
                 <span class="text-azure font-bold text-sm font-heading">{{ step.step }}</span>
               </div>
-              <span class="text-xl" aria-hidden="true">{{ step.icon }}</span>
+              <lll-icon [name]="step.icon" [size]="22" class="text-azure-dark" />
             </div>
 
             <h3 class="font-heading font-semibold text-navy text-base mb-2 group-hover:text-azure transition-colors duration-300">
