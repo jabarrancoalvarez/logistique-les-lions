@@ -71,7 +71,41 @@ public class YoonUAutoReseeder(
         "Blanc", "Gris", "Noir", "Argent", "Bleu", "Beige", "Rouge", "Vert"
     ];
 
+    /// <summary>Contraseña de las cuentas de demostración. Solo para probar.</summary>
+    private const string DemoPassword = "YoonDemo2026!";
+
+    private sealed record DemoSeller(
+        string Phone, string Name, AccountType Type, string Region, string City);
+
+    private static readonly DemoSeller[] DemoSellers =
+    [
+        new("+221771000001", "Auto Dakar Services", AccountType.Professionnel, "DK", "Dakar"),
+        new("+221771000002", "Sahel Motors",        AccountType.Professionnel, "TH", "Thiès"),
+        new("+221771000003", "Mamadou Diop",        AccountType.Particulier,   "DK", "Rufisque"),
+        new("+221771000004", "Fatou Ndiaye",        AccountType.Particulier,   "SL", "Saint-Louis"),
+        new("+221771000005", "Ousmane Sarr",        AccountType.Particulier,   "KL", "Kaolack"),
+        new("+221771000006", "Teranga Auto",        AccountType.Professionnel, "DK", "Pikine")
+    ];
+
+    /// <summary>
+    /// Frontera entre las cuentas de demostración del producto anterior y las de
+    /// Yoon u Auto.
+    /// </summary>
+    /// <remarks>
+    /// La adaptación empezó el 15 de agosto de 2026: todo lo anterior es del seed viejo.
+    /// Se usa la fecha y no la región porque la región es opcional al registrarse, y una
+    /// cuenta real sin región no puede confundirse con una de demostración.
+    /// </remarks>
+    private static readonly DateTimeOffset MigrationStart =
+        new(2026, 8, 1, 0, 0, 0, TimeSpan.Zero);
+
     public async Task ReseedAsync(CancellationToken ct = default)
+    {
+        await RetireLegacyCatalogueAsync(ct);
+        await RehomeListingsAsync(ct);
+    }
+
+    private async Task RetireLegacyCatalogueAsync(CancellationToken ct)
     {
         var legacy = await db.Vehicles
             .Where(v => v.CountryOrigin != "SN")
@@ -108,52 +142,113 @@ public class YoonUAutoReseeder(
     }
 
     /// <summary>
+    /// Pone los anuncios senegaleses en manos de vendedores senegaleses.
+    /// </summary>
+    /// <remarks>
+    /// La primera pasada reutilizó las cuentas que ya había, y las que había eran las de
+    /// demostración del producto anterior: un pick-up en Mbour aparecía vendido por
+    /// «Marie Dubois, Lyon». Aquí se corrige y se retiran esas cuentas, que además
+    /// falseaban el reparto por región de las estadísticas.
+    /// </remarks>
+    private async Task RehomeListingsAsync(CancellationToken ct)
+    {
+        var legacyUserIds = await db.UserProfiles
+            .Where(u => u.Role != UserRole.Admin && u.CreatedAt < MigrationStart)
+            .Select(u => u.Id)
+            .ToListAsync(ct);
+
+        if (legacyUserIds.Count == 0) return;
+
+        var misplaced = await db.Vehicles
+            .Where(v => v.CountryOrigin == "SN" && legacyUserIds.Contains(v.SellerId))
+            .ToListAsync(ct);
+
+        if (misplaced.Count == 0) return;
+
+        logger.LogInformation(
+            "🇸🇳 Reasignando {Count} anuncios que colgaban de cuentas heredadas",
+            misplaced.Count);
+
+        var now = DateTimeOffset.UtcNow;
+        var sellers = await EnsureSenegaleseSellersAsync(now, ct);
+        var rng = new Random(2026);
+
+        foreach (var vehicle in misplaced)
+        {
+            var seller = sellers[rng.Next(sellers.Count)];
+
+            vehicle.SellerId = seller.Id;
+            // El anuncio se queda donde está el coche; lo que se corrige es quién lo
+            // vende, no dónde se ve.
+            vehicle.UpdatedAt = now;
+        }
+
+        // Las cuentas heredadas se retiran: sin ellas, el reparto por región y el
+        // recuento de particuliers y professionnels vuelven a ser ciertos.
+        var legacyUsers = await db.UserProfiles
+            .Where(u => legacyUserIds.Contains(u.Id))
+            .ToListAsync(ct);
+
+        foreach (var user in legacyUsers)
+        {
+            user.DeletedAt = now;
+            user.UpdatedAt = now;
+        }
+
+        await db.SaveChangesAsync(ct);
+
+        logger.LogInformation(
+            "✓ {Count} anuncios reasignados · {Users} cuentas heredadas retiradas",
+            misplaced.Count, legacyUsers.Count);
+    }
+
+    /// <summary>Los vendedores de demostración, creados solo si faltan.</summary>
+    private async Task<List<UserProfile>> EnsureSenegaleseSellersAsync(
+        DateTimeOffset now, CancellationToken ct)
+    {
+        var phones = DemoSellers.Select(d => d.Phone).ToList();
+
+        var existing = await db.UserProfiles
+            .Where(u => phones.Contains(u.Phone))
+            .ToListAsync(ct);
+
+        var missing = DemoSellers
+            .Where(d => !existing.Any(u => u.Phone == d.Phone))
+            .ToList();
+
+        if (missing.Count == 0) return existing;
+
+        var hash = BCrypt.Net.BCrypt.HashPassword(DemoPassword);
+
+        var created = missing.Select(d => new UserProfile
+        {
+            Phone = d.Phone,
+            DisplayName = d.Name,
+            PasswordHash = hash,
+            AccountType = d.Type,
+            Region = d.Region,
+            City = d.City,
+            PhoneVerified = true,
+            CreatedAt = now.AddDays(-60),
+            UpdatedAt = now,
+            LastLoginAt = now.AddDays(-2)
+        }).ToList();
+
+        db.UserProfiles.AddRange(created);
+        await db.SaveChangesAsync(ct);
+
+        return [.. existing, .. created];
+    }
+
+    /// <summary>
     /// Quién publica los anuncios.
     /// </summary>
     /// <remarks>
-    /// Se reutilizan las cuentas que ya existan; si la base no tuviera ninguna aparte de
-    /// las de administración, se crean unas pocas para que los anuncios tengan vendedor.
+    /// Siempre cuentas senegalesas: reutilizar las que hubiera dejaba pick-ups de Mbour
+    /// vendidos desde Lyon.
     /// </remarks>
-    private async Task<List<UserProfile>> ResolveSellersAsync(
-        DateTimeOffset now, CancellationToken ct)
-    {
-        var existing = await db.UserProfiles
-            .Where(u => u.Role != UserRole.Admin && u.Status == AccountStatus.Active)
-            .ToListAsync(ct);
-
-        if (existing.Count >= 3) return existing;
-
-        // Contraseña conocida solo para las cuentas de demostración.
-        var hash = BCrypt.Net.BCrypt.HashPassword("YoonDemo2026!");
-
-        var demo = new List<UserProfile>
-        {
-            new() { Phone = "+221771000001", DisplayName = "Auto Dakar Services",
-                    PasswordHash = hash, AccountType = AccountType.Professionnel,
-                    Region = "DK", City = "Dakar", PhoneVerified = true },
-            new() { Phone = "+221771000002", DisplayName = "Sahel Motors",
-                    PasswordHash = hash, AccountType = AccountType.Professionnel,
-                    Region = "TH", City = "Thiès", PhoneVerified = true },
-            new() { Phone = "+221771000003", DisplayName = "Mamadou Diop",
-                    PasswordHash = hash, AccountType = AccountType.Particulier,
-                    Region = "DK", City = "Rufisque", PhoneVerified = true },
-            new() { Phone = "+221771000004", DisplayName = "Fatou Ndiaye",
-                    PasswordHash = hash, AccountType = AccountType.Particulier,
-                    Region = "SL", City = "Saint-Louis", PhoneVerified = true }
-        };
-
-        foreach (var user in demo)
-        {
-            user.CreatedAt = now.AddDays(-60);
-            user.UpdatedAt = now;
-            user.LastLoginAt = now.AddDays(-2);
-        }
-
-        db.UserProfiles.AddRange(demo);
-        await db.SaveChangesAsync(ct);
-
-        return [.. existing, .. demo];
-    }
+    private Task<List<UserProfile>> ResolveSellersAsync(
+        DateTimeOffset now, CancellationToken ct) => EnsureSenegaleseSellersAsync(now, ct);
 
     /// <summary>Marcas y modelos del catálogo, creando solo lo que falte.</summary>
     private async Task<(List<VehicleMake>, List<VehicleModel>)> EnsureCatalogueAsync(
