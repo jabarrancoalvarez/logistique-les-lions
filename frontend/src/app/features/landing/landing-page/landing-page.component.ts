@@ -111,7 +111,7 @@ export class LandingPageComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.title.setTitle('Yoon u Auto — Acheter et vendre sa voiture au Sénégal');
+    this.title.setTitle('Yoon u Auto — Achat et vente de véhicules au Sénégal');
 
     this.meta.updateTag({
       name: 'description',
@@ -121,7 +121,7 @@ export class LandingPageComponent implements OnInit {
     });
     this.meta.updateTag({
       property: 'og:title',
-      content: 'Yoon u Auto — Acheter et vendre sa voiture au Sénégal'
+      content: 'Yoon u Auto — Achat et vente de véhicules au Sénégal'
     });
     this.meta.updateTag({
       property: 'og:description',

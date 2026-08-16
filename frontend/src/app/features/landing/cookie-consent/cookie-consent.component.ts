@@ -28,9 +28,9 @@ export class CookieConsentComponent implements OnInit {
   });
 
   readonly cookiePrefs: { key: PrefKey; label: string; desc: string; alwaysOn: boolean }[] = [
-    { key: 'necessary', label: 'Necesarias', desc: 'Esenciales para el funcionamiento del sitio.', alwaysOn: true },
-    { key: 'analytics', label: 'Analíticas', desc: 'Nos ayudan a entender cómo usas la plataforma.', alwaysOn: false },
-    { key: 'marketing', label: 'Marketing', desc: 'Para mostrarte anuncios personalizados.', alwaysOn: false }
+    { key: 'necessary', label: 'Nécessaires', desc: 'Indispensables au fonctionnement du site.', alwaysOn: true },
+    { key: 'analytics', label: 'Analytiques', desc: 'Nous aident à comprendre comment le site est utilisé.', alwaysOn: false },
+    { key: 'marketing', label: 'Marketing', desc: 'Pour afficher des annonces personnalisées.', alwaysOn: false }
   ];
 
   private readonly STORAGE_KEY = 'lll-cookie-consent';
