@@ -1,6 +1,7 @@
 using LogistiqueLesLions.Domain.Entities;
 using LogistiqueLesLions.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace LogistiqueLesLions.Infrastructure.Persistence.Seeding;
@@ -24,8 +25,12 @@ namespace LogistiqueLesLions.Infrastructure.Persistence.Seeding;
 /// </remarks>
 public class YoonUAutoReseeder(
     ApplicationDbContext db,
+    IConfiguration configuration,
     ILogger<YoonUAutoReseeder> logger)
 {
+    /// <summary>Teléfono de la cuenta que debe tener el backoffice. Nunca su contraseña.</summary>
+    private string? adminPhone => configuration["Seed:AdminPhone"];
+
     /// <summary>Precio de referencia por modelo, en FCFA, para un ejemplar medio.</summary>
     private sealed record ModelSpec(
         string Make,
@@ -71,8 +76,17 @@ public class YoonUAutoReseeder(
         "Blanc", "Gris", "Noir", "Argent", "Bleu", "Beige", "Rouge", "Vert"
     ];
 
-    /// <summary>Contraseña de las cuentas de demostración. Solo para probar.</summary>
-    private const string DemoPassword = "YoonDemo2026!";
+    /// <summary>
+    /// Contraseña de las cuentas de demostración.
+    /// </summary>
+    /// <remarks>
+    /// Aleatoria y desechada: estas cuentas existen para figurar como vendedoras de los
+    /// anuncios de prueba, nadie necesita entrar con ellas. ❌ Una contraseña fija aquí
+    /// sería una puerta abierta —este repositorio es público— y quien la leyera podría
+    /// publicar y negociar en producción haciéndose pasar por ellas.
+    /// </remarks>
+    private static string UnusablePassword() =>
+        BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"));
 
     private sealed record DemoSeller(
         string Phone, string Name, AccountType Type, string Region, string City);
@@ -103,6 +117,56 @@ public class YoonUAutoReseeder(
     {
         await RetireLegacyCatalogueAsync(ct);
         await RehomeListingsAsync(ct);
+        await EnsureAdminAsync(ct);
+    }
+
+    /// <summary>
+    /// Garantiza que exista un administrador con el que se pueda entrar de verdad.
+    /// </summary>
+    /// <remarks>
+    /// El seed del producto anterior creó una cuenta de administración con un hash
+    /// inventado, así que nadie podía iniciar sesión con ella y el backoffice quedaba
+    /// inaccesible.
+    ///
+    /// ❌ Aquí no se escribe ninguna contraseña: este repositorio es público y cualquiera
+    /// podría leerla y entrar al backoffice de producción. Lo que se hace es
+    /// <b>promover una cuenta que ya existe</b>, creada por su dueño desde el formulario
+    /// de registro, cuya contraseña solo conoce quien la eligió.
+    ///
+    /// El teléfono se lee de la configuración (<c>Seed:AdminPhone</c>); sin él, el
+    /// método se limita a avisar de que no hay administrador utilizable.
+    /// </remarks>
+    private async Task EnsureAdminAsync(CancellationToken ct)
+    {
+        var phone = adminPhone;
+
+        // Se comprueba antes de consultar: con el teléfono vacío, la consulta buscaría
+        // una cuenta sin teléfono en lugar de no buscar nada.
+        var candidate = string.IsNullOrWhiteSpace(phone)
+            ? null
+            : await db.UserProfiles.FirstOrDefaultAsync(u => u.Phone == phone, ct);
+
+        if (candidate is null)
+        {
+            var hasAdmin = await db.UserProfiles.AnyAsync(u => u.Role == UserRole.Admin, ct);
+
+            if (!hasAdmin)
+            {
+                logger.LogWarning(
+                    "⚠ No hay ningún administrador. Registre una cuenta y ponga su " +
+                    "teléfono en Seed:AdminPhone para promoverla.");
+            }
+            return;
+        }
+
+        if (candidate.Role == UserRole.Admin) return;
+
+        candidate.Role = UserRole.Admin;
+        candidate.UpdatedAt = DateTimeOffset.UtcNow;
+        await db.SaveChangesAsync(ct);
+
+        logger.LogInformation(
+            "✓ Cuenta {Phone} promovida a administrador", phone);
     }
 
     private async Task RetireLegacyCatalogueAsync(CancellationToken ct)
@@ -218,13 +282,12 @@ public class YoonUAutoReseeder(
 
         if (missing.Count == 0) return existing;
 
-        var hash = BCrypt.Net.BCrypt.HashPassword(DemoPassword);
 
         var created = missing.Select(d => new UserProfile
         {
             Phone = d.Phone,
             DisplayName = d.Name,
-            PasswordHash = hash,
+            PasswordHash = UnusablePassword(),
             AccountType = d.Type,
             Region = d.Region,
             City = d.City,
