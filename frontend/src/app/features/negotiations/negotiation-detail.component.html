@@ -563,8 +563,16 @@
                 <div class="max-w-[80%] rounded-2xl px-4 py-2.5"
                      [class]="isMine(m) ? 'bg-navy text-frost' : 'bg-frost text-navy'">
                   <p class="text-sm whitespace-pre-line">{{ m.body }}</p>
-                  <p class="text-xs mt-1" [class]="isMine(m) ? 'text-frost/50' : 'text-navy/40'">
-                    {{ m.createdAt | date:'dd/MM HH:mm' }}
+                  <p class="text-xs mt-1 flex items-center gap-1"
+                     [class]="isMine(m) ? 'text-frost/50 justify-end' : 'text-navy/40'">
+                    <span>{{ m.createdAt | date:'dd/MM HH:mm' }}</span>
+                    @if (isMine(m) && $last) {
+                      @if (lastReadAt()) {
+                        <span title="Lu">✓✓</span>
+                      } @else {
+                        <span title="Envoyé">✓</span>
+                      }
+                    }
                   </p>
                 </div>
               </li>
@@ -572,9 +580,16 @@
           </ul>
         }
 
+        @if (otherTyping()) {
+          <p class="text-xs text-navy/50 italic mb-3" aria-live="polite">
+            {{ n.otherUserName }} est en train d'écrire…
+          </p>
+        }
+
         @if (n.acceptsNegotiation) {
           <div class="flex gap-2">
             <textarea [(ngModel)]="messageBody" rows="2" class="input resize-none flex-1"
+              (input)="onTyping()"
               placeholder="Écrire un message…" aria-label="Votre message"></textarea>
             <button type="button" (click)="sendMessage()"
               [disabled]="sending() || !messageBody.trim()"
