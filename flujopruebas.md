@@ -1205,6 +1205,37 @@ porque el servicio excluye a quien publica de su propia alerta
 - [ ] **«Jusqu'à trois véhicules» está escrito a mano** en `/mis-busquedas` con el límite
       configurado en 4. El resto de la aplicación lee el ajuste
 
+### 12.11 Barrido de enlaces en busca de 404 (2026-08-16)
+
+Recorrido de toda la navegación en producción, como visitante y como administrador,
+recogiendo cada `href` interno y visitando después uno por uno los destinos.
+
+| Comprobación | Resultado |
+|---|---|
+| Enlaces internos distintos recogidos | **40** en 10 páginas públicas y de usuario, **28** en 7 del backoffice |
+| Rutas visitadas | **53** (públicas, de usuario y `/admin/*`) |
+| 404 reales | **0** — ninguna ruta enlazada está rota |
+| Rutas retiradas que deben dar 404 | **17/17 correctas**: las 14 públicas del producto anterior (`/precios`, `/tramitacion`, `/transporte`, `/financiacion`, `/inspectores`, `/guias/*`, `/concesionarios`, `/tracking`, `/pagos`, `/valoraciones`, `/calculadora`, `/logistica`) y las 3 de administración (`/admin/procesos`, `/admin/incidencias`, `/admin/partners`) |
+| Enlaces que aún apuntaran a lo retirado | **ninguno** — el menú, el pie y la barra lateral del backoffice quedaron limpios tras el borrado |
+
+Las 13 rutas que redirigen a `/auth/login` sin sesión lo hacen por el `authGuard`: es el
+comportamiento esperado, no un enlace roto.
+
+**Lo que sí apareció, y va corregido en esta misma rama:**
+
+| Hallazgo | Corrección |
+|---|---|
+| La propia página de 404 estaba **en español** («Página no encontrada», «Volver al inicio») y con el león del producto anterior | Reescrita en francés, con dos salidas (ver vehículos / volver al inicio) en vez de una, y `OnPush` |
+| El buzón vacío decía «No tienes mensajes aún» | En francés |
+| Las 5 preguntas rápidas del chat estaban en español, y una preguntaba por la **exportación** —concepto del producto anterior— | En francés; la última pasa a preguntar por el **estado aduanero**, que es lo que importa en Senegal |
+| `vehicles-placeholder.component.ts` y `coming-soon/` seguían en el repositorio con texto en español | **Eliminados**: nadie los referenciaba desde el borrado del legacy, eran código muerto |
+
+Un rastreo posterior de caracteres y vocabulario propios del español por todo el frontend
+no encontró **ningún otro** texto visible sin traducir.
+
+> Único error de consola durante el barrido: un `Failed to start the connection` de SignalR,
+> provocado por mi propia navegación al abortar la negociación. No es un fallo de la aplicación.
+
 ### 12.9 Limpieza pendiente de las pruebas
 
 Estas cuentas y datos los he creado yo probando. **Conviene retirarlos antes de abrir al
