@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import * as signalR from '@microsoft/signalr';
@@ -54,6 +54,30 @@ export class NotificationService {
 
   private hubConnection?: signalR.HubConnection;
 
+  constructor() {
+    // El token caduca a los 15 minutos y el interceptor lo renueva solo. Antes, el hub
+    // se quedaba con el token viejo: la negociación devolvía 401, no se reintentaba
+    // nunca, y el tiempo real moría en silencio hasta recargar la página.
+    effect(() => {
+      const token = this.auth.accessToken();
+
+      if (!token) { this.disconnect(); return; }
+
+      // Si la conexión no está en pie, se levanta con el token nuevo.
+      if (this.hubConnection?.state !== signalR.HubConnectionState.Connected) {
+        this.reconnect();
+      }
+    });
+  }
+
+  /** Cierra lo que hubiera y vuelve a conectar con el token vigente. */
+  private reconnect(): void {
+    const previa = this.hubConnection;
+    this.hubConnection = undefined;
+    previa?.stop().catch(() => {});
+    this.connect();
+  }
+
   /** Carga las notificaciones del usuario y refresca el contador. */
   load(take = 30): Observable<NotificationListResponse> {
     const params = new HttpParams().set('take', take);
@@ -89,13 +113,14 @@ export class NotificationService {
   connect(): void {
     if (this.hubConnection) return;
 
-    const token = this.auth.accessToken();
-    if (!token) return;
+    if (!this.auth.accessToken()) return;
 
     const hubUrl = environment.apiUrl.replace('/api', '') + '/hubs/notifications';
 
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl, { accessTokenFactory: () => token })
+      // Se lee en cada negociación, no se captura: si el token se ha renovado mientras
+      // tanto, SignalR usa el nuevo al reconectar.
+      .withUrl(hubUrl, { accessTokenFactory: () => this.auth.accessToken() ?? '' })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Warning)
       .build();

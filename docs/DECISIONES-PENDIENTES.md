@@ -76,8 +76,14 @@ nunca**. El token nuevo sí vale (repetido a mano: 200). Efecto: pasados 15 minu
 notificaciones en tiempo real dejan de llegar **en silencio**, y solo vuelven al recargar.
 Es el pendiente nº 22, ahora medido.
 
-- [ ] **Decisión:** ¿se arregla antes de abrir (reconectar el hub cuando el interceptor
-      renueve el token), o se acepta que el tiempo real dependa de recargar?
+- [x] ✅ **RESUELTO el 16/08/2026: reconectar al renovar el token.** Eran dos fallos en
+      los dos hubs (`/hubs/notifications` y `/hubs/chat`):
+  1. `accessTokenFactory: () => token` **capturaba** el token al conectar, así que la
+     reconexión automática de SignalR seguía presentando el caducado. Ahora se lee en
+     cada negociación: `() => this.auth.accessToken()`.
+  2. Si el arranque fallaba, se descartaba la conexión y **nadie volvía a intentarlo**.
+     Ahora un `effect` sobre la señal del token rehace la conexión cuando el interceptor
+     lo renueva, y la cierra al cerrar sesión.
 
 ### 1.4 Almacenamiento efímero y correo sin configurar
 
