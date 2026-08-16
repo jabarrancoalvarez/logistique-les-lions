@@ -416,6 +416,38 @@
         </div>
       </div>
 
+      <!-- Document -->
+      <div class="border-t border-navy/10 mt-5 pt-4">
+        <h3 class="text-sm font-medium text-navy mb-1">Document du contrat</h3>
+        <p class="text-xs text-navy/50 mb-3">
+          Le PDF contient les <strong>pièces d'identité, les adresses et les téléphones des
+          deux parties</strong>. Le téléchargement exige un motif et reste inscrit dans la
+          traçabilité ci-dessous, au même titre que la lecture d'une conversation privée.
+        </p>
+
+        @if (!documentFormOpen()) {
+          <button type="button" (click)="toggleDocumentForm()" class="btn-outline text-sm"
+            [disabled]="busy()">
+            Télécharger le PDF
+          </button>
+        } @else {
+          <div class="flex flex-wrap gap-2">
+            <input type="text" [(ngModel)]="documentReason"
+              placeholder="Motif du téléchargement"
+              aria-label="Motif du téléchargement"
+              class="flex-1 min-w-[16rem] rounded-lg border border-navy/15 px-3 py-2 text-sm" />
+            <button type="button" (click)="downloadDocument()" class="btn-azure text-sm px-4"
+              [disabled]="busy()">
+              Télécharger
+            </button>
+            <button type="button" (click)="toggleDocumentForm()" class="btn-outline text-sm"
+              [disabled]="busy()">
+              Annuler
+            </button>
+          </div>
+        }
+      </div>
+
       <!-- Invalidation -->
       <div class="border-t border-navy/10 mt-5 pt-4">
         <h3 class="text-sm font-medium text-navy mb-1">Invalider le contrat</h3>
