@@ -150,6 +150,39 @@ public class AdminNegotiationTests : IDisposable
     }
 
     [Fact]
+    public async Task ElRecuentoDebeCuadrarConLoQueSeEnsena()
+    {
+        // Una negociación cuyo anuncio se ha eliminado no se puede presentar: la fila se
+        // construye leyendo el anuncio. Si se cuenta pero no se enseña, el listado dice
+        // un número y muestra otro, y la paginación ofrece páginas vacías.
+        await NegotiationAsync();
+
+        var huerfano = new Vehicle
+        {
+            Id = Guid.NewGuid(), PublicReference = "YU10002", Slug = "toyota-retire",
+            Title = "Toyota retiré", MakeId = _makeId, Year = 2018, Price = 7_000_000m,
+            SellerId = _sellerId, Status = VehicleStatus.Actif
+        };
+        _context.Vehicles.Add(huerfano);
+        await _context.SaveChangesAsync();
+
+        _context.Negotiations.Add(new Negotiation
+        {
+            Id = Guid.NewGuid(), BuyerId = _buyerId, SellerId = _sellerId,
+            VehicleId = huerfano.Id, Status = NegotiationStatus.EnCours
+        });
+        await _context.SaveChangesAsync();
+
+        huerfano.DeletedAt = DateTimeOffset.UtcNow;
+        await _context.SaveChangesAsync();
+
+        var result = await _list.Handle(new GetAdminNegotiationsQuery(), CancellationToken.None);
+
+        result.Value!.Items.Should().HaveCount(1);
+        result.Value.TotalCount.Should().Be(result.Value.Items.Count);
+    }
+
+    [Fact]
     public void LaFichaEstructuralNoDebeTraerMensajes()
     {
         // Si el DTO de la ficha llevara los mensajes, el registro de acceso no serviría

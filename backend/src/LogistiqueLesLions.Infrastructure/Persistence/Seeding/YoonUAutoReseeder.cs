@@ -113,11 +113,97 @@ public class YoonUAutoReseeder(
     private static readonly DateTimeOffset MigrationStart =
         new(2026, 8, 1, 0, 0, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Fotografías de demostración, por marca y modelo, servidas desde los estáticos del
+    /// frontend.
+    /// </summary>
+    /// <remarks>
+    /// Antes se pedían a <c>picsum.photos</c>, que devuelve imágenes <b>aleatorias</b>: los
+    /// anuncios salían ilustrados con paisajes y objetos que no eran el coche descrito.
+    ///
+    /// Van en el frontend y no en <c>uploads/</c> porque el disco de Render es efímero y
+    /// cualquier archivo subido desaparece al reiniciar; en cambio los estáticos del
+    /// frontend viajan con el despliegue. La procedencia y las licencias están en
+    /// <c>frontend/src/assets/vehicles/CREDITS.md</c>.
+    /// </remarks>
+    private static readonly Dictionary<string, string[]> Photos = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Toyota|Hilux"]           = ["toyota-hilux-1", "toyota-hilux-2"],
+        ["Toyota|RAV4"]            = ["toyota-rav4-1", "toyota-rav4-2"],
+        ["Toyota|Corolla"]         = ["toyota-corolla-1", "toyota-corolla-2"],
+        ["Hyundai|Tucson"]         = ["hyundai-tucson-1", "hyundai-tucson-2"],
+        ["Nissan|Qashqai"]         = ["nissan-qashqai-1", "nissan-qashqai-2"],
+        ["Mercedes-Benz|Classe C"] = ["mercedes-benz-classe-c-1", "mercedes-benz-classe-c-2"],
+        ["Peugeot|208"]            = ["peugeot-208-1", "peugeot-208-2"],
+        ["Renault|Duster"]         = ["renault-duster-1", "renault-duster-2"]
+    };
+
+    /// <summary>Raíz de los estáticos del frontend, sin barra final.</summary>
+    private string MediaRoot =>
+        (configuration["Frontend:Url"] ?? "https://logistique-les-lions.vercel.app")
+            .TrimEnd('/') + "/assets/vehicles";
+
+    /// <summary>
+    /// Foto que le toca a un anuncio. <paramref name="variant"/> reparte los ejemplares de
+    /// un mismo modelo entre las fotos disponibles para que el listado no se vea repetido.
+    /// </summary>
+    /// <returns><c>null</c> si el modelo no está en el catálogo de fotos.</returns>
+    private (string Url, string Thumbnail)? PhotoFor(string make, string? model, int variant)
+    {
+        if (model is null || !Photos.TryGetValue($"{make}|{model}", out var names)) return null;
+
+        var name = names[Math.Abs(variant) % names.Length];
+        return ($"{MediaRoot}/{name}.jpg", $"{MediaRoot}/{name}-thumb.jpg");
+    }
+
     public async Task ReseedAsync(CancellationToken ct = default)
     {
         await RetireLegacyCatalogueAsync(ct);
         await RehomeListingsAsync(ct);
+        await ReplaceRandomPhotosAsync(ct);
         await EnsureAdminAsync(ct);
+    }
+
+    /// <summary>
+    /// Cambia las fotos aleatorias de <c>picsum.photos</c> por la del modelo del anuncio.
+    /// </summary>
+    /// <remarks>
+    /// Corregir el sembrador no basta: los anuncios de demostración ya están en la base de
+    /// datos y nadie vuelve a sembrarlos. Esto se ejecuta al arrancar y solo toca las
+    /// imágenes que siguen apuntando a <c>picsum</c>, así que repetirlo no hace nada y
+    /// nunca pisa una foto subida por una persona.
+    /// </remarks>
+    private async Task ReplaceRandomPhotosAsync(CancellationToken ct)
+    {
+        var aleatorias = await db.VehicleImages
+            .Where(i => i.Url.Contains("picsum.photos"))
+            .Join(db.Vehicles.Include(v => v.Make).Include(v => v.Model),
+                  i => i.VehicleId, v => v.Id, (i, v) => new { Imagen = i, Vehiculo = v })
+            .ToListAsync(ct);
+
+        if (aleatorias.Count == 0) return;
+
+        var cambiadas = 0;
+
+        foreach (var (par, indice) in aleatorias.Select((p, n) => (p, n)))
+        {
+            var foto = PhotoFor(par.Vehiculo.Make.Name, par.Vehiculo.Model?.Name, indice);
+            if (foto is null) continue;
+
+            par.Imagen.Url           = foto.Value.Url;
+            par.Imagen.ThumbnailUrl  = foto.Value.Thumbnail;
+            par.Imagen.Width         = 1280;
+            par.Imagen.Height        = 853;
+            par.Imagen.AltText     ??= par.Vehiculo.Title;
+            cambiadas++;
+        }
+
+        if (cambiadas == 0) return;
+
+        await db.SaveChangesAsync(ct);
+        logger.LogInformation(
+            "✓ {Cambiadas} fotografías aleatorias sustituidas por la del modelo del anuncio",
+            cambiadas);
     }
 
     /// <summary>
@@ -470,22 +556,27 @@ public class YoonUAutoReseeder(
 
                 vehicles.Add(vehicle);
 
-                images.Add(new VehicleImage
+                // La foto la decide el modelo, no el azar: un anuncio tiene que enseñar el
+                // coche que dice ser. Se sirve desde los estáticos del frontend porque el
+                // disco de Render se pierde en cada reinicio.
+                var photo = PhotoFor(spec.Make, spec.Model, i);
+                if (photo is not null)
                 {
-                    VehicleId = vehicle.Id,
-                    // Imagen remota: el disco de Render es efímero y cualquier archivo
-                    // subido desaparece al reiniciar.
-                    Url = $"https://picsum.photos/seed/{vehicle.Id:N}/1200/800",
-                    ThumbnailUrl = $"https://picsum.photos/seed/{vehicle.Id:N}/400/300",
-                    SortOrder = 0,
-                    IsPrimary = true,
-                    AltText = $"{spec.Make} {spec.Model} {year}",
-                    Width = 1200,
-                    Height = 800,
-                    Format = "jpeg",
-                    CreatedAt = vehicle.CreatedAt,
-                    UpdatedAt = vehicle.CreatedAt
-                });
+                    images.Add(new VehicleImage
+                    {
+                        VehicleId = vehicle.Id,
+                        Url = photo.Value.Url,
+                        ThumbnailUrl = photo.Value.Thumbnail,
+                        SortOrder = 0,
+                        IsPrimary = true,
+                        AltText = $"{spec.Make} {spec.Model} {year}",
+                        Width = 1280,
+                        Height = 853,
+                        Format = "jpeg",
+                        CreatedAt = vehicle.CreatedAt,
+                        UpdatedAt = vehicle.CreatedAt
+                    });
+                }
             }
         }
 

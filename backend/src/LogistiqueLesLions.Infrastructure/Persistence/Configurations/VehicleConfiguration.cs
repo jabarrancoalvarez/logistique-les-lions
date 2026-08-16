@@ -57,6 +57,7 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.Ignore(v => v.SearchVector);
         builder.Ignore(v => v.IsPubliclyVisible);
         builder.Ignore(v => v.AcceptsNegotiation);
+        builder.Ignore(v => v.HasPublicPage);
 
         // ─── Soft delete filter ──────────────────────────────────────────────
         builder.HasQueryFilter(v => v.DeletedAt == null);

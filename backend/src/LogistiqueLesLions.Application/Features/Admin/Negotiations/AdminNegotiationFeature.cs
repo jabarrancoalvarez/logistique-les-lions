@@ -54,7 +54,12 @@ public class GetAdminNegotiationsQueryHandler(IApplicationDbContext db)
     public async Task<Result<AdminNegotiationListDto>> Handle(
         GetAdminNegotiationsQuery request, CancellationToken ct)
     {
-        var query = db.Negotiations.AsNoTracking();
+        // La fila se construye leyendo el anuncio y las dos partes; si el anuncio se ha
+        // eliminado, la proyección la descarta. Se descarta aquí también, antes de
+        // contar: si no, el listado dice «12 négociations» y enseña una.
+        var query = db.Negotiations
+            .AsNoTracking()
+            .Where(n => n.Vehicle != null && n.Buyer != null && n.Seller != null);
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {

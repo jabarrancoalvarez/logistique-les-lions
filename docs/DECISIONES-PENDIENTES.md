@@ -1,0 +1,221 @@
+# Decisiones pendientes
+
+Todo lo que ha salido probando contra producción y **necesita que decidas tú**, no que se
+programe sin más. Ordenado por lo que bloquea abrir al público.
+
+- Lo encontrado y ya corregido está en [`../flujopruebas.md`](../flujopruebas.md) §11 y §12.
+- Los módulos del producto anterior, uno a uno, en [`MODULOS-LEGACY.md`](MODULOS-LEGACY.md).
+- La deuda técnica de fondo, en [`PENDIENTES-TECNICOS.md`](PENDIENTES-TECNICOS.md).
+
+> Marca la casilla cuando la decisión esté tomada y anota al lado lo que se hace.
+
+---
+
+## 0. Antes que nada: dos correcciones sin desplegar
+
+No son decisiones, son trabajo hecho esperando salida. Mientras no se desplieguen, la
+aplicación tiene un agujero abierto.
+
+- [ ] **Desplegar la corrección de visibilidad de anuncios.** Hoy, en producción, un
+      anuncio en `Brouillon`, `EnPause`, `Archive` **o ocultado por moderación** se sirve
+      entero a cualquiera que tenga el enlace. Ocultar por moderación no oculta nada.
+- [ ] **Desplegar la corrección del listado de negociaciones** (decía «12» y enseñaba 1).
+
+Ambas con pruebas: 511 en verde y sin cambios de modelo pendientes.
+
+---
+
+## 1. Bloqueantes para abrir al público
+
+### 1.1 🔴 Las páginas legales describen una empresa española
+
+Las cinco (`/legal/aviso-legal`, `privacidad`, `cookies`, `terminos`, `rgpd`) tienen el
+título en francés y el cuerpo en español, y declaran:
+
+> «Yoon U Auto, **S.L.** … Domicilio social: Calle de ejemplo, 123, 28001 **Madrid,
+> España**. NIF: B-12345678. **Registro Mercantil de Madrid**», en cumplimiento de la
+> **Ley 34/2002 (LSSI-CE)**.
+
+La de RGPD invoca el Reglamento (UE) 2016/679 y la Ley Orgánica 3/2018. **Están enlazadas
+desde el pie de todas las páginas.**
+
+No se arregla traduciendo: el aviso legal de un marketplace senegalés declara una empresa
+que no es la suya, en un país que no es el suyo, bajo una ley que no le aplica.
+
+- [ ] **Decisión:** ¿con qué datos reales se reescriben (razón social, domicilio, registro,
+      identificador fiscal) y bajo qué normativa senegalesa? ¿Hace falta un asesor legal
+      local, o hay textos ya redactados?
+- [ ] Mientras tanto, ¿se retiran del pie o se dejan visibles?
+
+### 1.2 🔴 Las fotos de Mon Garage se sirven sin autenticación
+
+Van a `/uploads/`, la carpeta estática: `GET .../uploads/garage/<id>/<guid>.png` devuelve
+**200 sin token**. Los documentos sí están bien (401, y la `StorageKey` no sale en el DTO).
+En el código: `GarageEndpoints.cs:134` usa `UploadAsync`; las líneas 205 y 380, la versión
+privada.
+
+No es un descuido evidente: están en la carpeta pública **porque «Vendre ce véhicule» las
+hereda en el anuncio**, y las fotos de un anuncio tienen que ser públicas.
+
+- [ ] **Decisión, una de dos:**
+  1. Servirlas por endpoint autenticado y **copiarlas a la carpeta pública al vender**.
+     Respeta la regla de Mon Garage privado; cuesta un paso más al crear el borrador.
+  2. Dejarlas donde están y asumir que la foto del coche de alguien es accesible con solo
+     acertar su GUID.
+
+  *Recomendación: la 1.* «Mon Garage es privado» está escrito en la propia pantalla
+  («Vos documents sont strictement privés»), y hoy eso no es cierto para las fotos.
+
+### 1.3 🔴 Las notificaciones en vivo se mueren a los 15 minutos
+
+Al caducar el token, el `negotiate` de SignalR recibe 401 y **el cliente no lo reintenta
+nunca**. El token nuevo sí vale (repetido a mano: 200). Efecto: pasados 15 minutos las
+notificaciones en tiempo real dejan de llegar **en silencio**, y solo vuelven al recargar.
+Es el pendiente nº 22, ahora medido.
+
+- [ ] **Decisión:** ¿se arregla antes de abrir (reconectar el hub cuando el interceptor
+      renueve el token), o se acepta que el tiempo real dependa de recargar?
+
+### 1.4 Almacenamiento efímero y correo sin configurar
+
+Ya estaban documentados, pero ahora hay datos reales encima.
+
+- [ ] **Disco de Render efímero** (pendiente nº 2): las fotos de anuncios y los documentos
+      de Mon Garage **se pierden en cada reinicio**. ¿Se contrata almacenamiento externo
+      (S3/Blob) antes de abrir, o se abre sabiendo que se pierden?
+- [ ] **Sin `Email__ApiKey`** (pendiente nº 3): no sale ningún correo. Las comunicaciones
+      del backoffice solo llegan como notificación interna. ¿Se configura antes de abrir?
+
+---
+
+## 2. Decisiones de producto
+
+### 2.1 Retirar un equipamiento lo borra de los anuncios ya publicados
+
+Al retirar «Climatisation» del catálogo, el anuncio `YU10025` **dejó de mostrarla**; al
+reactivarla, volvió. La fila de enlace no se borra (la ficha filtra por `IsActive`), pero
+retirar una entrada cambia lo que dicen los anuncios vivos.
+
+- [ ] **Decisión:** ¿retirar debe (a) esconderlo solo del formulario de publicación,
+      dejando intactos los anuncios que ya lo declaraban, o (b) desaparecer de todas
+      partes, como ahora?
+
+  *Recomendación: la (a).* Un anuncio publicado describe un coche real; que el coche deje
+  de tener aire acondicionado porque un administrador tocó el catálogo es raro.
+
+### 2.2 El comparador expulsa en silencio en vez de avisar
+
+Con el límite lleno (4), el botón sigue activo, marca «(3/4)» —una menos de las que hay— y
+al pulsarlo **entra el nuevo y desaparece uno de los anteriores**, sin decir nada. El doc
+§2.9 pide avisar de que está lleno.
+
+- [ ] **Decisión:** ¿avisar y no dejar añadir (lo que pide el doc), o dejar la sustitución
+      pero contándola («se ha retirado X»)? En cualquier caso hay que corregir el contador.
+
+### 2.3 Invalidar un contrato: qué pasa con el anuncio y la negociación
+
+Invalidar **sí** revierte la reputación (−100 puntos sin borrar el +100, contador de ventas
+abajo, QR deja de verificar). Pero:
+
+- [ ] El **anuncio se queda en `Vendu`**. El vendedor lo recupera por un camino poco
+      evidente: Archiver → Remettre en brouillon → publicar. ¿Debería invalidar devolverlo
+      a `Actif`, u ofrecer «Remettre en vente» desde `Vendu`?
+- [ ] La **negociación se queda en `Terminée`**. Si se invalidó por fraude quizá deba
+      reabrirse; si fue un error administrativo, quizá no.
+
+### 2.4 Se puede cambiar el precio de un anuncio ya vendido
+
+Las acciones «Prix» y «Kilométrage» siguen ofreciéndose sobre un anuncio `Vendu`. No
+corrompe nada —el contrato congela el precio acordado—, pero cambia lo que ve quien abre
+un anuncio vendido.
+
+- [ ] **Decisión:** ¿se retiran esas dos acciones cuando el anuncio está `Vendu`?
+
+### 2.5 El administrador ve los anuncios no públicos en el Marketplace público
+
+La portada le anuncia «49 véhicules disponibles» cuando hay 46: el listado le cuela los
+pausados, el vendido y el ocultado. `/vehicles/count` sí devuelve 46, así que la pantalla
+se contradice consigo misma.
+
+- [ ] **Decisión:** ¿el backoffice es el único sitio donde se ven los no públicos, o se
+      mantiene el atajo para el administrador?
+
+### 2.6 Una sola sesión por cuenta
+
+Pendiente nº 25: entrar desde el móvil expulsa la sesión del ordenador.
+
+- [ ] **Decisión:** ¿se acepta, o se permiten sesiones simultáneas?
+
+### 2.7 Un anuncio `Réservé` sigue apareciendo en el buscador
+
+Con su etiqueta. Los `Vendu`, `En pause`, `Brouillon`, `Archivé` y los ocultados, no.
+Encaja con el doc (§2.2 solo excluye borradores, pausados y archivados) y parece deseable
+—lo reservado todavía está en venta—, pero conviene confirmarlo.
+
+- [ ] **Decisión:** ¿se confirma este comportamiento?
+
+---
+
+## 3. Correcciones menores, sin decisión de fondo
+
+Si estás de acuerdo, se hacen y ya. Están aquí para que las veas, no para debatirlas.
+
+- [ ] **Los rechazos no se explican.** Suspender sin motivo, leer una conversación sin
+      justificarla, ajustar puntos sin motivo o bajar el kilometraje **no hacen nada y no
+      dicen por qué**: el botón sigue activo y no aparece mensaje. La API sí devuelve el
+      error (`Admin.ReasonRequired`, `GarageVehicle.MileageWentBackwards`).
+      ⚠️ **El patrón correcto ya existe**: publicar un borrador sin precio responde
+      «Publication impossible. Vérifiez que l'annonce a un prix.» Hay que replicarlo.
+- [ ] **Falta el filtro «reportadas»** en Annonces. La API acepta `Reported`; el formulario
+      solo expone «Masquées» y «À réviser». El doc §6.4 lo pide.
+- [ ] **No se puede consultar el PDF del contrato ni verificar el QR desde el backoffice.**
+      La ficha enseña el código de verificación como texto, pero no hay enlace ni descarga.
+      El doc §6.7 pide ambas cosas.
+- [ ] **Enums crudos en francés a medias**: el journal escribe `Dispute` en vez de «Litige
+      entre les parties»; el historial de un signalement escribe `EnExamen`. Mismo fallo
+      que se corrigió en la ficha de negociación (commit 239cca6).
+- [ ] **El historial de un signalement rotula «Signalement clôturé» también al ponerlo en
+      examen**, que no lo cierra.
+- [ ] **Al proponer un vehículo interno, el buscador ofrece anuncios vendidos** (`YU10025`,
+      en `Vendu`, aparece entre las propuestas posibles).
+- [ ] **La API devuelve las URLs de fichero en `http://`**, no `https://`. Chrome deja
+      avisos de «Mixed Content» y las eleva él solo.
+- [ ] **El panel de complétude no se refresca**: al cerrar un recordatorio sigue diciendo
+      «2 rappels en retard» hasta recargar.
+- [ ] **El aviso de error de catálogo se queda pegado** en pantalla aunque la acción
+      siguiente funcione.
+- [ ] **Falta de ortografía**: «**Anexer** une annonce Yoon u Auto» → *Annexer*.
+- [ ] **«Jusqu'à trois véhicules» está escrito a mano** en `/mis-busquedas`, con el límite
+      configurado en 4. El resto de la aplicación lee el ajuste.
+
+---
+
+## 4. Módulos del producto anterior
+
+Todo eso vive en [`MODULOS-LEGACY.md`](MODULOS-LEGACY.md), módulo a módulo y con casilla
+para marcar **eliminar / adaptar / conservar**. Lo urgente de allí:
+
+- [ ] **Quedan euros en producción**: `/precios`, `/transporte` y `/financiacion` muestran
+      importes en **€**. Solo se llega por URL directa, pero están vivas y contradicen
+      «solo FCFA».
+- [ ] **El menú del backoffice sigue enseñando `Processus`, `Incidents` y `Partenaires`**,
+      en español y con datos europeos («Gestoría Iberia», «Carfax Europe Inspectors»).
+      Es lo primero que ve un administrador.
+
+---
+
+## 5. Operativo
+
+- [ ] **La contraseña de `+221770000101` no consta en ninguna parte**, y esa cuenta es el
+      administrador actual (`Seed:AdminPhone`). Bloquea probar la Etapa 2 y el tiempo real,
+      que exigen dos cuentas a la vez. Opciones: recuperarla, apuntar `Seed:AdminPhone` a
+      una cuenta nueva con contraseña conocida, o dar el backoffice por probado.
+- [ ] **Retirar los datos de prueba antes de abrir al público.** La lista completa está en
+      `flujopruebas.md` §12.9: dos cuentas QA, 48 anuncios sembrados, 6 vendedores, 11
+      negociaciones huérfanas, y lo creado en las pruebas (marca `Kia`, modelo `Sportage`,
+      equipamiento `SIEGES_CHAUFF`, signalement `SG00001`, demande `YD00001`, anuncios
+      `YU10026` y `YU10027` —ambos archivados—, y un vehículo de Mon Garage).
+- [ ] **Medir con volumen real.** Todo se midió con 10 usuarios y 49 anuncios, y con la API
+      caliente: nada por encima de 350 ms. Eso **no** responde al pendiente nº 19
+      (agregaciones de Statistiques en memoria) ni al arranque en frío de Render, que es lo
+      que se lleva el primer visitante del día.

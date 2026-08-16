@@ -140,10 +140,16 @@ public static class VehicleCrudEndpoints
         // ─── GET /api/v1/vehicles/{slug} ─────────────────────────────────────
         group.MapGet("/{slug}", async (
             string slug,
+            ClaimsPrincipal user,
             IMediator mediator,
             CancellationToken ct) =>
         {
-            var result = await mediator.Send(new GetVehicleBySlugQuery(slug), ct);
+            // La identidad decide si se puede abrir un anuncio sin página pública: su
+            // dueño ve su borrador, el backoffice ve lo ocultado, y nadie más.
+            var requesterId = TryGetUserId(user, out var id) ? id : (Guid?)null;
+
+            var result = await mediator.Send(
+                new GetVehicleBySlugQuery(slug, requesterId, user.IsInRole("Admin")), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.NotFound(result.Error);
         })
         .WithName("GetVehicleBySlug")
