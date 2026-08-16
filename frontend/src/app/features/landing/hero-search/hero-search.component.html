@@ -3,10 +3,20 @@
   class="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
   aria-labelledby="hero-heading"
 >
-  <!-- Fondo decorativo -->
+  <!-- ─── Fondo aurora ────────────────────────────────────────────────────
+       Degradado océano de base + tres blobs de color que derivan lentamente
+       (aurora) + un brillo diagonal que lo cruza. Da vida al hero sin recargar,
+       todo en CSS y respetando prefers-reduced-motion. -->
   <div class="absolute inset-0 z-0" aria-hidden="true">
-    <div class="absolute inset-0 bg-gradient-to-br from-navy via-navy/95 to-navy-light"></div>
-    <svg class="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
+    <div class="absolute inset-0 bg-gradient-to-br from-navy-dark via-navy to-navy-light"></div>
+
+    <!-- Aurora: blobs de color en movimiento -->
+    <div class="hero-aurora hero-aurora-a absolute -top-32 -right-24 w-[38rem] h-[38rem] rounded-full bg-azure opacity-25 blur-3xl"></div>
+    <div class="hero-aurora hero-aurora-b absolute top-1/3 -left-32 w-[32rem] h-[32rem] rounded-full bg-azure-light opacity-20 blur-3xl"></div>
+    <div class="hero-aurora hero-aurora-c absolute -bottom-32 right-1/4 w-[30rem] h-[30rem] rounded-full bg-navy-light opacity-30 blur-3xl"></div>
+
+    <!-- Rejilla sutil por encima del color -->
+    <svg class="absolute inset-0 w-full h-full opacity-[0.06]" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
           <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" stroke-width="0.5"/>
@@ -14,8 +24,9 @@
       </defs>
       <rect width="100%" height="100%" fill="url(#grid)"/>
     </svg>
-    <div class="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-azure opacity-10 blur-3xl"></div>
-    <div class="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-azure opacity-5 blur-3xl"></div>
+
+    <!-- Brillo diagonal que cruza el hero muy despacio -->
+    <div class="hero-sheen absolute -inset-y-10 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/10 to-transparent blur-2xl"></div>
   </div>
 
   <div class="relative z-10 container mx-auto px-4 lg:px-6 pt-8 pb-16">
