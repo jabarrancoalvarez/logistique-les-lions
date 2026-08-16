@@ -665,9 +665,13 @@ export class GarageVehicleComponent implements OnInit, OnDestroy {
       Documents: item.status === 'Complete' ? `${n} document${n > 1 ? 's' : ''}`
         : item.status === 'Partial' ? 'Carte grise ou assurance à ajouter'
         : 'Aucun document essentiel',
-      MaintenanceHistory: n > 0
+      // Como el resto: cuando falta algo se dice qué falta. Enunciar solo el recuento
+      // junto a un ⚠ se leía como si tener una intervención fuera el problema.
+      MaintenanceHistory: item.status === 'Complete'
         ? `${n} entretien${n > 1 ? 's' : ''} enregistré${n > 1 ? 's' : ''}`
-        : 'Aucun entretien enregistré',
+        : n > 0
+          ? `Historique d'entretien à étoffer (${n})`
+          : 'Aucun entretien enregistré',
       Reminders: item.status === 'Complete'
         ? 'Rappels à jour'
         : `${n} rappel${n > 1 ? 's' : ''} en retard`,
