@@ -707,3 +707,119 @@ está corregido y desplegado salvo donde se indique.
 - Ficha del anuncio con estado aduanero y su aviso de no verificación
 - Backoffice: tableau de bord y **Statistiques con mediana (7.600.000) frente a media
   (8.761.224)**, y «—» donde no hay datos
+
+---
+
+## 12. Qué queda por probar a mano
+
+Lo verificado automáticamente contra producción está en el apartado 11. **Esto es lo que
+falta**, agrupado por lo que necesita: casi todo lo pendiente exige varias cuentas
+distintas, esperar a que corra un proceso, o mirar dos pestañas a la vez — cosas que se
+hacen mejor a mano.
+
+> Se va actualizando conforme avanzan las pruebas. Lo que aparece aquí **no está
+> probado**: no significa que falle, significa que nadie lo ha mirado todavía.
+
+### 12.1 Necesita dos personas o dos dispositivos
+
+- [ ] **Chat en tiempo real**: dos navegadores abiertos, el mensaje llega sin recargar
+- [ ] Indicador «escribiendo…» y marcado de leído
+- [ ] **Notificaciones en vivo** por SignalR al recibir una oferta o validarse un contrato
+- [ ] ⚠️ **La conexión de SignalR no se rehace al refrescar el token** (pendiente nº 22):
+      comprobar cuánto tarda en notarse y si molesta en uso real
+- [ ] ⚠️ **Una sola sesión por cuenta** (pendiente nº 25): entrar desde el móvil expulsa
+      la sesión del ordenador. Decidir si se acepta
+
+### 12.2 Necesita esperar
+
+- [ ] **Rappels de Mon Garage**: el trabajo en segundo plano corre cada 6 h. Crear uno
+      que venza hoy y comprobar que llega la notificación
+- [ ] **Alerta de bajada de precio**: bajar el precio de un favorito y ver la notificación
+- [ ] **Alerta de búsqueda guardada**: publicar un anuncio que encaje y comprobar que
+      salta **una sola vez**, y que no vuelve a saltar al reactivar tras una pausa
+- [ ] **Caducidad del token**: dejar la sesión abierta más de 15 minutos y seguir
+      navegando sin que se cierre (corregido, pero conviene confirmarlo en uso real)
+
+### 12.3 Etapa 1 — sin probar
+
+- [ ] Favoritos: marcar, desmarcar, y que el contador del anuncio cambie
+- [ ] Búsquedas guardadas: guardar desde el buscador, activar y desactivar su alerta
+- [ ] Comparador: añadir hasta 3, que el cuarto avise, y que **cambiar el límite en
+      Configuration lo cambie sin desplegar**
+- [ ] «Trouvez-moi cette voiture»: crear una demande, ver su `YD#####`, cancelarla
+- [ ] Que el **teléfono del vendedor esté oculto** para quien no tiene cuenta
+
+### 12.4 Etapa 2 — sin probar
+
+- [ ] **Pedir una modificación** del contrato, corregirlo y reenviarlo
+- [ ] **Anular** un contrato y comprobar que se puede crear otro en la misma negociación
+      (índice único parcial `contracts.negotiation_id`, que los tests no validan)
+- [ ] Plantillas de respuesta rápida del vendedor
+- [ ] Rechazar una oferta
+
+### 12.5 Mon Garage — sin probar
+
+- [ ] **Rappels**: crear por fecha y por kilometraje, y que el de kilómetros solo salte
+      al actualizar el contador
+- [ ] Que el **kilometraje no pueda bajar**
+- [ ] **Transparence**: compartir una intervención y comprobar que **su factura no se
+      comparte sola** — son dos casillas
+- [ ] Ver lo compartido en el anuncio público desde una sesión cerrada
+- [ ] **«Vendre ce véhicule»**: que salga un borrador **sin precio, sin estado aduanero
+      y sin descripción**
+- [ ] Fotos del vehículo (⚠️ se perderán al reiniciar Render, pendiente nº 2)
+
+### 12.6 Mes annonces — sin probar
+
+- [ ] Los seis estados y sus cambios desde la lista
+- [ ] Estadísticas por anuncio: visitas, favoritos, contactos
+- [ ] Score de calidad del anuncio
+- [ ] Duplicar y archivar
+- [ ] Publicar cinco anuncios seguidos: **sin límite**
+
+### 12.7 Backoffice — la mayor parte sin probar
+
+Verificado: tableau de bord y statistiques. Falta:
+
+- [ ] **Utilisateurs**: suspender con fecha, bloquear, notas internas, y que **toda
+      medida exija motivo**
+- [ ] **Annonces**: ocultar con `AdminHiddenAt` sin tocar el estado del vendedor, y que
+      el administrador **no pueda editar** título, precio ni descripción
+- [ ] **Demandes**: asignarse, proponer vehículo interno y externo, responder
+- [ ] ⚠️ **Négociations**: que el contenido **no aparezca** en el listado ni en la ficha,
+      que leerlo **exija motivo**, y que esa lectura quede registrada en el journal
+- [ ] **Contrats**: invalidar con motivo, que baje el contador de ventas verificadas y
+      **que no exista forma de validar** en nombre de las partes
+- [ ] **Modération**: reportar, referencia `SG#####`, cerrar exigiendo explicación
+- [ ] **Communications**: enviar por audiencia y región; ⚠️ **no saldrá ningún correo**
+      (pendiente nº 3)
+- [ ] **Configuration**: parámetros fuera de rango rechazados, interruptores, catálogos,
+      y que el **código de un equipamiento no cambie**
+- [ ] **Journal**: valor anterior y nuevo, filtros, y que **no se pueda editar ni borrar**
+- [ ] **Points**: ajuste manual sin motivo rechazado *(el +100 automático ya está
+      verificado)*
+
+### 12.8 Transversal
+
+- [ ] ⚠️ Que **ningún endpoint acepte `userId` por query string**: añadir
+      `?userId=<otro>` a una llamada y comprobar que se ignora
+- [ ] Repaso de idioma pantalla por pantalla: quedan zonas del producto anterior sin
+      traducir, y las nuevas conviene mirarlas con ojos frescos
+- [ ] Que ninguna pantalla tarde más de 3 segundos con datos reales
+- [ ] **Statistiques con volumen**: las agregaciones se hacen en memoria (pendiente
+      nº 19); medir cuánto tardan cuando haya miles de filas
+
+### 12.9 Limpieza pendiente de las pruebas
+
+Estas cuentas y datos los he creado yo probando. **Conviene retirarlos antes de abrir al
+público:**
+
+| Qué | Detalle |
+|---|---|
+| `+221770000101` | «Test Vendeur QA» — **es el administrador actual** (`Seed:AdminPhone`) |
+| `+221770000202` | «Test Acheteur QA» |
+| Anuncio `YU10025` | Toyota Hilux 2020, ya vendido |
+| Contrato `YC00001` | Venta verificada de prueba, con su PDF y su QR |
+| 48 anuncios sembrados | Catálogo senegalés de demostración |
+| 6 cuentas de vendedor | `+221771000001` … `+221771000006`, sin contraseña utilizable |
+| ⚠️ 11 negociaciones huérfanas | Del seed anterior, apuntan a anuncios retirados (pendiente nº 23) |
