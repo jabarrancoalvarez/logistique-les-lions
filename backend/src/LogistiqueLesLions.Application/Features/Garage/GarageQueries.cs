@@ -28,7 +28,10 @@ public record GarageVehicleCardDto(
     int? Mileage,
     string? Color,
     string? RegistrationPlate,
-    string? ThumbnailUrl,
+    /// <summary>
+    /// Identificador de la foto principal, no su URL: se pide por endpoint autenticado.
+    /// </summary>
+    Guid? PrimaryImageId,
     /// <summary>Comprado dentro de Yoon u Auto con contrato validado.</summary>
     bool BoughtOnYoonUAuto,
     DateTimeOffset? PurchaseDate,
@@ -107,8 +110,8 @@ public class GetMyGarageQueryHandler(
                     v.Id,
                     GarageTitle.For(v.Make.Name, v.Model?.Name, v.Version),
                     v.Year, v.Mileage, v.Color, v.RegistrationPlate,
-                    v.Images.FirstOrDefault(i => i.IsPrimary)?.ThumbnailUrl
-                        ?? v.Images.FirstOrDefault()?.ThumbnailUrl,
+                    // El identificador, no una URL: la miniatura también es privada.
+                    (v.Images.FirstOrDefault(i => i.IsPrimary) ?? v.Images.FirstOrDefault())?.Id,
                     v.SourceContractId is not null,
                     v.PurchaseDate,
                     next is null ? null : new GarageCardReminderDto(
@@ -129,7 +132,11 @@ public class GetMyGarageQueryHandler(
 public record GetGarageVehicleQuery(Guid UserId, Guid GarageVehicleId)
     : IRequest<Result<GarageVehicleDetailDto>>;
 
-public record GarageVehicleImageDto(Guid Id, string Url, string? ThumbnailUrl, bool IsPrimary, int SortOrder);
+/// <summary>
+/// Fotografía del garaje. ❌ No lleva URL: el archivo es privado y se pide por
+/// <c>GET /garage/images/{id}</c>, que comprueba de quién es antes de servirlo.
+/// </summary>
+public record GarageVehicleImageDto(Guid Id, bool IsPrimary, int SortOrder);
 
 public record GarageVehicleDetailDto(
     Guid Id,
@@ -191,7 +198,7 @@ public class GetGarageVehicleQueryHandler(IApplicationDbContext db)
         var images = v.Images
             .OrderByDescending(i => i.IsPrimary)
             .ThenBy(i => i.SortOrder)
-            .Select(i => new GarageVehicleImageDto(i.Id, i.Url, i.ThumbnailUrl, i.IsPrimary, i.SortOrder))
+            .Select(i => new GarageVehicleImageDto(i.Id, i.IsPrimary, i.SortOrder))
             .ToList();
 
         // El anuncio se lee sin filtros: un borrador o un vehículo ya vendido siguen
@@ -308,4 +315,34 @@ internal static class GarageTitle
     public static string For(string make, string? model, string? version) =>
         string.Join(' ', new[] { make, model, version }
             .Where(s => !string.IsNullOrWhiteSpace(s)));
+}
+
+/// <summary>Datos necesarios para servir la fotografía de un vehículo del garaje.</summary>
+/// <remarks>
+/// El archivo es privado: la identidad sale del token y aquí se comprueba que quien lo
+/// pide es su dueño, igual que con los documentos.
+/// </remarks>
+public record GetGarageVehicleImageFileQuery(Guid UserId, Guid ImageId)
+    : IRequest<Result<GarageDocumentFileDto>>;
+
+public class GetGarageVehicleImageFileQueryHandler(IApplicationDbContext db)
+    : IRequestHandler<GetGarageVehicleImageFileQuery, Result<GarageDocumentFileDto>>
+{
+    public async Task<Result<GarageDocumentFileDto>> Handle(
+        GetGarageVehicleImageFileQuery request, CancellationToken ct)
+    {
+        var image = await db.GarageVehicleImages
+            .AsNoTracking()
+            .Include(i => i.GarageVehicle)
+            .FirstOrDefaultAsync(i => i.Id == request.ImageId, ct);
+
+        if (image is null)
+            return Result<GarageDocumentFileDto>.Failure("GarageVehicle.ImageNotFound");
+
+        if (image.GarageVehicle.UserId != request.UserId)
+            return Result<GarageDocumentFileDto>.Failure("GarageVehicle.AccessDenied");
+
+        return Result<GarageDocumentFileDto>.Success(new GarageDocumentFileDto(
+            image.StorageKey, image.FileName, image.ContentType));
+    }
 }

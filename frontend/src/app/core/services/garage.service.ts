@@ -35,7 +35,8 @@ export interface GarageVehicleCard {
   mileage: number | null;
   color: string | null;
   registrationPlate: string | null;
-  thumbnailUrl: string | null;
+  /** Identificador de la foto principal: la imagen se pide autenticada, no por URL. */
+  primaryImageId: string | null;
   /** Comprado dentro de Yoon u Auto con contrato validado. */
   boughtOnYoonUAuto: boolean;
   purchaseDate: string | null;
@@ -67,10 +68,9 @@ export interface Garage {
   vehicles: GarageVehicleCard[];
 }
 
+/** La fotografía no trae URL: es privada y se descarga por endpoint autenticado. */
 export interface GarageVehicleImage {
   id: string;
-  url: string;
-  thumbnailUrl: string | null;
   isPrimary: boolean;
   sortOrder: number;
 }
@@ -418,13 +418,17 @@ export class GarageService {
   }
 
   uploadImage(id: string, file: File, isPrimary = false, sortOrder = 0):
-      Observable<{ id: string; url: string; thumbnailUrl: string | null }> {
+      Observable<{ id: string }> {
     const data = new FormData();
     data.append('file', file);
     data.append('isPrimary', String(isPrimary));
     data.append('sortOrder', String(sortOrder));
-    return this.http.post<{ id: string; url: string; thumbnailUrl: string | null }>(
-      `${this.baseUrl}/${id}/images`, data);
+    return this.http.post<{ id: string }>(`${this.baseUrl}/${id}/images`, data);
+  }
+
+  /** Estas fotos nunca son públicas: llegan como blob por endpoint autenticado. */
+  getImageFile(imageId: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/images/${imageId}`, { responseType: 'blob' });
   }
 
   deleteImage(imageId: string): Observable<void> {

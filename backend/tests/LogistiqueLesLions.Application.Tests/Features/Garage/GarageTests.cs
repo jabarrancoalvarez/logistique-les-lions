@@ -274,7 +274,7 @@ public class GarageTests : IDisposable
         var id = await AddAsync();
 
         await _addImage.Handle(
-            new AddGarageVehicleImageCommand(_userId, id, "/a.webp", "/a-thumb.webp", false, 0),
+            new AddGarageVehicleImageCommand(_userId, id, "garage/a.webp", "a.webp", "image/webp", 1024, false, 0),
             CancellationToken.None);
 
         var image = await _context.GarageVehicleImages.SingleAsync();
@@ -286,13 +286,13 @@ public class GarageTests : IDisposable
     {
         var id = await AddAsync();
         await _addImage.Handle(
-            new AddGarageVehicleImageCommand(_userId, id, "/a.webp", null, false, 0), CancellationToken.None);
+            new AddGarageVehicleImageCommand(_userId, id, "garage/a.webp", "a.webp", "image/webp", 1024, false, 0), CancellationToken.None);
         await _addImage.Handle(
-            new AddGarageVehicleImageCommand(_userId, id, "/b.webp", null, true, 1), CancellationToken.None);
+            new AddGarageVehicleImageCommand(_userId, id, "garage/b.webp", "b.webp", "image/webp", 1024, true, 1), CancellationToken.None);
 
         var images = await _context.GarageVehicleImages.ToListAsync();
         images.Count(i => i.IsPrimary).Should().Be(1);
-        images.Single(i => i.IsPrimary).Url.Should().Be("/b.webp");
+        images.Single(i => i.IsPrimary).FileName.Should().Be("b.webp");
     }
 
     [Fact]
@@ -300,15 +300,15 @@ public class GarageTests : IDisposable
     {
         var id = await AddAsync();
         var first = await _addImage.Handle(
-            new AddGarageVehicleImageCommand(_userId, id, "/a.webp", null, false, 0), CancellationToken.None);
+            new AddGarageVehicleImageCommand(_userId, id, "garage/a.webp", "a.webp", "image/webp", 1024, false, 0), CancellationToken.None);
         await _addImage.Handle(
-            new AddGarageVehicleImageCommand(_userId, id, "/b.webp", null, false, 1), CancellationToken.None);
+            new AddGarageVehicleImageCommand(_userId, id, "garage/b.webp", "b.webp", "image/webp", 1024, false, 1), CancellationToken.None);
 
         await _deleteImage.Handle(
             new DeleteGarageVehicleImageCommand(_userId, first.Value), CancellationToken.None);
 
         var remaining = await _context.GarageVehicleImages.SingleAsync();
-        remaining.Url.Should().Be("/b.webp");
+        remaining.FileName.Should().Be("b.webp");
         remaining.IsPrimary.Should().BeTrue();
     }
 

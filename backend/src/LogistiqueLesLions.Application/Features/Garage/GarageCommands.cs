@@ -51,11 +51,14 @@ public record UpdateGarageVehicleCommand(
 public record DeleteGarageVehicleCommand(Guid UserId, Guid GarageVehicleId) : IRequest<Result>;
 
 /// <summary>Alta de una fotografía ya subida al almacenamiento.</summary>
+/// <summary>Alta de una fotografía ya subida al almacenamiento <b>privado</b>.</summary>
 public record AddGarageVehicleImageCommand(
     Guid UserId,
     Guid GarageVehicleId,
-    string Url,
-    string? ThumbnailUrl,
+    string StorageKey,
+    string FileName,
+    string ContentType,
+    long SizeBytes,
     bool IsPrimary,
     int SortOrder
 ) : IRequest<Result<Guid>>;

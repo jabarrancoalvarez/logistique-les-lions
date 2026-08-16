@@ -35,6 +35,7 @@ public record CreateListingResultDto(
 public class CreateListingFromGarageCommandHandler(
     IApplicationDbContext db,
     IPublicReferenceGenerator references,
+    IStorageService storage,
     IVehicleValuationService? valuation = null)
     : IRequestHandler<CreateListingFromGarageCommand, Result<CreateListingResultDto>>
 {
@@ -100,16 +101,25 @@ public class CreateListingFromGarageCommandHandler(
 
         db.Vehicles.Add(listing);
 
-        // Las fotografías del garaje ya están en el almacenamiento público, así que el
-        // anuncio reutiliza las mismas URL en lugar de duplicar archivos.
+        // Las fotografías del garaje son privadas. Publicar el anuncio es la decisión
+        // por la que su dueño las hace visibles, así que aquí se copian al
+        // almacenamiento público. Se copia y no se mueve: retirar el anuncio más tarde
+        // no puede vaciarle el garaje.
         var order = 0;
         foreach (var image in vehicle.Images.OrderByDescending(i => i.IsPrimary).ThenBy(i => i.SortOrder))
         {
+            var publicada = await storage.PublishPrivateAsync(
+                image.StorageKey, image.FileName, image.ContentType, $"vehicles/{listing.Id}", ct);
+
+            // Si el archivo ya no está, el anuncio sale sin esa foto en vez de fallar: el
+            // disco de Render es efímero y el borrador se puede completar a mano.
+            if (publicada is null) continue;
+
             db.VehicleImages.Add(new VehicleImage
             {
                 VehicleId    = listing.Id,
-                Url          = image.Url,
-                ThumbnailUrl = image.ThumbnailUrl,
+                Url          = publicada.Value.Url,
+                ThumbnailUrl = publicada.Value.ThumbnailUrl,
                 IsPrimary    = order == 0,
                 SortOrder    = order++
             });

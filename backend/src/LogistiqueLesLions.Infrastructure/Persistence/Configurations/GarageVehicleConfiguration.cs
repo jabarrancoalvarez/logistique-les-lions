@@ -89,8 +89,9 @@ public class GarageVehicleImageConfiguration : IEntityTypeConfiguration<GarageVe
         builder.HasKey(i => i.Id);
         builder.Property(i => i.Id).ValueGeneratedNever();
 
-        builder.Property(i => i.Url).HasMaxLength(500).IsRequired();
-        builder.Property(i => i.ThumbnailUrl).HasMaxLength(500);
+        builder.Property(i => i.StorageKey).HasMaxLength(500).IsRequired();
+        builder.Property(i => i.FileName).HasMaxLength(255).IsRequired();
+        builder.Property(i => i.ContentType).HasMaxLength(100).IsRequired();
 
         builder.HasIndex(i => i.GarageVehicleId);
 

@@ -57,14 +57,17 @@ privada.
 No es un descuido evidente: están en la carpeta pública **porque «Vendre ce véhicule» las
 hereda en el anuncio**, y las fotos de un anuncio tienen que ser públicas.
 
-- [ ] **Decisión, una de dos:**
-  1. Servirlas por endpoint autenticado y **copiarlas a la carpeta pública al vender**.
-     Respeta la regla de Mon Garage privado; cuesta un paso más al crear el borrador.
-  2. Dejarlas donde están y asumir que la foto del coche de alguien es accesible con solo
-     acertar su GUID.
+- [x] ✅ **RESUELTO el 16/08/2026: opción 1.** Las fotos van al almacenamiento privado y
+      se sirven por `GET /garage/images/{id}`, que comprueba el dueño antes de entregarlas.
+      Al pulsar «Vendre ce véhicule» se **copian** —no se mueven— a la carpeta pública
+      para el anuncio, así que retirar el anuncio no vacía el garaje.
 
-  *Recomendación: la 1.* «Mon Garage es privado» está escrito en la propia pantalla
-  («Vos documents sont strictement privés»), y hoy eso no es cierto para las fotos.
+      El frontend las pide como blob con el token, igual que ya hacía con los documentos
+      y las fotos de intervención: una etiqueta `<img>` no envía cabeceras.
+
+      La migración `PhotosPriveesDuGarage` retira las filas antiguas, que guardaban una
+      ruta pública imposible de servir en privado. ⚠️ Los archivos sueltos siguen en el
+      disco de Render hasta el próximo reinicio, que lo borra todo (pendiente nº 2).
 
 ### 1.3 🔴 Las notificaciones en vivo se mueren a los 15 minutos
 

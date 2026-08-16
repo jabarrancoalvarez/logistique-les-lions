@@ -36,4 +36,20 @@ public interface IStorageService
     Task<Stream?> OpenPrivateAsync(string key, CancellationToken ct = default);
 
     Task DeletePrivateAsync(string key, CancellationToken ct = default);
+
+    /// <summary>
+    /// Copia un archivo privado al almacenamiento público y devuelve sus URL.
+    /// <c>null</c> si el original ya no existe.
+    /// </summary>
+    /// <remarks>
+    /// Lo usa «Vendre ce véhicule»: las fotografías de Mon Garage son privadas, y al
+    /// publicar el anuncio su dueño decide hacerlas visibles. Se <b>copia</b> en lugar de
+    /// mover, para que retirar el anuncio más tarde no vacíe el garaje.
+    /// </remarks>
+    Task<(string Url, string? ThumbnailUrl)?> PublishPrivateAsync(
+        string key,
+        string fileName,
+        string contentType,
+        string folder,
+        CancellationToken ct = default);
 }
