@@ -5,7 +5,6 @@ using LogistiqueLesLions.Domain.Enums;
 using System.Security.Claims;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetFeaturedVehicles;
 using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleMakes;
-using LogistiqueLesLions.Application.Features.Vehicles.Queries.GetVehicleStats;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -57,33 +56,8 @@ public static class VehicleEndpoints
         .Produces<IEnumerable<FeaturedVehicleDto>>()
         .AllowAnonymous();
 
-        // GET /api/v1/vehicles/stats
-        group.MapGet("/stats", async (
-            IMediator mediator,
-            IDistributedCache cache,
-            CancellationToken ct) =>
-        {
-            const string cacheKey = "vehicle_stats";
-
-            var cached = await cache.GetStringAsync(cacheKey, ct);
-            if (cached is not null)
-                return Results.Ok(JsonSerializer.Deserialize<VehicleStatsDto>(cached, JsonOpts));
-
-            var result = await mediator.Send(new GetVehicleStatsQuery(), ct);
-            if (result.IsFailure)
-                return Results.Problem(result.Error, statusCode: 400);
-
-            await cache.SetStringAsync(cacheKey,
-                JsonSerializer.Serialize(result.Value, JsonOpts),
-                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) },
-                ct);
-
-            return Results.Ok(result.Value);
-        })
-        .WithName("GetVehicleStats")
-        .WithSummary("Estadísticas globales de la plataforma")
-        .Produces<VehicleStatsDto>()
-        .AllowAnonymous();
+        // ❌ Retirado «/stats»: alimentaba el contador de la portada (países soportados,
+        // dealers registrados) que se fue con el producto anterior.
 
         // GET /api/v1/vehicles/makes
         group.MapGet("/makes", async (

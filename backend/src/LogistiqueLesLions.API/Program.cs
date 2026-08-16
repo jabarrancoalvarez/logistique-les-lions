@@ -58,7 +58,6 @@ try
                                LogistiqueLesLions.API.Hubs.SignalRNotificationService>();
     builder.Services.AddScoped<LogistiqueLesLions.Application.Common.Interfaces.INotificationPusher,
                                LogistiqueLesLions.API.Hubs.SignalRNotificationPusher>();
-    builder.Services.AddScoped<LogistiqueLesLions.Infrastructure.Persistence.Seeding.DatabaseSeeder>();
     builder.Services.AddScoped<LogistiqueLesLions.Infrastructure.Persistence.Seeding.YoonUAutoReseeder>();
 
     // ─── OpenTelemetry ──────────────────────────────────────────────────────────
@@ -251,13 +250,6 @@ try
                 .GetRequiredService<LogistiqueLesLions.Infrastructure.Persistence.Seeding.YoonUAutoReseeder>();
             await reseeder.ReseedAsync();
 
-            if (builder.Configuration.GetValue<bool>("Seed:Enabled"))
-            {
-                var seeder = scope.ServiceProvider
-                    .GetRequiredService<LogistiqueLesLions.Infrastructure.Persistence.Seeding.DatabaseSeeder>();
-                await seeder.SeedAsync();
-                Log.Information("✓ Seed de datos demo aplicado");
-            }
         }
         catch (Exception ex)
         {
@@ -377,14 +369,6 @@ try
         .WithTags("Mon Garage")
         .MapGarageEndpoints();
 
-    v1.MapGroup("/compliance")
-        .WithTags("Tramitación / Compliance")
-        .MapComplianceEndpoints();
-
-    v1.MapGroup("/countries")
-        .WithTags("Países")
-        .MapCountryEndpoints();
-
     v1.MapGroup("/auth")
         .WithTags("Autenticación")
         .MapAuthEndpoints();
@@ -401,15 +385,6 @@ try
         .WithTags("Plateforme")
         .MapPlatformEndpoints();
 
-    v1.MapGroup("/newsletter")
-        .WithTags("Newsletter")
-        .MapNewsletterEndpoints();
-
-    // Endpoint público sin autenticación — tracking por código
-    v1.MapGroup("/public/tracking")
-        .WithTags("Tracking público")
-        .MapPublicTrackingEndpoints();
-
     // Endpoint público sin autenticación — verificación del QR de un contrato
     v1.MapGroup("/public/contracts")
         .WithTags("Vérification de contrat")
@@ -422,10 +397,6 @@ try
     v1.MapGroup("/notifications")
         .WithTags("Notificaciones")
         .MapNotificationsEndpoints();
-
-    v1.MapGroup("/marketplace")
-        .WithTags("Marketplace partners")
-        .MapMarketplaceEndpoints();
 
     // SignalR hubs
     app.MapHub<LogistiqueLesLions.API.Hubs.ChatHub>("/hubs/chat")

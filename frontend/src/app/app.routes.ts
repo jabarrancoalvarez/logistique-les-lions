@@ -18,11 +18,6 @@ export const routes: Routes = [
       import('./features/vehicles/vehicles.routes').then(m => m.VEHICLES_ROUTES)
   },
   {
-    path: 'tramitacion',
-    loadChildren: () =>
-      import('./features/compliance/compliance.routes').then(m => m.COMPLIANCE_ROUTES)
-  },
-  {
     path: 'mensajes',
     loadChildren: () =>
       import('./features/messaging/messaging.routes').then(m => m.MESSAGING_ROUTES)
@@ -146,81 +141,15 @@ export const routes: Routes = [
       import('./features/users/users.routes').then(m => m.USERS_ROUTES)
   },
   {
-    path: 'concesionarios',
-    loadComponent: () =>
-      import('./features/dealers/dealers.component').then(m => m.DealersComponent),
-    title: 'Concesionarios — Yoon U Auto'
-  },
-  {
     path: 'admin',
     loadChildren: () =>
       import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES)
-  },
-  // ─── Footer: Plataforma ────────────────────────────────────────────────────
-  {
-    path: 'precios',
-    loadComponent: () =>
-      import('./features/pricing/pricing-page.component').then(m => m.PricingPageComponent),
-    title: 'Precios — Yoon U Auto'
-  },
-  {
-    path: 'calculadora',
-    redirectTo: '/tramitacion/calculadora',
-    pathMatch: 'full'
-  },
-  {
-    path: 'inspectores',
-    loadComponent: () =>
-      import('./features/inspectors/inspectors-page.component').then(m => m.InspectorsPageComponent),
-    title: 'Inspectores Certificados — Yoon U Auto'
-  },
-  // ─── Footer: Servicios ────────────────────────────────────────────────────
-  {
-    path: 'guias',
-    loadChildren: () =>
-      import('./features/guides/guides.routes').then(m => m.GUIDES_ROUTES)
-  },
-  {
-    path: 'logistica',
-    redirectTo: '/transporte',
-    pathMatch: 'full'
   },
   // ─── Footer: Legal ────────────────────────────────────────────────────────
   {
     path: 'legal',
     loadChildren: () =>
       import('./features/legal/legal.routes').then(m => m.LEGAL_ROUTES)
-  },
-  // ─── Coming soon ─────────────────────────────────────────────────────────
-  {
-    path: 'pagos',
-    loadComponent: () =>
-      import('./shared/components/coming-soon/coming-soon.component').then(m => m.ComingSoonComponent),
-    title: 'Pagos — Yoon U Auto'
-  },
-  {
-    path: 'valoraciones',
-    loadComponent: () =>
-      import('./shared/components/coming-soon/coming-soon.component').then(m => m.ComingSoonComponent),
-    title: 'Valoraciones — Yoon U Auto'
-  },
-  {
-    path: 'transporte',
-    loadComponent: () =>
-      import('./features/transport/transport-page.component').then(m => m.TransportPageComponent),
-    title: 'Transporte Internacional — Yoon U Auto'
-  },
-  {
-    path: 'financiacion',
-    loadComponent: () =>
-      import('./features/financing/financing-page.component').then(m => m.FinancingPageComponent),
-    title: 'Financiación — Yoon U Auto'
-  },
-  {
-    path: 'tracking',
-    loadComponent: () =>
-      import('./features/tracking/public-tracking.component').then(m => m.PublicTrackingComponent),
-    title: 'Seguimiento de trámite — Yoon U Auto'
   },
   // Página pública del QR de un contrato — sin cuenta.
   {

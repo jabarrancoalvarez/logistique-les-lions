@@ -132,35 +132,35 @@ lo primero que ve un administrador al entrar.
 
 ## 7. Hoja de decisión
 
-Un bloque por línea. Marca `ELIMINAR`, `ADAPTAR` o `CONSERVAR`.
+Decidido el 16/08/2026 con el dueño del proyecto.
 
 | # | Bloque | Alcance | Decisión |
 |---|---|---|---|
-| 1 | **Planes de precio** (`/precios`) | Frontend | |
-| 2 | **Concesionarios** (`/concesionarios`) | Frontend | |
-| 3 | **Tramitación aduanera** (`/tramitacion` + wizard, checklist, estimador, guía, tracker) | Frontend + `ComplianceEndpoints` + `Features/Compliance` + 8 entidades | |
-| 4 | **Transporte** (`/transporte`) | Frontend | |
-| 5 | **Financiación** (`/financiacion`) | Frontend | |
-| 6 | **Inspectores** (`/inspectores`) | Frontend | |
-| 7 | **Guías** (`/guias/*`) | Frontend | |
-| 8 | **Tracking público** (`/tracking`) | Frontend + `PublicTrackingEndpoints` | |
-| 9 | **Placeholders** (`/pagos`, `/valoraciones`) | Frontend. Sustituibles por *Prochainement* | |
-| 10 | **Componentes huérfanos de la portada** (`country-map`, `newsletter`, `stats-counters`) | Frontend. Ya no se usan | |
-| 11 | **Backoffice heredado** (`/admin/procesos`, `/admin/incidencias`, `/admin/partners`) | ⚠️ **Sigue en el menú** | |
-| 12 | **`dashboard-kpis.component.ts`** | Huérfano, no lo usa nadie | |
-| 13 | **`CountryEndpoints` + `Features/Countries`** | Backend. El doc es mono-país | |
-| 14 | **`NewsletterEndpoints` + `NewsletterSubscriber`** | Backend | |
-| 15 | **`ExportEndpoints`** | Backend. ⚠️ El CSV **puede reutilizarse** en Statistiques | |
-| 16 | **`GET /vehicles/facets`** | Backend. **Devuelve 500 en producción** | |
-| 17 | **`Features/Marketplace` (partners)** | Backend. ⚠️ Colisión de nombres con el marketplace de vehículos | |
-| 18 | **Generación de descripciones con IA** | Backend. Ya desactivada, el código sigue. El doc **la prohíbe** | |
-| 19 | **Extracción IA de documentos** | Backend + paso 1 del formulario. **Sigue activa** | |
-| 20 | **Entidades de tramitación** (`Country`, `CountryRequirement`, `CustomsTariff`, `DocumentTemplate`, `HomologationRequirement`, `ImportExportProcess`, `ProcessDocument`, `ProcessIncident`, `ServicePartner`) | Dominio + migraciones | |
-| 21 | **`VehicleDocument` y `VehicleHistory`** | Dominio. ⚠️ **Revisar solape con Mon Garage antes de tocar** | |
-| 22 | **Multi-divisa** (`Currency` en `Vehicle` y `Country`) | Dominio. El doc es solo FCFA | |
-| 23 | **Contenido de las páginas legales** | Frontend. Hay que **reescribirlo**, no traducirlo | |
-| 24 | **Namespaces `LogistiqueLesLions.*` → `YoonUAuto.*`** | Todo el backend. Aplazado a propósito | |
-| 25 | **Rutas en español** (`/mis-vehiculos`, `/mi-garaje`, `/mis-busquedas`, `/ajustes`, `/mis-pedidos`…) | Frontend. Traducirlas rompe los enlaces ya compartidos | |
+| 1 | **Planes de precio** (`/precios`) | Frontend | **ELIMINAR** |
+| 2 | **Concesionarios** (`/concesionarios`) | Frontend | **ELIMINAR** |
+| 3 | **Tramitación aduanera** (`/tramitacion` + wizard, checklist, estimador, guía, tracker) | Frontend + `ComplianceEndpoints` + `Features/Compliance` + 8 entidades | **ELIMINAR** |
+| 4 | **Transporte** (`/transporte`) | Frontend | **ELIMINAR** |
+| 5 | **Financiación** (`/financiacion`) | Frontend | **ELIMINAR** |
+| 6 | **Inspectores** (`/inspectores`) | Frontend | **ELIMINAR** |
+| 7 | **Guías** (`/guias/*`) | Frontend | **ELIMINAR** |
+| 8 | **Tracking público** (`/tracking`) | Frontend + `PublicTrackingEndpoints` | **ELIMINAR** |
+| 9 | **Placeholders** (`/pagos`, `/valoraciones`) | Frontend. Sustituibles por *Prochainement* | **ELIMINAR** |
+| 10 | **Componentes huérfanos de la portada** (`country-map`, `newsletter`, `stats-counters`) | Frontend. Ya no se usan | **ELIMINAR** |
+| 11 | **Backoffice heredado** (`/admin/procesos`, `/admin/incidencias`, `/admin/partners`) | ⚠️ **Sigue en el menú** | **ELIMINAR** |
+| 12 | **`dashboard-kpis.component.ts`** | Huérfano, no lo usa nadie | **ELIMINAR** |
+| 13 | **`CountryEndpoints` + `Features/Countries`** | Backend. El doc es mono-país | **ELIMINAR** |
+| 14 | **`NewsletterEndpoints` + `NewsletterSubscriber`** | Backend | **ELIMINAR** |
+| 15 | **`ExportEndpoints`** | Backend. ⚠️ El CSV **puede reutilizarse** en Statistiques | **ADAPTAR** — salvar el CSV para Statistiques |
+| 16 | **`GET /vehicles/facets`** | Backend. **Devuelve 500 en producción** | **ELIMINAR** |
+| 17 | **`Features/Marketplace` (partners)** | Backend. ⚠️ Colisión de nombres con el marketplace de vehículos | **ELIMINAR** |
+| 18 | **Generación de descripciones con IA** | Backend. Ya desactivada, el código sigue. El doc **la prohíbe** | **ELIMINAR** — la prohíbe el doc |
+| 19 | **Extracción IA de documentos** | Backend + paso 1 del formulario. **Sigue activa** | **CONSERVAR** — solo rellena el formulario |
+| 20 | **Entidades de tramitación** (`Country`, `CountryRequirement`, `CustomsTariff`, `DocumentTemplate`, `HomologationRequirement`, `ImportExportProcess`, `ProcessDocument`, `ProcessIncident`, `ServicePartner`) | Dominio + migraciones | **ELIMINAR** — con migración |
+| 21 | **`VehicleDocument` y `VehicleHistory`** | Dominio. ⚠️ **Revisar solape con Mon Garage antes de tocar** | `VehicleDocument` **ELIMINAR** · `VehicleHistory` **CONSERVAR** (en uso) |
+| 22 | **Multi-divisa** (`Currency` en `Vehicle` y `Country`) | Dominio. El doc es solo FCFA | **CONSERVAR** — siempre XOF, quitarlo no aporta |
+| 23 | **Contenido de las páginas legales** | Frontend. Hay que **reescribirlo**, no traducirlo | ✅ **HECHO** — reescritas en francés para Senegal |
+| 24 | **Namespaces `LogistiqueLesLions.*` → `YoonUAuto.*`** | Todo el backend. Aplazado a propósito | **APLAZADO** — después de abrir |
+| 25 | **Rutas en español** (`/mis-vehiculos`, `/mi-garaje`, `/mis-busquedas`, `/ajustes`, `/mis-pedidos`…) | Frontend. Traducirlas rompe los enlaces ya compartidos | **APLAZADO** — rompería enlaces compartidos |
 
 > Al eliminar entidades hay que **generar la migración correspondiente**, y las tablas
 > tienen datos sembrados. Nada de esto es borrar archivos y ya.

@@ -299,3 +299,9 @@ para marcar **eliminar / adaptar / conservar**. Lo urgente de allí:
       solo lo arregla recargando a mano.
       Se corrige capturando ese fallo de carga y recargando la página una vez.
       Visto en producción el 16/08/2026 tras cinco despliegues seguidos.
+
+- [ ] ⚠️ **Hay un tercer uso de IA que no estaba en la hoja del legacy**: un chat
+      contextual sobre el anuncio (`POST /vehicles/{id}/ai/ask`,
+      `IAiContentService.AnswerVehicleQuestionAsync`). No es generación de descripciones
+      —que ya se retiró— ni extracción de documentos —que se conserva—. **No aparece en
+      el documento funcional.** Queda en pie a la espera de tu decisión.

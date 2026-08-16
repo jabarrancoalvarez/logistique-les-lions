@@ -15,12 +15,9 @@ using LogistiqueLesLions.Application.Features.Admin.Negotiations;
 using LogistiqueLesLions.Application.Features.Admin.Requests;
 using LogistiqueLesLions.Application.Features.Admin.Users;
 using System.Security.Claims;
-using LogistiqueLesLions.Application.Features.Admin.Queries.GetAdminStats;
-using LogistiqueLesLions.Application.Features.Admin.Queries.GetDashboardKpis;
 using LogistiqueLesLions.Application.Features.Admin.Queries.GetVehiclesAdmin;
 using LogistiqueLesLions.Domain.Enums;
 using LogistiqueLesLions.Domain.Entities;
-using LogistiqueLesLions.Infrastructure.Persistence.Seeding;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -731,21 +728,9 @@ public static class AdminEndpoints
         .WithName("GetStatistics")
         .WithSummary("Estadísticas: usuarios, oferta, demanda, desajuste y conversión");
 
-        // GET /api/v1/admin/dashboard/kpis
-        group.MapGet("/dashboard/kpis", async (ISender sender, CancellationToken ct) =>
-        {
-            var result = await sender.Send(new GetDashboardKpisQuery(), ct);
-            return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
-        })
-        .WithSummary("KPIs agregados para el dashboard (procesos por estado, lead time, incidencias)");
-
-        // GET /api/v1/admin/stats
-        group.MapGet("/stats", async (ISender sender, CancellationToken ct) =>
-        {
-            var result = await sender.Send(new GetAdminStatsQuery(), ct);
-            return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
-        })
-        .WithSummary("Estadísticas generales de la plataforma");
+        // ❌ Retirados «/dashboard/kpis» y «/stats»: contaban procesos de tramitación e
+        // incidencias, que ya no existen. Las cifras de Yoon u Auto están en
+        // «/admin/dashboard» y «/admin/statistics».
 
         // GET /api/v1/admin/vehicles
         group.MapGet("/vehicles", async (
@@ -770,17 +755,9 @@ public static class AdminEndpoints
         .RequireAuthorization("AdminOnly")
         .WithSummary("Aprobar un vehículo (pasar a estado Active)");
 
-        // POST /api/v1/admin/seed
-        // Ejecuta el DatabaseSeeder bajo demanda. Idempotente: solo inserta lo que
-        // aún no existe. Útil para poblar la demo sin tener que reiniciar el
-        // servicio con Seed:Enabled=true.
-        group.MapPost("/seed", async (DatabaseSeeder seeder, CancellationToken ct) =>
-        {
-            await seeder.SeedAsync(ct);
-            return Results.Ok(new { ok = true, message = "Seed ejecutado" });
-        })
-        .RequireAuthorization("AdminOnly")
-        .WithSummary("Ejecuta el seeder de datos demo (idempotente)");
+        // ❌ Retirado «/seed»: ejecutaba el sembrador del producto anterior, que poblaba
+        // países, procesos de tramitación y partners. El catálogo senegalés lo mantiene
+        // YoonUAutoReseeder al arrancar.
 
         return group;
     }

@@ -1,14 +1,14 @@
 namespace LogistiqueLesLions.Application.Common.Interfaces;
 
 /// <summary>
-/// Servicios de IA generativa (Anthropic Claude).
-/// Genera descripciones de vehículos y extrae datos estructurados de documentos.
+/// Servicios de IA (Anthropic Claude): extrae datos de documentos y responde preguntas
+/// sobre un vehículo.
 /// </summary>
+/// <remarks>
+/// ❌ Ya no genera descripciones de anuncios: el documento funcional lo prohíbe.
+/// </remarks>
 public interface IAiContentService
 {
-    Task<AiVehicleDescription> GenerateVehicleDescriptionAsync(
-        VehicleAiContext context, CancellationToken cancellationToken = default);
-
     Task<AiDocumentExtraction> ExtractVehicleDocumentAsync(
         byte[] imageBytes, string mediaType, CancellationToken cancellationToken = default);
 
@@ -39,8 +39,6 @@ public record VehicleAiContext(
     string Currency,
     string CountryOrigin,
     bool IsExportReady);
-
-public record AiVehicleDescription(string DescriptionEs, string DescriptionEn);
 
 public record AiDocumentExtraction(
     string? Vin,

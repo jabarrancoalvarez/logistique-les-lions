@@ -32,10 +32,9 @@ public class GetFeaturedVehiclesQueryHandler(IApplicationDbContext context)
                 v.Price,
                 v.Currency,
                 v.CountryOrigin,
-                context.Countries
-                    .Where(c => c.Code == v.CountryOrigin)
-                    .Select(c => c.FlagEmoji)
-                    .FirstOrDefault(),
+                // Sin bandera: el catálogo multi-país se retiró y Yoon u Auto es
+                // mono-país. El campo se conserva en el DTO para no romper el contrato.
+                null,
                 v.Condition,
                 v.FuelType,
                 v.Transmission,

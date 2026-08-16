@@ -28,10 +28,8 @@ public class ApplicationDbContext(
     public DbSet<VehicleEquipmentLink> VehicleEquipmentLinks => Set<VehicleEquipmentLink>();
     public DbSet<VehiclePriceHistory> VehiclePriceHistories => Set<VehiclePriceHistory>();
     public DbSet<PriceIndicatorSettings> PriceIndicatorSettings => Set<PriceIndicatorSettings>();
-    public DbSet<Country> Countries => Set<Country>();
 
     // ─── M2 ────────────────────────────────────────────────────────────────
-    public DbSet<VehicleDocument> VehicleDocuments => Set<VehicleDocument>();
     public DbSet<VehicleHistory> VehicleHistories => Set<VehicleHistory>();
     public DbSet<SavedVehicle> SavedVehicles => Set<SavedVehicle>();
     public DbSet<SavedSearch> SavedSearches => Set<SavedSearch>();
@@ -40,13 +38,6 @@ public class ApplicationDbContext(
     public DbSet<VehicleRequestProposal> VehicleRequestProposals => Set<VehicleRequestProposal>();
 
     // ─── M3 ────────────────────────────────────────────────────────────────
-    public DbSet<CountryRequirement> CountryRequirements => Set<CountryRequirement>();
-    public DbSet<ImportExportProcess> ImportExportProcesses => Set<ImportExportProcess>();
-    public DbSet<ProcessDocument> ProcessDocuments => Set<ProcessDocument>();
-    public DbSet<DocumentTemplate> DocumentTemplates => Set<DocumentTemplate>();
-    public DbSet<HomologationRequirement> HomologationRequirements => Set<HomologationRequirement>();
-    public DbSet<CustomsTariff> CustomsTariffs => Set<CustomsTariff>();
-    public DbSet<ProcessIncident> ProcessIncidents => Set<ProcessIncident>();
 
     // ─── M5 ────────────────────────────────────────────────────────────────
     public DbSet<Negotiation> Negotiations => Set<Negotiation>();
@@ -57,7 +48,6 @@ public class ApplicationDbContext(
     public DbSet<VehicleInspectionItem> VehicleInspectionItems => Set<VehicleInspectionItem>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
-    public DbSet<ServicePartner> ServicePartners => Set<ServicePartner>();
 
     // ─── Mon Garage ────────────────────────────────────────────────────────
     public DbSet<GarageVehicle> GarageVehicles => Set<GarageVehicle>();
@@ -88,7 +78,6 @@ public class ApplicationDbContext(
     public DbSet<FeatureInterest> FeatureInterests => Set<FeatureInterest>();
 
     // ─── Newsletter ─────────────────────────────────────────────────────────
-    public DbSet<NewsletterSubscriber> NewsletterSubscribers => Set<NewsletterSubscriber>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
