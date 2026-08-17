@@ -4,9 +4,10 @@ App Android de Yoon u Auto. **Consume la misma API que la web** (Render + Neon):
 reimplementa nada de negocio, solo el front en Flutter. Mismos datos, mismo JWT, mismos
 tres usuarios y los mismos dos roles (`User` / `Admin`).
 
-## Estado: Fase 0 — Cimientos ✅
+## Estado: Fase 1 — Autenticación ✅
 
-Lo que ya está montado y validado (`flutter analyze` limpio, `flutter test` en verde):
+Cimientos (Fase 0) + pantallas de sesión. Todo validado (`flutter analyze` limpio,
+`flutter test` en verde, 4 tests):
 
 - **Arquitectura** feature-first, igual que el Angular de la web.
 - **Tema de marca** (`core/theme`): paleta azul océano + celeste, solo azules y blanco.
@@ -15,13 +16,17 @@ Lo que ya está montado y validado (`flutter analyze` limpio, `flutter test` en 
   reintenta** —igual que la web—.
 - **Sesión** (`features/auth`): login/registro/logout, tokens **cifrados** en el Keystore
   (`flutter_secure_storage`), restauración de sesión al abrir, estado con **Riverpod**.
-- **Navegación** con **go_router**.
-- **Pantalla provisional** que comprueba en vivo la conexión a la API (muestra el número
-  real de vehículos del catálogo de Senegal) y el estado de sesión.
+- **Pantalla de login** por teléfono (o correo) + contraseña, con validación y errores.
+- **Pantalla de registro**: nombre, teléfono `+221`, tipo de cuenta
+  (Particulier/Professionnel), **región** (las 14 de Senegal), ciudad y correo opcionales,
+  contraseña. Deja la sesión iniciada al terminar.
+- **Navegación con guard** (`go_router`): splash mientras se restaura la sesión, redirección
+  a `/login` sin sesión y a la portada con sesión iniciada.
+- **Portada post-login** que saluda al usuario, muestra su rol y comprueba en vivo la
+  conexión a la API (número real de vehículos del catálogo de Senegal), con cierre de sesión.
 
 ## Fases siguientes
 
-1. **Auth** — pantallas de login y registro por teléfono, los 3 usuarios, guards.
 2. **Étape 1** — marketplace, filtros, ficha, favoritos, búsquedas, comparador, demandes.
 3. **Étape 2** — negociación, chat en vivo (SignalR), ofertas, inspección, contrato, PDF, QR.
 4. **Étape 3** — Mon Garage, mantenimiento, recordatorios, valor, vendre.

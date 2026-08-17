@@ -25,6 +25,7 @@ class AuthRepository {
     required String password,
     required String displayName,
     required String accountType, // 'Particulier' | 'Professionnel'
+    String? region,
     String? city,
     String? email,
   }) async {
@@ -33,6 +34,7 @@ class AuthRepository {
       'password': password,
       'displayName': displayName,
       'accountType': accountType,
+      'region': region,
       'city': city,
       'email': (email != null && email.isNotEmpty) ? email : null,
     });

@@ -7,16 +7,16 @@ void main() {
   runApp(const ProviderScope(child: YoonUAutoApp()));
 }
 
-class YoonUAutoApp extends StatelessWidget {
+class YoonUAutoApp extends ConsumerWidget {
   const YoonUAutoApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
       title: 'Yoon u Auto',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      routerConfig: appRouter,
+      routerConfig: ref.watch(routerProvider),
     );
   }
 }

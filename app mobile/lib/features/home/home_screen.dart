@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../auth/providers/auth_providers.dart';
 
-/// Pantalla provisional de la Fase 0.
+/// Portada tras iniciar sesión.
 ///
-/// No es todavía la portada real: sirve para comprobar que los cimientos funcionan —el
-/// tema de marca, la conexión a la MISMA API de Render y el estado de sesión—. Las
-/// pantallas de negocio llegan en las fases siguientes.
+/// Provisional: confirma la sesión activa contra la MISMA API de Render y ofrece
+/// cerrar sesión. Las pantallas de negocio (marketplace, ficha, negociación,
+/// garaje…) llegan en las fases siguientes.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -29,11 +29,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     try {
       final api = ref.read(apiClientProvider);
       final res = await api.dio.get('/vehicles/count');
+      if (!mounted) return;
       setState(() {
         _count = (res.data as Map<String, dynamic>)['count'] as int?;
         _status = 'API connectée';
       });
     } catch (_) {
+      if (!mounted) return;
       setState(() => _status = 'API indisponible (démarrage de Render ?)');
     }
   }
@@ -41,24 +43,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authControllerProvider);
+    final user = auth is Authenticated ? auth.user : null;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Yoon u Auto')),
+      appBar: AppBar(
+        title: const Text('Yoon u Auto'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Se déconnecter',
+            onPressed: () =>
+                ref.read(authControllerProvider.notifier).logout(),
+          ),
+        ],
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.directions_car_filled, size: 64, color: AppColors.azureDark),
+              const Icon(Icons.directions_car_filled,
+                  size: 64, color: AppColors.azureDark),
               const SizedBox(height: 16),
-              const Text(
-                'Yoon u Auto',
-                style: TextStyle(
-                    fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.navy),
+              Text(
+                user != null ? 'Bonjour, ${user.displayName}' : 'Yoon u Auto',
+                style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.navy),
+                textAlign: TextAlign.center,
               ),
-              const Text('Services Automobiles au Sénégal',
-                  style: TextStyle(color: AppColors.steel)),
+              if (user != null)
+                Text(
+                  '${user.phone ?? ''} · ${user.isAdmin ? 'Admin' : user.accountType ?? 'Particulier'}',
+                  style: const TextStyle(color: AppColors.steel),
+                ),
               const SizedBox(height: 32),
               Card(
                 child: Padding(
@@ -70,7 +90,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                           Icon(
                             _count != null ? Icons.check_circle : Icons.sync,
-                            color: _count != null ? AppColors.success : AppColors.steel,
+                            color:
+                                _count != null ? AppColors.success : AppColors.steel,
                             size: 18,
                           ),
                           const SizedBox(width: 8),
@@ -89,18 +110,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              Text(
-                switch (auth) {
-                  AuthLoading() => 'Session : vérification…',
-                  Authenticated(:final user) => 'Connecté : ${user.displayName}',
-                  Unauthenticated() => 'Non connecté',
-                },
-                style: const TextStyle(color: AppColors.steel),
-              ),
               const SizedBox(height: 24),
               const Text(
-                'Fondations (Phase 0) prêtes.\nLes écrans arrivent par phases.',
+                'Authentification (Phase 1) prête.\nLes écrans de vente arrivent en Phase 2.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppColors.steel, fontSize: 12),
               ),
