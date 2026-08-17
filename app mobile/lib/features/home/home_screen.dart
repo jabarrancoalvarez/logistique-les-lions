@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../auth/providers/auth_providers.dart';
+import '../notifications/ui/notification_bell.dart';
 
 /// «Accueil» — portada de la app. Presenta la marca y lleva al escaparate.
 class HomeScreen extends ConsumerWidget {
@@ -20,6 +21,7 @@ class HomeScreen extends ConsumerWidget {
             pinned: true,
             expandedHeight: 220,
             automaticallyImplyLeading: false,
+            actions: const [NotificationBell()],
             flexibleSpace: FlexibleSpaceBar(
               background: _Hero(name: name),
             ),

@@ -4,11 +4,23 @@ App Android de Yoon u Auto. **Consume la misma API que la web** (Render + Neon):
 reimplementa nada de negocio, solo el front en Flutter. Mismos datos, mismo JWT, mismos
 tres usuarios y los mismos dos roles (`User` / `Admin`).
 
-## Estado: Fase 4 — Mon Garage completo ✅
+## Estado: Fase 5 — Notificaciones ✅
+
+Cimientos + auth + marketplace + negociación + Mon Garage + **notificaciones en tiempo
+real**. Todo validado (`flutter analyze` limpio, `flutter test` en verde, 15 tests):
+
+- **Campana** con contador de no leídos **en vivo** en Accueil, Véhicules y
+  Négociations (solo con sesión).
+- **Tiempo real por SignalR** (`/hubs/notifications`, evento `notification`): mensajes,
+  ofertas, contratos, rappels y avisos de admin llegan sin recargar y suben el contador.
+- **Pantalla Notifications** (`GET /notifications`): lista con icono por categoría, leído/
+  no leído, «Tout lire» (`/read-all`), marcar al abrir (`/{id}/read`) y **navegación al
+  elemento** (negociación, anuncio, favoris) traduciendo el `link` del backend.
+
+## Fase 4 — Mon Garage completo ✅
 
 Cimientos + auth + marketplace + negociación completa + **Mon Garage** (con fotos,
-documentos y transparence). Todo validado (`flutter analyze` limpio, `flutter test` en
-verde, 14 tests):
+documentos y transparence):
 
 - **Mon Garage** (`features/garage`, acceso desde Compte): resumen (nº vehículos,
   rappels abiertos, valeur estimée totale) y tarjetas con complétude y próximo rappel.
@@ -92,7 +104,6 @@ Pantallas de sesión sobre la misma API:
 
 ## Fases siguientes
 
-5. **Notificaciones** — campana + tiempo real (`/hubs/notifications`).
 6. **Admin** — backoffice en móvil.
 7. **Release** — iconos, splash, firma, build y ficha de Play Store.
 

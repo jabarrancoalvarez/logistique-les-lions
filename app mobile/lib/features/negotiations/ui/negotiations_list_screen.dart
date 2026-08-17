@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/util/fcfa.dart';
 import '../../../core/util/time_ago.dart';
 import '../../auth/providers/auth_providers.dart';
+import '../../notifications/ui/notification_bell.dart';
 import '../models/negotiation_summary.dart';
 import '../providers/negotiation_providers.dart';
 
@@ -28,6 +29,7 @@ class NegotiationsListScreen extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Négociations'),
+          actions: const [NotificationBell()],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'En cours'),

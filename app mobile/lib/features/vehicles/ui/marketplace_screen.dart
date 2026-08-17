@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../favorites/providers/favorites_providers.dart';
+import '../../notifications/ui/notification_bell.dart';
 import '../models/vehicle_summary.dart';
 import '../providers/vehicle_providers.dart';
 import 'filters_sheet.dart';
@@ -89,6 +90,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
             icon: const Icon(Icons.swap_vert),
             onPressed: () => _openSort(state.filters.sortBy, state.filters.sortDesc),
           ),
+          const NotificationBell(),
         ],
       ),
       body: Column(

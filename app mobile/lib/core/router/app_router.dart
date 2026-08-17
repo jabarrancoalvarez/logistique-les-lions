@@ -15,6 +15,7 @@ import '../../features/garage/ui/reminders_screen.dart';
 import '../../features/garage/ui/transparency_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/negotiations/ui/contract_screen.dart';
+import '../../features/notifications/ui/notifications_screen.dart';
 import '../../features/negotiations/ui/inspection_screen.dart';
 import '../../features/negotiations/ui/negotiation_chat_screen.dart';
 import '../../features/negotiations/ui/negotiations_list_screen.dart';
@@ -55,6 +56,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
+      GoRoute(
+        path: '/notifications',
+        builder: (_, _) => const NotificationsScreen(),
+      ),
       GoRoute(
         path: '/vehicules/:slug',
         builder: (_, state) =>
