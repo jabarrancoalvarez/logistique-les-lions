@@ -2,7 +2,7 @@
     <!-- La app consume la API de Render por HTTPS; necesario en release. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="yoon_u_auto"
+        android:label="Yoon u Auto"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
