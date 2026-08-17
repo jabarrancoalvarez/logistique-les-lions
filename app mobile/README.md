@@ -4,10 +4,37 @@ App Android de Yoon u Auto. **Consume la misma API que la web** (Render + Neon):
 reimplementa nada de negocio, solo el front en Flutter. Mismos datos, mismo JWT, mismos
 tres usuarios y los mismos dos roles (`User` / `Admin`).
 
-## Estado: Fase 6 — Backoffice (admin) ✅
+## Estado: Fase 7 — Preparación de release ✅
 
-Todo lo de usuario + **backoffice de administración**. Validado (`flutter analyze`
-limpio, `flutter test` en verde, 18 tests):
+Todas las fases funcionales + **identidad de app y preparación para Play Store**.
+Validado (`flutter analyze` limpio, `flutter test` en verde, 18 tests):
+
+- **Nombre** visible «Yoon u Auto» (Android e iOS).
+- **Icono** de app (adaptativo + legacy) generado con `flutter_launcher_icons` desde el
+  logo de marca (`assets/icon/icon.png`).
+- **Splash nativo** azul océano con el símbolo de carretera (`flutter_native_splash`,
+  incluye Android 12+), a juego con el splash interno de restauración de sesión.
+- Fuente de assets: `assets/icon/` y `assets/splash/`. Regenerar con
+  `dart run flutter_launcher_icons` y `dart run flutter_native_splash:create`.
+
+### Publicar en Google Play (pasos del usuario)
+
+1. **Clave de firma** (una vez): `keytool -genkey -v -keystore ~/yoon-upload.jks
+   -keyalg RSA -keysize 2048 -validity 10000 -alias upload`.
+2. Crear `android/key.properties` (gitignoreado) con `storeFile`, `storePassword`,
+   `keyAlias`, `keyPassword`, y referenciarlo en `android/app/build.gradle`
+   (`signingConfigs.release`).
+3. Subir la versión en `pubspec.yaml` (`version: 1.0.0+1` → `+2`, etc.).
+4. `flutter build appbundle --release` → `build/app/outputs/bundle/release/app-release.aab`.
+5. **Play Console** (cuenta 25 $): crear la app, subir el `.aab`, rellenar ficha
+   (capturas, descripción, política de privacidad) y enviar a revisión.
+
+> ⚠️ El **.aab/.apk aún no se generan en esta máquina**: falta el SDK de Android completo
+> (cmdline-tools + licencias + platform 37). El código y la config de release están listos.
+
+## Fase 6 — Backoffice (admin) ✅
+
+Todo lo de usuario + **backoffice de administración**:
 
 - **Acceso** desde Compte solo para rol Admin; ruta `/admin/**` protegida en el router.
 - **Dashboard** (`GET /admin/dashboard`): usuarios, marketplace, actividad, demanda y
@@ -129,12 +156,13 @@ Pantallas de sesión sobre la misma API:
   contraseña. Deja la sesión iniciada al terminar.
 - **Splash** mientras se restaura la sesión guardada al abrir la app.
 
-## Fases siguientes
+## Pendiente (mejoras, no bloqueantes)
 
-7. **Release** — iconos, splash, firma, build y ficha de Play Store.
-
-Pendiente de fases anteriores: comparador y demandes (Étape 1); fotos de las
-intervenciones de Mon Garage (Étape 3).
+Las 8 fases están completas. Quedan piezas menores para más adelante: comparador y
+demandes/búsquedas guardadas (Étape 1); fotos de las intervenciones de Mon Garage
+(Étape 3); módulos admin de configuración/estadística (settings, catalogs, statistics,
+communications). Y, del lado del usuario, generar el `.aab` cuando el SDK de Android esté
+instalado y publicar en Play Store.
 
 ## Cómo ejecutarla
 
