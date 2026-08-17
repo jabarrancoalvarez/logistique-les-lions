@@ -71,6 +71,44 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
+  /// Alta de cuenta. Deja la sesión iniciada si tiene éxito.
+  Future<String?> register({
+    required String phone,
+    required String password,
+    required String displayName,
+    required String accountType,
+    String? region,
+    String? city,
+    String? email,
+  }) async {
+    state = const AuthLoading();
+    try {
+      final user = await _repo.register(
+        phone: phone,
+        password: password,
+        displayName: displayName,
+        accountType: accountType,
+        region: region,
+        city: city,
+        email: email,
+      );
+      state = Authenticated(user);
+      return null;
+    } catch (e) {
+      state = const Unauthenticated();
+      return _messageFrom(e);
+    }
+  }
+
+  /// Traduce el error de la API a un texto para el usuario.
+  String _messageFrom(Object e) {
+    final s = e.toString();
+    if (s.contains('PhoneAlreadyExists') || s.contains('409')) {
+      return 'Ce numéro est déjà enregistré.';
+    }
+    return 'Impossible de créer le compte. Réessayez.';
+  }
+
   Future<void> logout() async {
     await _repo.logout();
     state = const Unauthenticated();
