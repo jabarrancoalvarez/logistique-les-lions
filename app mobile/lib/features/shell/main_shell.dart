@@ -35,6 +35,11 @@ class MainShell extends StatelessWidget {
             label: 'Favoris',
           ),
           NavigationDestination(
+            icon: Icon(Icons.forum_outlined),
+            selectedIcon: Icon(Icons.forum),
+            label: 'Messages',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.person_outline),
             selectedIcon: Icon(Icons.person),
             label: 'Compte',

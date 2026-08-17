@@ -5,6 +5,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/util/fcfa.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../favorites/providers/favorites_providers.dart';
+import '../../negotiations/providers/negotiation_providers.dart';
+import '../../negotiations/ui/offer_sheet.dart';
 import '../models/vehicle_detail.dart';
 import '../models/vehicle_enums.dart';
 import '../providers/vehicle_providers.dart';
@@ -60,14 +62,66 @@ class _DetailBodyState extends ConsumerState<_DetailBody> {
         .toggleById(widget.vehicle.id);
   }
 
-  void _contact() {
-    final auth = ref.read(authControllerProvider);
-    if (auth is! Authenticated) {
-      _snack('Connectez-vous pour contacter le vendeur.', login: true);
-      return;
+  /// «Contacter» — abre la conversación con un primer mensaje.
+  Future<void> _contact() async {
+    if (!_requireLogin('contacter le vendeur')) return;
+    final message = await _composeMessage();
+    if (message == null) return;
+    await _startNegotiation(message: message);
+  }
+
+  /// «Faire une offre» — importe + mensaje opcional.
+  Future<void> _makeOffer() async {
+    if (!_requireLogin('faire une offre')) return;
+    final input =
+        await showOfferSheet(context, listedPrice: widget.vehicle.price);
+    if (input == null) return;
+    await _startNegotiation(amount: input.amount, message: input.message);
+  }
+
+  bool _requireLogin(String action) {
+    if (ref.read(authControllerProvider) is Authenticated) return true;
+    _snack('Connectez-vous pour $action.', login: true);
+    return false;
+  }
+
+  Future<String?> _composeMessage() {
+    final ctrl = TextEditingController(
+        text: 'Bonjour, votre ${widget.vehicle.title} est-il toujours disponible ?');
+    return showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Contacter le vendeur'),
+        content: TextField(
+          controller: ctrl,
+          maxLines: 4,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Votre message…'),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Annuler')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, ctrl.text.trim()),
+              child: const Text('Envoyer')),
+        ],
+      ),
+    ).then((v) => (v == null || v.isEmpty) ? null : v);
+  }
+
+  Future<void> _startNegotiation({num? amount, String? message}) async {
+    try {
+      final res = await ref.read(negotiationRepositoryProvider).makeOffer(
+            vehicleId: widget.vehicle.id,
+            amount: amount,
+            message: message,
+          );
+      if (!mounted) return;
+      context.push('/negociations/${res.negotiationId}');
+    } catch (_) {
+      _snack('Action impossible pour le moment. Réessayez.');
     }
-    // La négociation (chat, offres, contrat) arrive en Phase 3.
-    _snack('La messagerie avec le vendeur arrive très bientôt.');
   }
 
   void _snack(String message, {bool login = false}) {
@@ -220,7 +274,15 @@ class _DetailBodyState extends ConsumerState<_DetailBody> {
                 ),
                 const SizedBox(height: 22),
                 _SectionTitle('Vendeur'),
-                _SellerCard(vehicle: v, onContact: _contact),
+                _SellerCard(
+                  vehicle: v,
+                  isOwner: switch (ref.watch(authControllerProvider)) {
+                    Authenticated(:final user) => user.id == v.sellerId,
+                    _ => false,
+                  },
+                  onContact: _contact,
+                  onOffer: _makeOffer,
+                ),
               ],
             ),
           ),
@@ -455,9 +517,16 @@ class _SpecsGrid extends StatelessWidget {
 }
 
 class _SellerCard extends StatelessWidget {
-  const _SellerCard({required this.vehicle, required this.onContact});
+  const _SellerCard({
+    required this.vehicle,
+    required this.isOwner,
+    required this.onContact,
+    required this.onOffer,
+  });
   final VehicleDetail vehicle;
+  final bool isOwner;
   final VoidCallback onContact;
+  final VoidCallback onOffer;
 
   @override
   Widget build(BuildContext context) {
@@ -537,14 +606,42 @@ class _SellerCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: (vehicle.status == 'Vendu') ? null : onContact,
-              icon: const Icon(Icons.chat_bubble_outline),
-              label: const Text('Contacter le vendeur'),
+          if (isOwner)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.frostDark,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text('C’est votre annonce',
+                  style: TextStyle(
+                      color: AppColors.steel, fontWeight: FontWeight.w600)),
+            )
+          else if (vehicle.status == 'Vendu')
+            const Text('Ce véhicule est vendu.',
+                style: TextStyle(color: AppColors.steel))
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: onContact,
+                    icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                    label: const Text('Contacter'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: onOffer,
+                    icon: const Icon(Icons.local_offer_outlined, size: 18),
+                    label: const Text('Offre'),
+                  ),
+                ),
+              ],
             ),
-          ),
         ],
       ),
     );

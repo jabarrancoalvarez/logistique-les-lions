@@ -3,10 +3,56 @@ import 'package:yoon_u_auto/core/data/senegal_regions.dart';
 import 'package:yoon_u_auto/core/theme/app_theme.dart';
 import 'package:yoon_u_auto/core/util/fcfa.dart';
 import 'package:yoon_u_auto/features/auth/models/app_user.dart';
+import 'package:yoon_u_auto/features/negotiations/models/negotiation_detail.dart';
+import 'package:yoon_u_auto/features/negotiations/models/negotiation_enums.dart';
 import 'package:yoon_u_auto/features/vehicles/models/vehicle_filters.dart';
 import 'package:yoon_u_auto/features/vehicles/models/vehicle_summary.dart';
 
 void main() {
+  test('NegotiationDetail parsea cronología, ofertas y oferta viva', () {
+    final n = NegotiationDetail.fromJson({
+      'id': 'n1',
+      'status': 'EnAttente',
+      'isBuyer': true,
+      'vehicleId': 'v1',
+      'vehicleSlug': 'toyota-yu1',
+      'vehicleTitle': 'Toyota Corolla',
+      'vehiclePublicReference': 'YU1',
+      'vehiclePrice': 9000000,
+      'vehicleStatus': 'Actif',
+      'acceptsNegotiation': true,
+      'otherUserId': 'u2',
+      'otherUserName': 'Vendeur',
+      'createdAt': '2026-08-17T10:00:00Z',
+      'timeline': [
+        {'id': 'e1', 'type': 'ConversationStarted', 'byMe': true,
+         'createdAt': '2026-08-17T10:00:00Z'},
+        {'id': 'e2', 'type': 'OfferMade', 'amount': 8500000, 'byMe': true,
+         'createdAt': '2026-08-17T10:01:00Z'},
+      ],
+      'offers': [
+        {'id': 'o1', 'amount': 8500000, 'listedPrice': 9000000,
+         'status': 'EnAttente', 'byMe': true, 'canRespond': false,
+         'createdAt': '2026-08-17T10:01:00Z'},
+      ],
+      'pendingOffer': {
+        'id': 'o1', 'amount': 8500000, 'listedPrice': 9000000,
+        'status': 'EnAttente', 'byMe': true, 'canRespond': false,
+        'createdAt': '2026-08-17T10:01:00Z',
+      },
+    });
+    expect(n.timeline.length, 2);
+    expect(n.offers.single.amount, 8500000);
+    expect(n.pendingOffer, isNotNull);
+    expect(n.pendingOffer!.byMe, isTrue);
+  });
+
+  test('Etiquetas de negociación en francés', () {
+    expect(negotiationStatusLabel('EnCours'), 'En cours');
+    expect(offerStatusLabel('Acceptee'), 'Acceptée');
+    expect(eventLabel('SaleVerified', byMe: false), 'Vente vérifiée ✓');
+  });
+
   test('fcfa formatea con separador de millares y sufijo', () {
     expect(fcfa(8900000), '8.900.000 FCFA');
     expect(fcfa(8900000, withSuffix: false), '8.900.000');

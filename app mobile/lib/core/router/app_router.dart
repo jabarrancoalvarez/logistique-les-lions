@@ -7,6 +7,8 @@ import '../../features/auth/ui/login_screen.dart';
 import '../../features/auth/ui/register_screen.dart';
 import '../../features/favorites/ui/favorites_screen.dart';
 import '../../features/home/home_screen.dart';
+import '../../features/negotiations/ui/negotiation_chat_screen.dart';
+import '../../features/negotiations/ui/negotiations_list_screen.dart';
 import '../../features/shell/main_shell.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/vehicles/ui/marketplace_screen.dart';
@@ -49,6 +51,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) =>
             VehicleDetailScreen(slug: state.pathParameters['slug']!),
       ),
+      GoRoute(
+        path: '/negociations/:id',
+        builder: (_, state) =>
+            NegotiationChatScreen(negotiationId: state.pathParameters['id']!),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             MainShell(navigationShell: navigationShell),
@@ -63,6 +70,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           ]),
           StatefulShellBranch(routes: [
             GoRoute(path: '/favoris', builder: (_, _) => const FavoritesScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+                path: '/negociations',
+                builder: (_, _) => const NegotiationsListScreen()),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(path: '/compte', builder: (_, _) => const AccountScreen()),
