@@ -2,6 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/account/ui/account_screen.dart';
+import '../../features/admin/ui/admin_home_screen.dart';
+import '../../features/admin/ui/admin_listing_detail_screen.dart';
+import '../../features/admin/ui/admin_listings_screen.dart';
+import '../../features/admin/ui/admin_report_detail_screen.dart';
+import '../../features/admin/ui/admin_reports_screen.dart';
+import '../../features/admin/ui/admin_user_detail_screen.dart';
+import '../../features/admin/ui/admin_users_screen.dart';
 import '../../features/auth/providers/auth_providers.dart';
 import '../../features/auth/ui/login_screen.dart';
 import '../../features/auth/ui/register_screen.dart';
@@ -49,6 +56,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Con sesión, no tiene sentido ver login/registro.
       if (auth is Authenticated && (loc == '/login' || loc == '/register')) {
         return '/';
+      }
+      // El backoffice es solo para administradores.
+      if (loc.startsWith('/admin')) {
+        final isAdmin = auth is Authenticated && auth.user.isAdmin;
+        if (!isAdmin) return '/';
       }
       return null;
     },
@@ -115,6 +127,32 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/garage/:id',
         builder: (_, state) =>
             GarageVehicleScreen(id: state.pathParameters['id']!),
+      ),
+      // Backoffice (rol Admin, protegido en el redirect).
+      GoRoute(path: '/admin', builder: (_, _) => const AdminHomeScreen()),
+      GoRoute(
+          path: '/admin/users',
+          builder: (_, _) => const AdminUsersScreen()),
+      GoRoute(
+        path: '/admin/users/:id',
+        builder: (_, state) =>
+            AdminUserDetailScreen(id: state.pathParameters['id']!),
+      ),
+      GoRoute(
+          path: '/admin/listings',
+          builder: (_, _) => const AdminListingsScreen()),
+      GoRoute(
+        path: '/admin/listings/:id',
+        builder: (_, state) =>
+            AdminListingDetailScreen(id: state.pathParameters['id']!),
+      ),
+      GoRoute(
+          path: '/admin/reports',
+          builder: (_, _) => const AdminReportsScreen()),
+      GoRoute(
+        path: '/admin/reports/:id',
+        builder: (_, state) =>
+            AdminReportDetailScreen(id: state.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

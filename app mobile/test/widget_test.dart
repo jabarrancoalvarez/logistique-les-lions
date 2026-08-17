@@ -3,6 +3,9 @@ import 'package:yoon_u_auto/core/data/senegal_regions.dart';
 import 'package:yoon_u_auto/core/theme/app_theme.dart';
 import 'package:yoon_u_auto/core/util/fcfa.dart';
 import 'package:yoon_u_auto/features/auth/models/app_user.dart';
+import 'package:yoon_u_auto/features/admin/models/admin_dashboard.dart';
+import 'package:yoon_u_auto/features/admin/models/admin_enums.dart';
+import 'package:yoon_u_auto/features/admin/models/admin_report.dart';
 import 'package:yoon_u_auto/features/garage/models/garage_document.dart';
 import 'package:yoon_u_auto/features/garage/models/garage_enums.dart';
 import 'package:yoon_u_auto/features/garage/models/garage_models.dart';
@@ -59,6 +62,47 @@ void main() {
     expect(reminderStatusLabel('AVenir'), 'À venir');
     expect(completenessLevelLabel('TresBien'), 'Très bien');
     expect(reminderIsOpen('Termine'), isFalse);
+  });
+
+  test('AdminDashboard parsea las 5 secciones', () {
+    final d = AdminDashboard.fromJson({
+      'users': {'total': 120, 'newLast7Days': 8, 'phoneVerified': 90,
+        'professionnels': 15},
+      'marketplace': {'active': 46, 'sold': 3, 'pendingModeration': 2},
+      'activity': {'negotiationsActive': 5, 'verifiedSales': 3},
+      'demand': {'favoritesTotal': 40, 'requestsPending': 4},
+      'garage': {'vehiclesTotal': 12, 'convertedToListings': 2},
+    });
+    expect(d.users.total, 120);
+    expect(d.marketplace.pendingModeration, 2);
+    expect(d.garage.convertedToListings, 2);
+  });
+
+  test('ReportList con countByStatus y etiquetas admin', () {
+    final list = ReportList.fromJson({
+      'totalCount': 1,
+      'page': 1,
+      'pageSize': 30,
+      'countByStatus': {'Nouveau': 1},
+      'items': [
+        {
+          'id': 'r1',
+          'publicReference': 'SR001',
+          'targetType': 'Listing',
+          'targetId': 'v1',
+          'targetLabel': 'Toyota',
+          'reporterId': 'u1',
+          'reporterName': 'QA',
+          'reason': 'PrixTrompeur',
+          'status': 'Nouveau',
+          'createdAt': '2026-08-17T10:00:00Z',
+        },
+      ],
+    });
+    expect(list.countByStatus['Nouveau'], 1);
+    expect(reportReasonLabel(list.items.single.reason), 'Prix trompeur');
+    expect(listingActionLabel('Hide'), 'Masquer');
+    expect(accountStatusLabel('Blocked'), 'Bloqué');
   });
 
   test('Notification: parseo, evento en vivo y mapeo de link', () {

@@ -80,6 +80,21 @@ class AccountScreen extends ConsumerWidget {
             onTap: () => context.push('/garage'),
           ),
         ),
+        if (user.isAdmin) ...[
+          const SizedBox(height: 10),
+          Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              leading: const Icon(Icons.admin_panel_settings_outlined,
+                  color: AppColors.navy),
+              title: const Text('Backoffice',
+                  style: TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: const Text('Administration de la plateforme'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/admin'),
+            ),
+          ),
+        ],
         const SizedBox(height: 24),
         OutlinedButton.icon(
           onPressed: () async {
