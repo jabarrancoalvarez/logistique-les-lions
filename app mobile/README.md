@@ -4,10 +4,34 @@ App Android de Yoon u Auto. **Consume la misma API que la web** (Render + Neon):
 reimplementa nada de negocio, solo el front en Flutter. Mismos datos, mismo JWT, mismos
 tres usuarios y los mismos dos roles (`User` / `Admin`).
 
-## Estado: Fase 3 — Negociación completa ✅
+## Estado: Fase 4 — Mon Garage ✅ (fotos/documentos/transparence en 4b)
+
+Cimientos + auth + marketplace + negociación completa + **Mon Garage**. Todo validado
+(`flutter analyze` limpio, `flutter test` en verde, 13 tests):
+
+- **Mon Garage** (`features/garage`, acceso desde Compte): resumen (nº vehículos,
+  rappels abiertos, valeur estimée totale) y tarjetas con complétude y próximo rappel.
+- **Ficha del vehículo del garaje**: datos técnicos, compra, **valeur estimée** (rango
+  + comparables + évolution) y **complétude** (score, niveau y checklist del historial,
+  con el aviso de que no es un diagnóstico mecánico). Insignia «Acheté ici» y enlace al
+  anuncio si está en venta.
+- **Alta/edición** del vehículo (marca del catálogo, año, km, carburante, caja,
+  carrocería, potencia, cilindrada, color, matrícula, VIN, compra).
+- **Entretien**: historial por año con totales; alta/edición/eliminación de
+  intervenciones (tipo, fecha, km, descripción, coste, atelier).
+- **Rappels**: por fecha y/o kilometraje, con «en retard/dans X j·km», marcar
+  terminé/annulé/rouvrir y borrar.
+- **Vendre ce véhicule**: crea un **borrador** de anuncio (`/garage/{id}/sell`) y navega
+  a él. ❌ Nunca publica automáticamente.
+
+> **Fase 4b (pendiente):** fotos del vehículo/intervención, documentos (subir/descargar)
+> y «Transparence» (elegir qué historial se comparte en el anuncio) — necesitan selector
+> de archivos.
+
+## Fase 3 — Negociación completa ✅
 
 Cimientos + auth + marketplace + **negociación con chat en tiempo real, inspección y
-contrato**. Todo validado (`flutter analyze` limpio, `flutter test` en verde, 11 tests):
+contrato**:
 
 - **Pestaña Messages** (5.ª de la barra): «Mes négociations» con sub-pestañas
   **En cours · En attente · Terminées**, contador de no leídos y última actividad.
@@ -65,7 +89,7 @@ Pantallas de sesión sobre la misma API:
 
 ## Fases siguientes
 
-4. **Étape 3** — Mon Garage, mantenimiento, recordatorios, valor, vendre.
+- **4b** — fotos y documentos del garaje (subir/descargar) + «Transparence».
 5. **Notificaciones** — campana + tiempo real.
 6. **Admin** — backoffice en móvil.
 7. **Release** — iconos, splash, firma, build y ficha de Play Store.

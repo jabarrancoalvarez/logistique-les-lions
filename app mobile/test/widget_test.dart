@@ -3,6 +3,9 @@ import 'package:yoon_u_auto/core/data/senegal_regions.dart';
 import 'package:yoon_u_auto/core/theme/app_theme.dart';
 import 'package:yoon_u_auto/core/util/fcfa.dart';
 import 'package:yoon_u_auto/features/auth/models/app_user.dart';
+import 'package:yoon_u_auto/features/garage/models/garage_enums.dart';
+import 'package:yoon_u_auto/features/garage/models/garage_models.dart';
+import 'package:yoon_u_auto/features/garage/models/valuation.dart';
 import 'package:yoon_u_auto/features/negotiations/models/contract.dart';
 import 'package:yoon_u_auto/features/negotiations/models/inspection.dart';
 import 'package:yoon_u_auto/features/negotiations/models/negotiation_detail.dart';
@@ -11,6 +14,50 @@ import 'package:yoon_u_auto/features/vehicles/models/vehicle_filters.dart';
 import 'package:yoon_u_auto/features/vehicles/models/vehicle_summary.dart';
 
 void main() {
+  test('GarageSummary parsea tarjetas y próximo rappel', () {
+    final g = GarageSummary.fromJson({
+      'vehicleCount': 1,
+      'openReminderCount': 1,
+      'totalEstimatedValue': 9000000,
+      'vehicles': [
+        {
+          'id': 'g1',
+          'title': 'Toyota RAV4',
+          'year': 2019,
+          'mileage': 82000,
+          'boughtOnYoonUAuto': true,
+          'completenessScore': 82,
+          'estimatedValue': 9000000,
+          'nextReminder': {
+            'id': 'r1',
+            'type': 'Vidange',
+            'label': 'Vidange moteur',
+            'status': 'AVenir',
+          },
+        },
+      ],
+    });
+    expect(g.vehicles.single.completenessScore, 82);
+    expect(g.vehicles.single.boughtOnYoonUAuto, isTrue);
+    expect(g.vehicles.single.nextReminder!.label, 'Vidange moteur');
+  });
+
+  test('Valuation y etiquetas del garaje', () {
+    final v = Valuation.fromJson({
+      'hasEstimate': true,
+      'estimatedValue': 9000000,
+      'lowValue': 8000000,
+      'highValue': 10000000,
+      'comparableCount': 7,
+    });
+    expect(v.hasEstimate, isTrue);
+    expect(v.comparableCount, 7);
+    expect(maintenanceTypeLabel('RevisionGenerale'), 'Révision générale');
+    expect(reminderStatusLabel('AVenir'), 'À venir');
+    expect(completenessLevelLabel('TresBien'), 'Très bien');
+    expect(reminderIsOpen('Termine'), isFalse);
+  });
+
   test('ContractTab parsea contrato validado y permisos', () {
     final tab = ContractTab.fromJson({
       'contract': {

@@ -67,6 +67,19 @@ class AccountScreen extends ConsumerWidget {
         _infoTile(Icons.phone_outlined, 'Téléphone', user.phone ?? '—'),
         if (user.email != null && user.email!.isNotEmpty)
           _infoTile(Icons.email_outlined, 'E-mail', user.email!),
+        const SizedBox(height: 16),
+        Card(
+          margin: EdgeInsets.zero,
+          child: ListTile(
+            leading: const Icon(Icons.garage_outlined,
+                color: AppColors.azureDark),
+            title: const Text('Mon Garage',
+                style: TextStyle(fontWeight: FontWeight.w700)),
+            subtitle: const Text('Vos véhicules, entretien et rappels'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/garage'),
+          ),
+        ),
         const SizedBox(height: 24),
         OutlinedButton.icon(
           onPressed: () async {
@@ -82,7 +95,7 @@ class AccountScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 24),
         const Text(
-          'D’autres sections (Mes annonces, Mon Garage, Négociations) arrivent dans les prochaines phases.',
+          'D’autres sections (Mes annonces) arrivent dans les prochaines phases.',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 12, color: AppColors.steel),
         ),
