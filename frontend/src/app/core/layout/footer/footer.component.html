@@ -1,7 +1,5 @@
-<footer class="bg-navy text-frost" role="contentinfo">
+<footer class="bg-white text-navy border-t-2 border-azure/60" role="contentinfo">
 
-  <!-- ─── Franja azure decorativa ────────────────────────────────────────── -->
-  <div class="h-0.5 bg-gradient-to-r from-transparent via-azure to-transparent opacity-40"></div>
 
   <!-- ─── Contenido principal ──────────────────────────────────────────── -->
   <div class="container mx-auto px-4 lg:px-6 py-16">
@@ -9,10 +7,10 @@
 
       <!-- Columna 1: Marca y descripción -->
       <div class="lg:col-span-2">
-        <a routerLink="/" class="inline-block logo-chip px-4 py-2.5 mb-5">
+        <a routerLink="/" class="inline-block mb-5">
           <img src="assets/logo.png" alt="Yoon U Auto — Services Automobiles" class="h-12 w-auto" loading="lazy">
         </a>
-        <p class="text-frost/60 text-sm leading-relaxed mb-6 max-w-xs">
+        <p class="text-navy/60 text-sm leading-relaxed mb-6 max-w-xs">
           La plateforme sénégalaise pour acheter, vendre et suivre sa voiture. Gratuite, en FCFA, avec contrat vérifié et Mon Garage.
         </p>
         <!-- Redes sociales -->
@@ -23,7 +21,7 @@
               [attr.aria-label]="social.name"
               target="_blank"
               rel="noopener noreferrer"
-              class="w-9 h-9 border border-white/20 rounded-lg flex items-center justify-center text-frost/60 hover:text-azure-light hover:border-azure/50 transition-all duration-200"
+              class="w-9 h-9 border border-navy/15 rounded-lg flex items-center justify-center text-navy/50 hover:text-azure-dark hover:border-azure/50 transition-all duration-200"
             >
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path [attr.d]="social.icon"/>
@@ -35,11 +33,11 @@
 
       <!-- Columna 2: Plataforma -->
       <div>
-        <h3 class="text-xs font-bold uppercase tracking-widest text-azure-light mb-5">Plateforme</h3>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-azure-dark mb-5">Plateforme</h3>
         <ul class="space-y-3" role="list">
           @for (link of platformLinks; track link.label) {
             <li>
-              <a [routerLink]="link.path" class="text-sm text-frost/60 hover:text-azure-light transition-colors duration-200">
+              <a [routerLink]="link.path" class="text-sm text-navy/60 hover:text-azure-dark transition-colors duration-200">
                 {{ link.label }}
               </a>
             </li>
@@ -49,11 +47,11 @@
 
       <!-- Columna 3: Servicios -->
       <div>
-        <h3 class="text-xs font-bold uppercase tracking-widest text-azure-light mb-5">Mon espace</h3>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-azure-dark mb-5">Mon espace</h3>
         <ul class="space-y-3" role="list">
           @for (link of serviceLinks; track link.label) {
             <li>
-              <a [routerLink]="link.path" class="text-sm text-frost/60 hover:text-azure-light transition-colors duration-200">
+              <a [routerLink]="link.path" class="text-sm text-navy/60 hover:text-azure-dark transition-colors duration-200">
                 {{ link.label }}
               </a>
             </li>
@@ -63,18 +61,18 @@
 
       <!-- Columna 4: Legal -->
       <div>
-        <h3 class="text-xs font-bold uppercase tracking-widest text-azure-light mb-5">Legal</h3>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-azure-dark mb-5">Legal</h3>
         <ul class="space-y-3" role="list">
           @for (link of legalLinks; track link.label) {
             <li>
-              <a [routerLink]="link.path" class="text-sm text-frost/60 hover:text-azure-light transition-colors duration-200">
+              <a [routerLink]="link.path" class="text-sm text-navy/60 hover:text-azure-dark transition-colors duration-200">
                 {{ link.label }}
               </a>
             </li>
           }
         </ul>
         <!-- Badge RGPD -->
-        <div class="mt-6 flex items-center gap-2 text-xs text-frost/40">
+        <div class="mt-6 flex items-center gap-2 text-xs text-navy/40">
           <svg class="w-4 h-4 text-success flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
           </svg>
@@ -84,12 +82,12 @@
     </div>
 
     <!-- ─── Newsletter ─────────────────────────────────────────────────── -->
-    <div class="mt-12 pt-10 border-t border-white/10">
+    <div class="mt-12 pt-10 border-t border-navy/10">
       <div class="max-w-xl">
-        <h3 class="font-heading font-semibold text-lg text-frost mb-1">
+        <h3 class="font-heading font-semibold text-lg text-navy mb-1">
           Une voiture précise en tête&nbsp;?
         </h3>
-        <p class="text-sm text-frost/50 mb-4">Enregistrez votre recherche et recevez une alerte dès qu’elle est publiée.</p>
+        <p class="text-sm text-navy/50 mb-4">Enregistrez votre recherche et recevez une alerte dès qu’elle est publiée.</p>
         <a routerLink="/mis-busquedas" class="btn-azure text-sm py-2.5 px-5 inline-block">
           Mes recherches enregistrées
         </a>
@@ -98,12 +96,12 @@
   </div>
 
   <!-- ─── Bottom bar ────────────────────────────────────────────────────── -->
-  <div class="border-t border-white/10">
+  <div class="border-t border-navy/10">
     <div class="container mx-auto px-4 lg:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <p class="text-xs text-frost/40">
+      <p class="text-xs text-navy/40">
         © {{ currentYear }} Yoon u Auto. Tous droits réservés.
       </p>
-      <div class="flex items-center gap-6 text-xs text-frost/40">
+      <div class="flex items-center gap-6 text-xs text-navy/40">
         <span>Sénégal · Prix en FCFA</span>
       </div>
     </div>
