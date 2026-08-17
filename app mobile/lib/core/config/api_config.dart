@@ -17,6 +17,9 @@ class ApiConfig {
   static const String chatHubUrl =
       'https://logistique-les-lions-api.onrender.com/hubs/chat';
 
+  /// Frontend web (Vercel), para la página pública de vérification del contrato.
+  static const String webUrl = 'https://yoon-u-auto.vercel.app';
+
   /// El primer arranque en frío de Render puede tardar; damos margen.
   static const Duration connectTimeout = Duration(seconds: 60);
   static const Duration receiveTimeout = Duration(seconds: 60);

@@ -4,6 +4,8 @@ import '../../auth/providers/auth_providers.dart';
 import '../data/chat_hub_service.dart';
 import '../data/negotiation_repository.dart';
 import '../models/chat_message.dart';
+import '../models/contract.dart';
+import '../models/inspection.dart';
 import '../models/negotiation_detail.dart';
 import '../models/negotiation_summary.dart';
 
@@ -36,6 +38,20 @@ final negotiationsListProvider =
     FutureProvider.family<List<NegotiationSummary>, String?>(
   (ref, status) =>
       ref.watch(negotiationRepositoryProvider).getMyNegotiations(status: status),
+);
+
+/// Checklist privada de inspección de una negociación.
+final inspectionProvider =
+    FutureProvider.autoDispose.family<Inspection, String>(
+  (ref, negotiationId) =>
+      ref.watch(negotiationRepositoryProvider).getInspection(negotiationId),
+);
+
+/// Pestaña «Contrat» de una negociación.
+final contractTabProvider =
+    FutureProvider.autoDispose.family<ContractTab, String>(
+  (ref, negotiationId) =>
+      ref.watch(negotiationRepositoryProvider).getContractTab(negotiationId),
 );
 
 // ─── Chat de una negociación ───────────────────────────────────────────────

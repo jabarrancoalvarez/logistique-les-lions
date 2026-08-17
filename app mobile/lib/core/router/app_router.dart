@@ -7,6 +7,8 @@ import '../../features/auth/ui/login_screen.dart';
 import '../../features/auth/ui/register_screen.dart';
 import '../../features/favorites/ui/favorites_screen.dart';
 import '../../features/home/home_screen.dart';
+import '../../features/negotiations/ui/contract_screen.dart';
+import '../../features/negotiations/ui/inspection_screen.dart';
 import '../../features/negotiations/ui/negotiation_chat_screen.dart';
 import '../../features/negotiations/ui/negotiations_list_screen.dart';
 import '../../features/shell/main_shell.dart';
@@ -55,6 +57,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/negociations/:id',
         builder: (_, state) =>
             NegotiationChatScreen(negotiationId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/negociations/:id/inspection',
+        builder: (_, state) =>
+            InspectionScreen(negotiationId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/negociations/:id/contrat',
+        builder: (_, state) =>
+            ContractScreen(negotiationId: state.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

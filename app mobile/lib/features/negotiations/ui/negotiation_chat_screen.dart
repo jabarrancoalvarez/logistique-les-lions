@@ -123,6 +123,29 @@ class _NegotiationChatScreenState
       appBar: AppBar(
         title: Text(detail?.otherUserName ?? 'Négociation',
             style: const TextStyle(fontSize: 16)),
+        actions: detail == null
+            ? null
+            : [
+                IconButton(
+                  tooltip: 'Inspection',
+                  icon: const Icon(Icons.fact_check_outlined),
+                  onPressed: () => context
+                      .push('/negociations/${widget.negotiationId}/inspection'),
+                ),
+                IconButton(
+                  tooltip: 'Contrat',
+                  icon: const Icon(Icons.description_outlined),
+                  onPressed: () async {
+                    await context
+                        .push('/negociations/${widget.negotiationId}/contrat');
+                    // El contrato puede haber cambiado el estado (venta validée).
+                    await ref
+                        .read(chatControllerProvider(widget.negotiationId)
+                            .notifier)
+                        .refreshDetail();
+                  },
+                ),
+              ],
         bottom: state.otherTyping
             ? const PreferredSize(
                 preferredSize: Size.fromHeight(18),

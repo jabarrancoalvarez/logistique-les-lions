@@ -4,27 +4,27 @@ App Android de Yoon u Auto. **Consume la misma API que la web** (Render + Neon):
 reimplementa nada de negocio, solo el front en Flutter. Mismos datos, mismo JWT, mismos
 tres usuarios y los mismos dos roles (`User` / `Admin`).
 
-## Estado: Fase 3 — Negociación ✅ (contrato en 3b)
+## Estado: Fase 3 — Negociación completa ✅
 
-Cimientos + auth + marketplace + **negociación con chat en tiempo real**. Todo
-validado (`flutter analyze` limpio, `flutter test` en verde, 9 tests):
+Cimientos + auth + marketplace + **negociación con chat en tiempo real, inspección y
+contrato**. Todo validado (`flutter analyze` limpio, `flutter test` en verde, 11 tests):
 
 - **Pestaña Messages** (5.ª de la barra): «Mes négociations» con sub-pestañas
   **En cours · En attente · Terminées**, contador de no leídos y última actividad.
-  Requiere sesión.
 - **Chat de la negociación** (`features/negotiations`): cronología + mensajes
   fusionados, burbujas propias/ajenas, cabecera del vehículo, **tiempo real por
   SignalR** (`/hubs/chat`, `signalr_netcore`) — mensajes en vivo, «en train
   d’écrire…» y marca de leído. Envío por REST (`/messaging/send`).
 - **Ofertas**: «Faire une offre» y «Contre-offre» (modal), **aceptar/refuser** la
   oferta viva con confirmación; la cronología y el estado se refrescan solos.
-- **Contacto desde la ficha**: «Contacter» (primer mensaje) y «Offre» crean/abren
-  la negociación (`/negotiations/offers`) y navegan al chat. Detecta «C’est votre
-  annonce» y anuncios vendidos.
-
-> **Fase 3b (pendiente):** inspección (checklist privada) y **contrato** completo
-> (crear/enviar/valider, PDF con QR, página de vérification). La venta verificada
-> nace al validar el contrato.
+- **Inspection** (3b): checklist privada de los 11 puntos (Bon/Moyen/Mauvais), fecha
+  de visita, kilometraje y notas. Solo la ve su autor.
+- **Contrat** (3b): ver/redactar/**modifier**/envoyer/**valider**, demander une
+  modification y annuler según los permisos del backend. **Valider produce la vente
+  vérifiée.** PDF del contrato (`open_filex`) y página de **vérification** en el
+  navegador (`url_launcher`) desde el código QR.
+- **Contacto desde la ficha**: «Contacter» y «Offre» crean/abren la negociación y
+  navegan al chat. Detecta «C’est votre annonce» y anuncios vendidos.
 
 ## Fase 2 — Marketplace ✅
 
@@ -65,7 +65,6 @@ Pantallas de sesión sobre la misma API:
 
 ## Fases siguientes
 
-- **3b** — inspección + contrato (crear/enviar/valider), PDF con QR, vérification.
 4. **Étape 3** — Mon Garage, mantenimiento, recordatorios, valor, vendre.
 5. **Notificaciones** — campana + tiempo real.
 6. **Admin** — backoffice en móvil.
