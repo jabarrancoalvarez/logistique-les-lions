@@ -13,6 +13,10 @@ class ApiConfig {
   static const String rootUrl =
       'https://logistique-les-lions-api.onrender.com';
 
+  /// Hub SignalR del chat de negociaciones. El JWT viaja como `?access_token=`.
+  static const String chatHubUrl =
+      'https://logistique-les-lions-api.onrender.com/hubs/chat';
+
   /// El primer arranque en frío de Render puede tardar; damos margen.
   static const Duration connectTimeout = Duration(seconds: 60);
   static const Duration receiveTimeout = Duration(seconds: 60);
