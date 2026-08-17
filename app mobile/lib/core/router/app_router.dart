@@ -1,20 +1,22 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/account/ui/account_screen.dart';
 import '../../features/auth/providers/auth_providers.dart';
 import '../../features/auth/ui/login_screen.dart';
 import '../../features/auth/ui/register_screen.dart';
+import '../../features/favorites/ui/favorites_screen.dart';
 import '../../features/home/home_screen.dart';
+import '../../features/shell/main_shell.dart';
 import '../../features/splash/splash_screen.dart';
+import '../../features/vehicles/ui/marketplace_screen.dart';
+import '../../features/vehicles/ui/vehicle_detail_screen.dart';
 
-/// Rutas públicas que un usuario sin sesión puede ver.
-const _publicRoutes = {'/login', '/register'};
-
-/// Navegación de la app, dependiente del estado de sesión.
+/// Navegación de la app.
 ///
-/// Redirige según el `AuthState`: mientras se restaura la sesión muestra el
-/// splash; sin sesión fuerza a `/login`; con sesión iniciada aleja de las
-/// pantallas de auth. Las pantallas de negocio se añaden fase a fase.
+/// El escaparate se puede recorrer **sin sesión** (igual que la web): solo el
+/// splash (mientras se restaura la sesión) y las pantallas de auth quedan fuera
+/// del shell. Iniciar sesión se pide de forma contextual (favoritos, contacto…).
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier<int>(0);
   ref.listen(authControllerProvider, (_, _) => refresh.value++);
@@ -30,24 +32,43 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (auth is AuthLoading) {
         return loc == '/splash' ? null : '/splash';
       }
-
-      final loggedIn = auth is Authenticated;
-      final onPublic = _publicRoutes.contains(loc);
-
-      if (!loggedIn) {
-        // Sin sesión solo se permiten las pantallas públicas de auth.
-        return onPublic ? null : '/login';
+      // Sesión resuelta: nadie se queda en el splash.
+      if (loc == '/splash') return '/';
+      // Con sesión, no tiene sentido ver login/registro.
+      if (auth is Authenticated && (loc == '/login' || loc == '/register')) {
+        return '/';
       }
-
-      // Con sesión, aleja del splash y de las pantallas de auth.
-      if (loc == '/splash' || onPublic) return '/';
       return null;
     },
     routes: [
       GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
-      GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
+      GoRoute(
+        path: '/vehicules/:slug',
+        builder: (_, state) =>
+            VehicleDetailScreen(slug: state.pathParameters['slug']!),
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+                path: '/vehicules',
+                builder: (_, _) => const MarketplaceScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/favoris', builder: (_, _) => const FavoritesScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/compte', builder: (_, _) => const AccountScreen()),
+          ]),
+        ],
+      ),
     ],
   );
 });
