@@ -3,8 +3,10 @@ import 'package:yoon_u_auto/core/data/senegal_regions.dart';
 import 'package:yoon_u_auto/core/theme/app_theme.dart';
 import 'package:yoon_u_auto/core/util/fcfa.dart';
 import 'package:yoon_u_auto/features/auth/models/app_user.dart';
+import 'package:yoon_u_auto/features/garage/models/garage_document.dart';
 import 'package:yoon_u_auto/features/garage/models/garage_enums.dart';
 import 'package:yoon_u_auto/features/garage/models/garage_models.dart';
+import 'package:yoon_u_auto/features/garage/models/transparency.dart';
 import 'package:yoon_u_auto/features/garage/models/valuation.dart';
 import 'package:yoon_u_auto/features/negotiations/models/contract.dart';
 import 'package:yoon_u_auto/features/negotiations/models/inspection.dart';
@@ -56,6 +58,42 @@ void main() {
     expect(reminderStatusLabel('AVenir'), 'À venir');
     expect(completenessLevelLabel('TresBien'), 'Très bien');
     expect(reminderIsOpen('Termine'), isFalse);
+  });
+
+  test('GarageDocument y Transparence: parseo y dos casillas', () {
+    final doc = GarageDocument.fromJson({
+      'id': 'd1',
+      'type': 'CarteGrise',
+      'name': 'Carte grise',
+      'fileName': 'cg.pdf',
+      'contentType': 'application/pdf',
+      'sizeBytes': 2048,
+      'uploadedAt': '2026-08-17T10:00:00Z',
+    });
+    expect(doc.isPdf, isTrue);
+    expect(garageDocumentTypeLabel(doc.type), 'Carte grise');
+
+    final t = TransparencySettings.fromJson({
+      'vehicleId': 'v1',
+      'showMaintenanceHistory': true,
+      'showMaintenanceDetails': false,
+      'showMileageEvolution': true,
+      'records': [
+        {
+          'maintenanceRecordId': 'm1',
+          'type': 'Vidange',
+          'performedAt': '2026-01-10T00:00:00Z',
+          'description': 'Vidange',
+          'hasInvoice': true,
+          'shared': true,
+          'shareInvoice': false,
+        },
+      ],
+    });
+    // Compartir la intervención no comparte su factura: dos casillas.
+    expect(t.records.single.shared, isTrue);
+    expect(t.records.single.shareInvoice, isFalse);
+    expect(t.records.single.toInput()['maintenanceRecordId'], 'm1');
   });
 
   test('ContractTab parsea contrato validado y permisos', () {

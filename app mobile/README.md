@@ -4,10 +4,11 @@ App Android de Yoon u Auto. **Consume la misma API que la web** (Render + Neon):
 reimplementa nada de negocio, solo el front en Flutter. Mismos datos, mismo JWT, mismos
 tres usuarios y los mismos dos roles (`User` / `Admin`).
 
-## Estado: Fase 4 — Mon Garage ✅ (fotos/documentos/transparence en 4b)
+## Estado: Fase 4 — Mon Garage completo ✅
 
-Cimientos + auth + marketplace + negociación completa + **Mon Garage**. Todo validado
-(`flutter analyze` limpio, `flutter test` en verde, 13 tests):
+Cimientos + auth + marketplace + negociación completa + **Mon Garage** (con fotos,
+documentos y transparence). Todo validado (`flutter analyze` limpio, `flutter test` en
+verde, 14 tests):
 
 - **Mon Garage** (`features/garage`, acceso desde Compte): resumen (nº vehículos,
   rappels abiertos, valeur estimée totale) y tarjetas con complétude y próximo rappel.
@@ -23,10 +24,12 @@ Cimientos + auth + marketplace + negociación completa + **Mon Garage**. Todo va
   terminé/annulé/rouvrir y borrar.
 - **Vendre ce véhicule**: crea un **borrador** de anuncio (`/garage/{id}/sell`) y navega
   a él. ❌ Nunca publica automáticamente.
-
-> **Fase 4b (pendiente):** fotos del vehículo/intervención, documentos (subir/descargar)
-> y «Transparence» (elegir qué historial se comparte en el anuncio) — necesitan selector
-> de archivos.
+- **Fotos privadas** (4b): tira de fotos en la ficha y miniatura en la tarjeta; se
+  descargan por endpoint autenticado (`image_picker` cámara/galería, byte-fetch).
+- **Documents** (4b): carte grise, factures, assurance… subir (`file_picker`), abrir
+  (`open_filex`) y borrar. El archivo nunca se sirve estático.
+- **Transparence** (4b): al vender, se elige **casilla a casilla** qué historial se
+  comparte; compartir una intervención no comparte su factura (dos casillas).
 
 ## Fase 3 — Negociación completa ✅
 
@@ -89,12 +92,12 @@ Pantallas de sesión sobre la misma API:
 
 ## Fases siguientes
 
-- **4b** — fotos y documentos del garaje (subir/descargar) + «Transparence».
-5. **Notificaciones** — campana + tiempo real.
+5. **Notificaciones** — campana + tiempo real (`/hubs/notifications`).
 6. **Admin** — backoffice en móvil.
 7. **Release** — iconos, splash, firma, build y ficha de Play Store.
 
-Pendiente de Étape 1 para fases posteriores: comparador y demandes (búsquedas guardadas).
+Pendiente de fases anteriores: comparador y demandes (Étape 1); fotos de las
+intervenciones de Mon Garage (Étape 3).
 
 ## Cómo ejecutarla
 

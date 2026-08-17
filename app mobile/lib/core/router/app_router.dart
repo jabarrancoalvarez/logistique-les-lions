@@ -6,11 +6,13 @@ import '../../features/auth/providers/auth_providers.dart';
 import '../../features/auth/ui/login_screen.dart';
 import '../../features/auth/ui/register_screen.dart';
 import '../../features/favorites/ui/favorites_screen.dart';
+import '../../features/garage/ui/documents_screen.dart';
 import '../../features/garage/ui/garage_form_screen.dart';
 import '../../features/garage/ui/garage_screen.dart';
 import '../../features/garage/ui/garage_vehicle_screen.dart';
 import '../../features/garage/ui/maintenance_screen.dart';
 import '../../features/garage/ui/reminders_screen.dart';
+import '../../features/garage/ui/transparency_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/negotiations/ui/contract_screen.dart';
 import '../../features/negotiations/ui/inspection_screen.dart';
@@ -93,6 +95,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/garage/:id/rappels',
         builder: (_, state) =>
             RemindersScreen(vehicleId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/garage/:id/documents',
+        builder: (_, state) =>
+            DocumentsScreen(vehicleId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/garage/transparence/:vehicleId',
+        builder: (_, state) => TransparencyScreen(
+            listedVehicleId: state.pathParameters['vehicleId']!),
       ),
       GoRoute(
         path: '/garage/:id',
