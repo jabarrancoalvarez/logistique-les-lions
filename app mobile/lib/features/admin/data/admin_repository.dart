@@ -1,7 +1,9 @@
 import '../../../core/network/api_client.dart';
 import '../models/admin_common.dart';
+import '../models/admin_contract.dart';
 import '../models/admin_dashboard.dart';
 import '../models/admin_listing.dart';
+import '../models/admin_negotiation.dart';
 import '../models/admin_report.dart';
 import '../models/admin_user.dart';
 
@@ -96,4 +98,48 @@ class AdminRepository {
 
   Future<void> warnReportedUser(String id, String message) =>
       _api.dio.post('/admin/reports/$id/warn', data: {'message': message});
+
+  // ─── Negotiations (estructura; contenido con motivo) ────────────────────
+
+  Future<AdminPage<AdminNegotiationRow>> getNegotiations(
+      {int page = 1, int pageSize = 30}) async {
+    final res = await _api.dio.get('/admin/negotiations',
+        queryParameters: {'page': page, 'pageSize': pageSize});
+    return AdminPage.fromJson(
+        res.data as Map<String, dynamic>, AdminNegotiationRow.fromJson);
+  }
+
+  Future<AdminNegotiationDetail> getNegotiation(String id) async {
+    final res = await _api.dio.get('/admin/negotiations/$id');
+    return AdminNegotiationDetail.fromJson(res.data as Map<String, dynamic>);
+  }
+
+  /// Leer el contenido **exige motivo** y queda registrado en la misma operación.
+  Future<List<AdminMessage>> accessNegotiationContent(String id,
+      {required String reason, String? details}) async {
+    final res = await _api.dio.post('/admin/negotiations/$id/content',
+        data: {'reason': reason, 'details': ?details});
+    return (res.data as List<dynamic>)
+        .map((e) => AdminMessage.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  // ─── Contracts (solo invalidar, con motivo) ─────────────────────────────
+
+  Future<AdminPage<AdminContractRow>> getContracts(
+      {int page = 1, int pageSize = 30}) async {
+    final res = await _api.dio.get('/admin/contracts',
+        queryParameters: {'page': page, 'pageSize': pageSize});
+    return AdminPage.fromJson(
+        res.data as Map<String, dynamic>, AdminContractRow.fromJson);
+  }
+
+  Future<AdminContractDetail> getContract(String id) async {
+    final res = await _api.dio.get('/admin/contracts/$id');
+    return AdminContractDetail.fromJson(res.data as Map<String, dynamic>);
+  }
+
+  Future<void> invalidateContract(String id, String reason) =>
+      _api.dio.post('/admin/contracts/$id/invalidate',
+          data: {'reason': reason});
 }

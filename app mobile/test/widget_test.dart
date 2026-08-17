@@ -3,8 +3,10 @@ import 'package:yoon_u_auto/core/data/senegal_regions.dart';
 import 'package:yoon_u_auto/core/theme/app_theme.dart';
 import 'package:yoon_u_auto/core/util/fcfa.dart';
 import 'package:yoon_u_auto/features/auth/models/app_user.dart';
+import 'package:yoon_u_auto/features/admin/models/admin_contract.dart';
 import 'package:yoon_u_auto/features/admin/models/admin_dashboard.dart';
 import 'package:yoon_u_auto/features/admin/models/admin_enums.dart';
+import 'package:yoon_u_auto/features/admin/models/admin_negotiation.dart';
 import 'package:yoon_u_auto/features/admin/models/admin_report.dart';
 import 'package:yoon_u_auto/features/garage/models/garage_document.dart';
 import 'package:yoon_u_auto/features/garage/models/garage_enums.dart';
@@ -76,6 +78,60 @@ void main() {
     expect(d.users.total, 120);
     expect(d.marketplace.pendingModeration, 2);
     expect(d.garage.convertedToListings, 2);
+  });
+
+  test('Admin négociation: estructura sin contenido; contrato invalidable', () {
+    final n = AdminNegotiationDetail.fromJson({
+      'negotiation': {
+        'id': 'n1',
+        'vehicleReference': 'YU1',
+        'vehicleTitle': 'Toyota',
+        'buyerName': 'A',
+        'sellerName': 'B',
+        'status': 'EnCours',
+        'offersCount': 1,
+        'messagesCount': 4,
+        'createdAt': '2026-08-17T10:00:00Z',
+      },
+      'offers': [
+        {'id': 'o1', 'amount': 8000000, 'listedPrice': 9000000,
+         'status': 'EnAttente', 'fromBuyer': true,
+         'createdAt': '2026-08-17T10:01:00Z'},
+      ],
+      'timeline': [
+        {'type': 'OfferMade', 'amount': 8000000,
+         'createdAt': '2026-08-17T10:01:00Z'},
+      ],
+      'actions': [],
+    });
+    // La estructura no incluye el contenido de los mensajes.
+    expect(n.negotiation.messagesCount, 4);
+    expect(n.offers.single.fromBuyer, isTrue);
+    expect(adminTimelineLabel('SaleVerified'), 'Vente vérifiée');
+    expect(contentAccessReasonLabel('FraudInvestigation'), 'Enquête fraude');
+
+    final c = AdminContractDetail.fromJson({
+      'contract': {
+        'id': 'c1',
+        'publicReference': 'YC1',
+        'negotiationId': 'n1',
+        'vehicleReference': 'YU1',
+        'vehicleLabel': 'Toyota Corolla',
+        'sellerName': 'B',
+        'buyerName': 'A',
+        'agreedPrice': 8000000,
+        'status': 'Valide',
+        'saleDate': '2026-08-17T00:00:00Z',
+        'createdAt': '2026-08-17T00:00:00Z',
+        'isVerifiedSale': true,
+      },
+      'vehicleYear': 2020,
+      'timeline': [],
+      'actions': [],
+      'notes': [],
+    });
+    expect(c.contract.isVerifiedSale, isTrue);
+    expect(c.contract.status, 'Valide');
   });
 
   test('ReportList con countByStatus y etiquetas admin', () {

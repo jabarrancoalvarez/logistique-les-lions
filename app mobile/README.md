@@ -4,10 +4,10 @@ App Android de Yoon u Auto. **Consume la misma API que la web** (Render + Neon):
 reimplementa nada de negocio, solo el front en Flutter. Mismos datos, mismo JWT, mismos
 tres usuarios y los mismos dos roles (`User` / `Admin`).
 
-## Estado: Fase 6 — Backoffice (admin) ✅ (núcleo; resto en 6b)
+## Estado: Fase 6 — Backoffice (admin) ✅
 
 Todo lo de usuario + **backoffice de administración**. Validado (`flutter analyze`
-limpio, `flutter test` en verde, 17 tests):
+limpio, `flutter test` en verde, 18 tests):
 
 - **Acceso** desde Compte solo para rol Admin; ruta `/admin/**` protegida en el router.
 - **Dashboard** (`GET /admin/dashboard`): usuarios, marketplace, actividad, demanda y
@@ -21,9 +21,15 @@ limpio, `flutter test` en verde, 17 tests):
   estado y **avertir l’utilisateur**, todo con motivo. Enlaces a la annonce/usuario.
 - Toda medida deja traza en `admin_actions` (historial visible en cada ficha).
 
-> **Fase 6b (pendiente):** negociaciones (estructura + leer contenido **con motivo**,
-> que queda registrado), contratos (solo **invalidar** con motivo), demandes,
-> communications, settings/catalogs y statistics.
+- **Négociations**: estructura (partes, ofertas, cronología) sin el contenido; **leer los
+  mensajes exige motivo** (motif + détails) y queda **registrado** en la misma operación,
+  visible en «Accès enregistrés».
+- **Contrats**: ficha y, como única medida, **invalider avec motif** (nunca validar en
+  nombre de las partes).
+
+> Módulos admin de configuración/estadística (demandes, communications, settings/catalogs,
+> statistics) no se han portado al móvil: son herramientas de escritorio poco usadas en
+> movilidad.
 
 ## Fase 5 — Notificaciones ✅
 
@@ -125,8 +131,6 @@ Pantallas de sesión sobre la misma API:
 
 ## Fases siguientes
 
-- **6b** — admin: negociaciones (contenido con motivo), contratos (invalider),
-  demandes, communications, settings/catalogs, statistics.
 7. **Release** — iconos, splash, firma, build y ficha de Play Store.
 
 Pendiente de fases anteriores: comparador y demandes (Étape 1); fotos de las

@@ -2,9 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/account/ui/account_screen.dart';
+import '../../features/admin/ui/admin_contract_detail_screen.dart';
+import '../../features/admin/ui/admin_contracts_screen.dart';
 import '../../features/admin/ui/admin_home_screen.dart';
 import '../../features/admin/ui/admin_listing_detail_screen.dart';
 import '../../features/admin/ui/admin_listings_screen.dart';
+import '../../features/admin/ui/admin_negotiation_detail_screen.dart';
+import '../../features/admin/ui/admin_negotiations_screen.dart';
 import '../../features/admin/ui/admin_report_detail_screen.dart';
 import '../../features/admin/ui/admin_reports_screen.dart';
 import '../../features/admin/ui/admin_user_detail_screen.dart';
@@ -153,6 +157,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/admin/reports/:id',
         builder: (_, state) =>
             AdminReportDetailScreen(id: state.pathParameters['id']!),
+      ),
+      GoRoute(
+          path: '/admin/negotiations',
+          builder: (_, _) => const AdminNegotiationsScreen()),
+      GoRoute(
+        path: '/admin/negotiations/:id',
+        builder: (_, state) =>
+            AdminNegotiationDetailScreen(id: state.pathParameters['id']!),
+      ),
+      GoRoute(
+          path: '/admin/contracts',
+          builder: (_, _) => const AdminContractsScreen()),
+      GoRoute(
+        path: '/admin/contracts/:id',
+        builder: (_, state) =>
+            AdminContractDetailScreen(id: state.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

@@ -52,6 +52,16 @@ class AdminHomeScreen extends ConsumerWidget {
               title: 'Signalements',
               onTap: () => context.push('/admin/reports'),
             ),
+            _NavTile(
+              icon: Icons.forum_outlined,
+              title: 'Négociations',
+              onTap: () => context.push('/admin/negotiations'),
+            ),
+            _NavTile(
+              icon: Icons.description_outlined,
+              title: 'Contrats',
+              onTap: () => context.push('/admin/contracts'),
+            ),
           ],
         ),
       ),
