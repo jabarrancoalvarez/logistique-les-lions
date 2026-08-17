@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/util/fcfa.dart';
 import '../models/garage_models.dart';
 import '../providers/garage_providers.dart';
+import 'widgets/garage_image.dart';
 
 /// Mon Garage — espacio privado del usuario con los vehículos que posee.
 class GarageScreen extends ConsumerWidget {
@@ -134,6 +135,17 @@ class _VehicleCard extends StatelessWidget {
             children: [
               Row(
                 children: [
+                  if (card.primaryImageId != null) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: SizedBox(
+                        width: 52,
+                        height: 52,
+                        child: GarageImage(imageId: card.primaryImageId!),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
                   Expanded(
                     child: Text(card.title,
                         maxLines: 1,

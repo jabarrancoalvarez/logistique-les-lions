@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/util/fcfa.dart';
@@ -9,6 +10,7 @@ import '../models/garage_enums.dart';
 import '../models/garage_models.dart';
 import '../models/valuation.dart';
 import '../providers/garage_providers.dart';
+import 'widgets/garage_image.dart';
 
 /// Ficha de un vehículo de Mon Garage: datos, valeur, complétude y accesos a
 /// entretien y rappels, además de vendre / modifier / supprimer.
@@ -125,6 +127,8 @@ class _Body extends ConsumerWidget {
             ),
           ),
         const SizedBox(height: 16),
+        _PhotosStrip(vehicle: v),
+        const SizedBox(height: 16),
         _specs(v),
         if (v.purchaseDate != null || v.purchasePrice != null) ...[
           const SizedBox(height: 8),
@@ -153,6 +157,23 @@ class _Body extends ConsumerWidget {
             ref.invalidate(completenessProvider(v.id));
           },
         ),
+        _NavTile(
+          icon: Icons.folder_outlined,
+          title: 'Documents',
+          subtitle: 'Carte grise, factures, assurance…',
+          onTap: () async {
+            await context.push('/garage/${v.id}/documents');
+            ref.invalidate(completenessProvider(v.id));
+          },
+        ),
+        if (v.listedVehicleId != null)
+          _NavTile(
+            icon: Icons.visibility_outlined,
+            title: 'Transparence',
+            subtitle: 'Ce que l’annonce partage de l’historique',
+            onTap: () =>
+                context.push('/garage/transparence/${v.listedVehicleId}'),
+          ),
         const SizedBox(height: 20),
         FilledButton.icon(
           onPressed: v.listedVehicleId != null ? null : () => _sell(context, ref),
@@ -230,6 +251,151 @@ class _Body extends ConsumerWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _PhotosStrip extends ConsumerWidget {
+  const _PhotosStrip({required this.vehicle});
+  final GarageVehicleDetail vehicle;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      height: 96,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _AddPhotoButton(onTap: () => _add(context, ref)),
+          for (final id in vehicle.imageIds)
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onLongPress: () => _delete(context, ref, id),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                      width: 128, height: 96, child: GarageImage(imageId: id)),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _add(BuildContext context, WidgetRef ref) async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: const Text('Prendre une photo'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Choisir dans la galerie'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+
+    final picked = await ImagePicker()
+        .pickImage(source: source, maxWidth: 2000, imageQuality: 85);
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    try {
+      await ref.read(garageRepositoryProvider).uploadVehicleImage(
+            vehicle.id,
+            bytes: bytes,
+            filename: picked.name,
+            contentType: _contentType(picked.name, picked.mimeType),
+            isPrimary: vehicle.imageIds.isEmpty,
+          );
+      ref.invalidate(garageVehicleProvider(vehicle.id));
+      ref.invalidate(garageSummaryProvider);
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Envoi de la photo impossible.')),
+        );
+      }
+    }
+  }
+
+  Future<void> _delete(BuildContext context, WidgetRef ref, String id) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Supprimer la photo ?'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Annuler')),
+          FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Supprimer')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await ref.read(garageRepositoryProvider).deleteVehicleImage(id);
+      ref.invalidate(garageVehicleProvider(vehicle.id));
+      ref.invalidate(garageSummaryProvider);
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Suppression impossible.')),
+        );
+      }
+    }
+  }
+
+  static String _contentType(String name, String? mime) {
+    if (mime != null && mime.isNotEmpty) return mime;
+    final n = name.toLowerCase();
+    if (n.endsWith('.png')) return 'image/png';
+    if (n.endsWith('.webp')) return 'image/webp';
+    return 'image/jpeg';
+  }
+}
+
+class _AddPhotoButton extends StatelessWidget {
+  const _AddPhotoButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        width: 96,
+        height: 96,
+        decoration: BoxDecoration(
+          color: AppColors.frost,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.silver),
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_a_photo_outlined, color: AppColors.azureDark),
+            SizedBox(height: 4),
+            Text('Ajouter',
+                style: TextStyle(fontSize: 11, color: AppColors.steel)),
+          ],
+        ),
       ),
     );
   }
