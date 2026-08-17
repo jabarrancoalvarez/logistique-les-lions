@@ -4,10 +4,31 @@ App Android de Yoon u Auto. **Consume la misma API que la web** (Render + Neon):
 reimplementa nada de negocio, solo el front en Flutter. Mismos datos, mismo JWT, mismos
 tres usuarios y los mismos dos roles (`User` / `Admin`).
 
-## Estado: Fase 5 — Notificaciones ✅
+## Estado: Fase 6 — Backoffice (admin) ✅ (núcleo; resto en 6b)
+
+Todo lo de usuario + **backoffice de administración**. Validado (`flutter analyze`
+limpio, `flutter test` en verde, 17 tests):
+
+- **Acceso** desde Compte solo para rol Admin; ruta `/admin/**` protegida en el router.
+- **Dashboard** (`GET /admin/dashboard`): usuarios, marketplace, actividad, demanda y
+  garaje en cifras.
+- **Utilisateurs** (`/admin/users`): búsqueda, ficha con actividad e historial, y cambio
+  de estado (Actif/Suspendu/Bloqué) **con motivo obligatorio**.
+- **Annonces** (`/admin/listings`): búsqueda, ficha con datos y contadores, moderación
+  (masquer/réafficher/marquer/archiver/supprimer) **con motivo** y **demander une
+  correction**. El admin **nunca edita** la información comercial.
+- **Signalements** (`/admin/reports`): pestañas por estado, ficha con pruebas, cambio de
+  estado y **avertir l’utilisateur**, todo con motivo. Enlaces a la annonce/usuario.
+- Toda medida deja traza en `admin_actions` (historial visible en cada ficha).
+
+> **Fase 6b (pendiente):** negociaciones (estructura + leer contenido **con motivo**,
+> que queda registrado), contratos (solo **invalidar** con motivo), demandes,
+> communications, settings/catalogs y statistics.
+
+## Fase 5 — Notificaciones ✅
 
 Cimientos + auth + marketplace + negociación + Mon Garage + **notificaciones en tiempo
-real**. Todo validado (`flutter analyze` limpio, `flutter test` en verde, 15 tests):
+real**:
 
 - **Campana** con contador de no leídos **en vivo** en Accueil, Véhicules y
   Négociations (solo con sesión).
@@ -104,7 +125,8 @@ Pantallas de sesión sobre la misma API:
 
 ## Fases siguientes
 
-6. **Admin** — backoffice en móvil.
+- **6b** — admin: negociaciones (contenido con motivo), contratos (invalider),
+  demandes, communications, settings/catalogs, statistics.
 7. **Release** — iconos, splash, firma, build y ficha de Play Store.
 
 Pendiente de fases anteriores: comparador y demandes (Étape 1); fotos de las
