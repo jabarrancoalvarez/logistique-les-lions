@@ -17,6 +17,10 @@ class ApiConfig {
   static const String chatHubUrl =
       'https://logistique-les-lions-api.onrender.com/hubs/chat';
 
+  /// Hub SignalR de notificaciones (campana en vivo).
+  static const String notificationsHubUrl =
+      'https://logistique-les-lions-api.onrender.com/hubs/notifications';
+
   /// Frontend web (Vercel), para la página pública de vérification del contrato.
   static const String webUrl = 'https://yoon-u-auto.vercel.app';
 

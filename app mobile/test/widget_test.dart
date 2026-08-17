@@ -10,6 +10,7 @@ import 'package:yoon_u_auto/features/garage/models/transparency.dart';
 import 'package:yoon_u_auto/features/garage/models/valuation.dart';
 import 'package:yoon_u_auto/features/negotiations/models/contract.dart';
 import 'package:yoon_u_auto/features/negotiations/models/inspection.dart';
+import 'package:yoon_u_auto/features/notifications/models/app_notification.dart';
 import 'package:yoon_u_auto/features/negotiations/models/negotiation_detail.dart';
 import 'package:yoon_u_auto/features/negotiations/models/negotiation_enums.dart';
 import 'package:yoon_u_auto/features/vehicles/models/vehicle_filters.dart';
@@ -58,6 +59,30 @@ void main() {
     expect(reminderStatusLabel('AVenir'), 'À venir');
     expect(completenessLevelLabel('TresBien'), 'Très bien');
     expect(reminderIsOpen('Termine'), isFalse);
+  });
+
+  test('Notification: parseo, evento en vivo y mapeo de link', () {
+    final n = AppNotification.fromJson({
+      'id': 'n1',
+      'category': 'message',
+      'title': 'Nouveau message',
+      'body': 'Bonjour',
+      'link': '/mis-negociaciones/abc',
+      'isRead': false,
+      'createdAt': '2026-08-17T10:00:00Z',
+    });
+    expect(n.category, 'message');
+    expect(notificationRoute(n.link), '/negociations/abc');
+
+    final live = AppNotification.fromHub({
+      'id': 'n2',
+      'category': 'offer',
+      'title': 'Nouvelle offre',
+      'link': '/vehiculos/toyota-yu1',
+    });
+    expect(live.isRead, isFalse);
+    expect(notificationRoute(live.link), '/vehicules/toyota-yu1');
+    expect(notificationRoute(null), isNull);
   });
 
   test('GarageDocument y Transparence: parseo y dos casillas', () {
