@@ -3,12 +3,63 @@ import 'package:yoon_u_auto/core/data/senegal_regions.dart';
 import 'package:yoon_u_auto/core/theme/app_theme.dart';
 import 'package:yoon_u_auto/core/util/fcfa.dart';
 import 'package:yoon_u_auto/features/auth/models/app_user.dart';
+import 'package:yoon_u_auto/features/negotiations/models/contract.dart';
+import 'package:yoon_u_auto/features/negotiations/models/inspection.dart';
 import 'package:yoon_u_auto/features/negotiations/models/negotiation_detail.dart';
 import 'package:yoon_u_auto/features/negotiations/models/negotiation_enums.dart';
 import 'package:yoon_u_auto/features/vehicles/models/vehicle_filters.dart';
 import 'package:yoon_u_auto/features/vehicles/models/vehicle_summary.dart';
 
 void main() {
+  test('ContractTab parsea contrato validado y permisos', () {
+    final tab = ContractTab.fromJson({
+      'contract': {
+        'id': 'c1',
+        'publicReference': 'YC00004',
+        'status': 'Valide',
+        'negotiationId': 'n1',
+        'vehicleMake': 'Toyota',
+        'vehicleYear': 2020,
+        'vehicleReference': 'YU1',
+        'agreedPrice': 8500000,
+        'saleDate': '2026-08-17T10:00:00Z',
+        'sellerLegalName': 'A',
+        'buyerLegalName': 'B',
+        'createdByMe': true,
+        'canValidate': false,
+        'canDownloadPdf': true,
+        'verificationCode': 'ABC123',
+        'createdAt': '2026-08-17T09:00:00Z',
+      },
+      'prefill': {
+        'vehicleMake': 'Toyota',
+        'vehicleYear': 2020,
+        'vehicleReference': 'YU1',
+        'suggestedPrice': 8500000,
+        'sellerLegalName': 'A',
+        'buyerLegalName': 'B',
+      },
+      'canCreate': false,
+      'isSeller': true,
+    });
+    expect(tab.contract, isNotNull);
+    expect(tab.contract!.canDownloadPdf, isTrue);
+    expect(tab.contract!.verificationCode, 'ABC123');
+    expect(contractStatusLabel(tab.contract!.status), 'Validé');
+  });
+
+  test('Inspection expone los 11 puntos y etiquetas', () {
+    expect(inspectionItemTypes.length, 11);
+    expect(inspectionItemLabel('Vin'), 'Numéro de châssis (VIN)');
+    final insp = Inspection.fromJson({
+      'items': [
+        {'type': 'Moteur', 'result': 'Bon', 'notes': null},
+      ],
+    });
+    expect(insp.items.single.result, 'Bon');
+    expect(inspectionResultLabel('Mauvais'), 'Mauvais');
+  });
+
   test('NegotiationDetail parsea cronología, ofertas y oferta viva', () {
     final n = NegotiationDetail.fromJson({
       'id': 'n1',

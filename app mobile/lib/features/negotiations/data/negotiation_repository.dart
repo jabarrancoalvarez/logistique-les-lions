@@ -1,5 +1,8 @@
+import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import '../models/chat_message.dart';
+import '../models/contract.dart';
+import '../models/inspection.dart';
 import '../models/negotiation_detail.dart';
 import '../models/negotiation_summary.dart';
 
@@ -93,5 +96,73 @@ class NegotiationRepository {
   /// `POST /negotiations/offers/{offerId}/reject`.
   Future<void> rejectOffer(String offerId) async {
     await _api.dio.post('/negotiations/offers/$offerId/reject');
+  }
+
+  // ─── Inspection ─────────────────────────────────────────────────────────
+
+  /// `GET /negotiations/{id}/inspection` (valor directo).
+  Future<Inspection> getInspection(String negotiationId) async {
+    final res = await _api.dio.get('/negotiations/$negotiationId/inspection');
+    return Inspection.fromJson(res.data as Map<String, dynamic>);
+  }
+
+  /// `PUT /negotiations/{id}/inspection`.
+  Future<void> saveInspection(
+    String negotiationId, {
+    DateTime? visitedAt,
+    int? observedMileage,
+    String? notes,
+    required List<InspectionItem> items,
+  }) async {
+    await _api.dio.put('/negotiations/$negotiationId/inspection', data: {
+      'visitedAt': visitedAt?.toUtc().toIso8601String(),
+      'observedMileage': observedMileage,
+      'notes': notes,
+      'items': items.map((e) => e.toJson()).toList(),
+    });
+  }
+
+  // ─── Contrat ────────────────────────────────────────────────────────────
+
+  /// `GET /negotiations/{id}/contract` (valor directo).
+  Future<ContractTab> getContractTab(String negotiationId) async {
+    final res = await _api.dio.get('/negotiations/$negotiationId/contract');
+    return ContractTab.fromJson(res.data as Map<String, dynamic>);
+  }
+
+  /// `POST /negotiations/{id}/contract` — crea el contrato. Devuelve su id.
+  Future<String> createContract(
+      String negotiationId, Map<String, dynamic> body) async {
+    final res =
+        await _api.dio.post('/negotiations/$negotiationId/contract', data: body);
+    return (res.data as Map<String, dynamic>)['id'] as String;
+  }
+
+  /// `PUT /negotiations/contracts/{id}` — corrige un borrador.
+  Future<void> updateContract(
+      String contractId, Map<String, dynamic> body) async {
+    await _api.dio.put('/negotiations/contracts/$contractId', data: body);
+  }
+
+  Future<void> sendContract(String contractId) =>
+      _api.dio.post('/negotiations/contracts/$contractId/send');
+
+  Future<void> validateContract(String contractId) =>
+      _api.dio.post('/negotiations/contracts/$contractId/validate');
+
+  Future<void> requestContractChanges(String contractId, String notes) =>
+      _api.dio.post('/negotiations/contracts/$contractId/request-changes',
+          data: {'notes': notes});
+
+  Future<void> cancelContract(String contractId) =>
+      _api.dio.post('/negotiations/contracts/$contractId/cancel');
+
+  /// Descarga el PDF del contrato validado (con el JWT del interceptor).
+  Future<List<int>> downloadContractPdf(String contractId) async {
+    final res = await _api.dio.get<List<int>>(
+      '/negotiations/contracts/$contractId.pdf',
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return res.data ?? const [];
   }
 }
