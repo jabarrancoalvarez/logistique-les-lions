@@ -71,10 +71,10 @@ flutter_launcher_icons:
 
 # Splash nativo de marca (generado con: dart run flutter_native_splash:create).
 flutter_native_splash:
-  color: "#14567F"
+  color: "#12699F"
   image: assets/splash/splash_mark.png
   android_12:
-    color: "#14567F"
+    color: "#12699F"
     image: assets/splash/splash_mark.png
 
 # For information on the generic Dart part of this file, see the
@@ -87,6 +87,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/brand/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

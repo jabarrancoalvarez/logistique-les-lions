@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/util/fcfa.dart';
+import '../../../core/util/image_url.dart';
 import '../../../core/util/time_ago.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../models/chat_message.dart';
@@ -219,8 +220,9 @@ class _VehicleHeader extends StatelessWidget {
                 child: SizedBox(
                   width: 44,
                   height: 44,
-                  child: detail.vehicleThumbnailUrl != null
-                      ? Image.network(detail.vehicleThumbnailUrl!,
+                  child: resolveImageUrl(detail.vehicleThumbnailUrl) != null
+                      ? Image.network(
+                          resolveImageUrl(detail.vehicleThumbnailUrl)!,
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => const ColoredBox(
                               color: AppColors.frostDark,

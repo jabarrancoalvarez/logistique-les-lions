@@ -68,36 +68,16 @@ class _Header extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.navyDark, AppColors.navy, AppColors.navyLight],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [AppColors.heroTop, AppColors.heroBottom],
         ),
       ),
       padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.directions_car_filled,
-                    color: AppColors.white, size: 26),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Yoon u Auto',
-                style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800),
-              ),
-            ],
-          ),
+          Image.asset('assets/brand/logo.png', height: 60, fit: BoxFit.contain),
           const SizedBox(height: 28),
           Text(
             title,
