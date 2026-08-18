@@ -21,7 +21,7 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.HasIndex(v => v.CountryOrigin);
         // Filtros del Marketplace con especial protagonismo en Senegal.
         builder.HasIndex(v => new { v.Region, v.City });
-        builder.HasIndex(v => new { v.Status, v.IsFeatured, v.DeletedAt })
+        builder.HasIndex(v => new { v.Status, v.FeaturedTier, v.FeaturedUntil })
             .HasFilter("deleted_at IS NULL")
             .HasDatabaseName("ix_vehicles_active_featured");
         builder.HasIndex(v => new { v.Price, v.Currency });
@@ -45,6 +45,7 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.Property(v => v.Price).HasPrecision(12, 2);
 
         builder.Property(v => v.Status).HasConversion<string>().HasMaxLength(20);
+        builder.Property(v => v.FeaturedTier).HasConversion<string>().HasMaxLength(20);
         builder.Property(v => v.Condition).HasConversion<string>().HasMaxLength(20);
         builder.Property(v => v.FuelType).HasConversion<string>().HasMaxLength(30);
         builder.Property(v => v.Transmission).HasConversion<string>().HasMaxLength(20);

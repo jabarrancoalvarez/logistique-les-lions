@@ -43,7 +43,12 @@ public record MyListingDto(
     int QualityScore,
     DateTimeOffset CreatedAt,
     DateTimeOffset? PublishedAt,
-    DateTimeOffset? SoldAt
+    DateTimeOffset? SoldAt,
+
+    /// <summary>Nivel de destacado vigente (Aucune si no lo está o ha caducado).</summary>
+    FeaturedTier FeaturedTier,
+    /// <summary>Hasta cuándo dura el destacado, para mostrar «En vedette jusqu'au…».</summary>
+    DateTimeOffset? FeaturedUntil
 );
 
 public class GetMyListingsQueryHandler(IApplicationDbContext db)
@@ -51,6 +56,8 @@ public class GetMyListingsQueryHandler(IApplicationDbContext db)
 {
     public async Task<Result<MyListingsDto>> Handle(GetMyListingsQuery request, CancellationToken ct)
     {
+        var now = DateTimeOffset.UtcNow;
+
         // Sin el filtro global: los borradores y los archivados también son suyos.
         var mine = db.Vehicles
             .AsNoTracking()
@@ -88,7 +95,9 @@ public class GetMyListingsQueryHandler(IApplicationDbContext db)
                 v.ViewsCount, v.FavoritesCount, v.ContactsCount,
                 negotiationsByVehicle.GetValueOrDefault(v.Id),
                 ListingQualityCalculator.For(v).Score,
-                v.CreatedAt, v.PublishedAt, v.SoldAt))
+                v.CreatedAt, v.PublishedAt, v.SoldAt,
+                v.IsFeaturedActive(now) ? v.FeaturedTier : FeaturedTier.Aucune,
+                v.IsFeaturedActive(now) ? v.FeaturedUntil : null))
             .ToList();
 
         return Result<MyListingsDto>.Success(new MyListingsDto(

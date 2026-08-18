@@ -1,5 +1,6 @@
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Common.Models;
+using LogistiqueLesLions.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -60,7 +61,8 @@ public class GetVehicleBySlugQueryHandler(
             v.Price, v.Currency, v.PriceNegotiable, initialPrice, priceChangedAt,
             indicator.Indicator, indicator.ComparablesCount,
             v.Region, v.City, v.District,
-            v.Status, v.IsFeatured, v.PublishedAt, v.ReservedAt, v.SoldAt,
+            v.Status, v.IsFeaturedActive(DateTimeOffset.UtcNow) ? v.FeaturedTier : FeaturedTier.Aucune,
+            v.PublishedAt, v.ReservedAt, v.SoldAt,
             v.ViewsCount, v.FavoritesCount, v.ContactsCount, v.CreatedAt,
             v.Images
                 .Select(i => new VehicleImageDto(i.Id, i.Url, i.ThumbnailUrl, i.IsPrimary, i.SortOrder, i.AltText))

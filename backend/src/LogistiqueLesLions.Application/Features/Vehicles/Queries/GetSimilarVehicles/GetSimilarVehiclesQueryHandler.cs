@@ -89,8 +89,10 @@ public class GetSimilarVehiclesQueryHandler(IApplicationDbContext context)
                      && (v.Status == VehicleStatus.Actif || v.Status == VehicleStatus.Reserve));
 
     /// <summary>Los similares usan la misma tarjeta reducida que el Marketplace.</summary>
-    private static IQueryable<VehicleListDto> ToCards(IQueryable<Vehicle> query) =>
-        query.Select(v => new VehicleListDto(
+    private static IQueryable<VehicleListDto> ToCards(IQueryable<Vehicle> query)
+    {
+        var now = DateTimeOffset.UtcNow;
+        return query.Select(v => new VehicleListDto(
             v.Id,
             v.PublicReference,
             v.Slug,
@@ -116,11 +118,12 @@ public class GetSimilarVehiclesQueryHandler(IApplicationDbContext context)
                 .Take(8)
                 .ToList(),
             v.Images.Count,
-            v.IsFeatured,
+            v.FeaturedUntil > now ? v.FeaturedTier : FeaturedTier.Aucune,
             v.FavoritesCount,
             v.ViewsCount,
             v.CreatedAt,
             v.Status,
             v.SellerId,
             null));   // el indicador de precio se calcula después, en bloque
+    }
 }

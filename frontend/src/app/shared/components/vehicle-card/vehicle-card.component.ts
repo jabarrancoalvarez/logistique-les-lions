@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
   FeaturedVehicle, VehicleListItem, VehicleService,
-  FUEL_LABELS, STATUS_LABELS,
+  FUEL_LABELS, STATUS_LABELS, FEATURED_LABELS,
   PRICE_INDICATOR_LABELS, PRICE_INDICATOR_CLASSES
 } from '../../../core/services/vehicle.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -105,6 +105,20 @@ export class VehicleCardComponent {
   get modelLine(): string {
     const v = this.vehicle;
     return [v.makeName, v.modelName, this.version].filter(Boolean).join(' ');
+  }
+
+  /**
+   * Distintivo «Sponsorisé» de la tarjeta. Los ítems de la portada son siempre «À la
+   * une»; los del listado traen su nivel vigente en `featuredTier`.
+   */
+  get featuredBadge(): string | null {
+    if ('featuredTier' in this.vehicle) {
+      const t = (this.vehicle as VehicleListItem).featuredTier;
+      return t === 'ALaUne' ? FEATURED_LABELS.ALaUne
+           : t === 'EnVedette' ? FEATURED_LABELS.EnVedette
+           : null;
+    }
+    return FEATURED_LABELS.ALaUne;
   }
 
   /** Se avisa cuando el anuncio ya no está simplemente disponible. */
