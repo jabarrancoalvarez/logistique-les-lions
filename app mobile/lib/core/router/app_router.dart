@@ -15,6 +15,7 @@ import '../../features/admin/ui/admin_user_detail_screen.dart';
 import '../../features/admin/ui/admin_users_screen.dart';
 import '../../features/auth/providers/auth_providers.dart';
 import '../../features/auth/ui/login_screen.dart';
+import '../../features/auth/ui/profile_edit_screen.dart';
 import '../../features/auth/ui/register_screen.dart';
 import '../../features/favorites/ui/favorites_screen.dart';
 import '../../features/garage/ui/documents_screen.dart';
@@ -75,6 +76,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/notifications',
         builder: (_, _) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/profil/edit',
+        builder: (_, _) => const ProfileEditScreen(),
       ),
       GoRoute(
         path: '/vehicules/:slug',
