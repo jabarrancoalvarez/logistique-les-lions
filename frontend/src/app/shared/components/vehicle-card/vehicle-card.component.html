@@ -28,6 +28,17 @@
       }
     </a>
 
+    <!-- Mise en avant : distintivo «Sponsorisé» -->
+    @if (featuredBadge) {
+      <span class="absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-azure-dark text-white text-[11px] font-semibold px-2.5 py-1 shadow-sm"
+            [title]="'Annonce ' + featuredBadge + ' (sponsorisée)'">
+        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M9.05 2.93c.3-.92 1.6-.92 1.9 0l1.36 4.18h4.4c.97 0 1.37 1.24.59 1.81l-3.56 2.59 1.36 4.18c.3.92-.75 1.68-1.54 1.11L10 14.22l-3.56 2.59c-.79.57-1.84-.19-1.54-1.11l1.36-4.18L2.7 8.93c-.78-.57-.38-1.81.59-1.81h4.4L9.05 2.93z"/>
+        </svg>
+        {{ featuredBadge }}
+      </span>
+    }
+
     <!-- Flèches de navigation -->
     @if (hasGallery) {
       <button type="button" (click)="prevImage($event)"

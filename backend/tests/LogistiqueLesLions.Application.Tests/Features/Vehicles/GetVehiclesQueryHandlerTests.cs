@@ -245,5 +245,37 @@ public class GetVehiclesQueryHandlerTests : IDisposable
         titles.Should().BeEquivalentTo(["Toyota RAV4", "Toyota Corolla"]);
     }
 
+    [Fact]
+    public async Task ElDestacadoEncabezaElOrdenPorDefecto()
+    {
+        var p208 = _context.Vehicles.IgnoreQueryFilters().First(v => v.Title == "Peugeot 208");
+        p208.FeaturedTier = FeaturedTier.ALaUne;
+        p208.FeaturedAt = DateTimeOffset.UtcNow;
+        p208.FeaturedUntil = DateTimeOffset.UtcNow.AddDays(10);
+        await _context.SaveChangesAsync();
+
+        var titles = await TitlesFor(new GetVehiclesQuery());
+
+        // En el orden por defecto el destacado vigente sube al primer puesto.
+        titles.First().Should().Be("Peugeot 208");
+    }
+
+    [Fact]
+    public async Task ElDestacadoNoAlteraElOrdenExplicito()
+    {
+        var hilux = _context.Vehicles.IgnoreQueryFilters().First(v => v.Title == "Toyota Hilux");
+        hilux.FeaturedTier = FeaturedTier.ALaUne;
+        hilux.FeaturedAt = DateTimeOffset.UtcNow;
+        hilux.FeaturedUntil = DateTimeOffset.UtcNow.AddDays(10);
+        await _context.SaveChangesAsync();
+
+        // Al ordenar por precio ascendente manda el precio, no el destacado: el Hilux
+        // (12M) es el más caro, así que no debe encabezar pese a estar destacado.
+        var titles = await TitlesFor(new GetVehiclesQuery { SortBy = "price", SortDesc = false });
+
+        titles.First().Should().Be("Peugeot 208");
+        titles.First().Should().NotBe("Toyota Hilux");
+    }
+
     public void Dispose() => _context.Dispose();
 }

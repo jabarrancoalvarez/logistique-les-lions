@@ -584,7 +584,13 @@ public class YoonUAutoReseeder(
                     Region = region,
                     City = city,
                     Status = VehicleStatus.Actif,
-                    IsFeatured = i == 0,
+                    // Datos de ejemplo para lucir la mise en avant: uno «À la une» y otro
+                    // «En vedette» por modelo, con caducidad todavía vigente.
+                    FeaturedTier = i == 0
+                        ? FeaturedTier.ALaUne
+                        : (i == 3 ? FeaturedTier.EnVedette : FeaturedTier.Aucune),
+                    FeaturedAt = i is 0 or 3 ? publishedAt : null,
+                    FeaturedUntil = i is 0 or 3 ? now.AddDays(30) : null,
                     ViewsCount = rng.Next(20, 900),
                     FavoritesCount = rng.Next(0, 25),
                     ContactsCount = rng.Next(0, 12),

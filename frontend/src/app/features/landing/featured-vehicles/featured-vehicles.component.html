@@ -10,16 +10,37 @@
         </h2>
         <p class="mt-1 text-navy/60 text-sm">Les annonces les plus consultées ces derniers jours</p>
       </div>
-      <a
-        routerLink="/vehiculos"
-        class="btn-outline text-sm shrink-0"
-        aria-label="Voir toutes les annonces disponibles"
-      >
-        Voir tout
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-        </svg>
-      </a>
+      <div class="flex items-center gap-3 shrink-0">
+        <!-- Flèches de rotation : par groupes de 6 -->
+        @if (hasPages()) {
+          <div class="flex items-center gap-2">
+            <button type="button" (click)="prev()"
+              class="w-10 h-10 rounded-full border border-navy/15 flex items-center justify-center text-navy hover:bg-frost transition-colors"
+              aria-label="Annonces précédentes">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <button type="button" (click)="next()"
+              class="w-10 h-10 rounded-full border border-navy/15 flex items-center justify-center text-navy hover:bg-frost transition-colors"
+              aria-label="Annonces suivantes">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        }
+        <a
+          routerLink="/vehiculos"
+          class="btn-outline text-sm"
+          aria-label="Voir toutes les annonces disponibles"
+        >
+          Voir tout
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </a>
+      </div>
     </div>
 
     <!-- Grid de vehículos -->
@@ -39,12 +60,24 @@
       </div>
     } @else if (vehicles().length > 0) {
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        @for (vehicle of vehicles(); track vehicle.id; let i = $index) {
+        @for (vehicle of pageVehicles(); track vehicle.id; let i = $index) {
           <div class="animate-fadeInUp" [style.animation-delay]="(i * 0.08) + 's'" style="opacity:0;animation-fill-mode:forwards">
             <lll-vehicle-card [vehicle]="vehicle" />
           </div>
         }
       </div>
+
+      <!-- Points de pagination -->
+      @if (hasPages()) {
+        <div class="mt-8 flex items-center justify-center gap-2">
+          @for (idx of pageIndexes(); track idx) {
+            <button type="button" (click)="goTo(idx)"
+              class="h-2 rounded-full transition-all"
+              [class]="idx === page() ? 'w-6 bg-azure-dark' : 'w-2 bg-navy/20 hover:bg-navy/40'"
+              [attr.aria-label]="'Page ' + (idx + 1)"></button>
+          }
+        </div>
+      }
     } @else {
       <p class="text-center text-navy/50 py-8">Aucune annonce à afficher pour le moment.</p>
     }

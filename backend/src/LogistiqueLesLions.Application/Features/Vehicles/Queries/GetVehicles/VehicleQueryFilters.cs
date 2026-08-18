@@ -102,7 +102,14 @@ public static class VehicleQueryFilters
             query = query.Where(v => v.IsExportReady == r.IsExportReady.Value);
 
         // ─── Uso interno ───────────────────────────────────────────────────
-        if (r.IsFeatured.HasValue) query = query.Where(v => v.IsFeatured == r.IsFeatured.Value);
+        if (r.IsFeatured.HasValue)
+        {
+            // «Destacado» ya no es una bandera: es tener un nivel vigente (no caducado).
+            var now = DateTimeOffset.UtcNow;
+            query = r.IsFeatured.Value
+                ? query.Where(v => v.FeaturedTier != FeaturedTier.Aucune && v.FeaturedUntil > now)
+                : query.Where(v => v.FeaturedTier == FeaturedTier.Aucune || v.FeaturedUntil <= now);
+        }
         if (r.SellerId.HasValue)   query = query.Where(v => v.SellerId == r.SellerId.Value);
         if (r.Status.HasValue)     query = query.Where(v => v.Status == r.Status.Value);
 
@@ -110,6 +117,11 @@ public static class VehicleQueryFilters
     }
 
     /// <summary>Las cinco ordenaciones de la especificación.</summary>
+    /// <remarks>
+    /// Los destacados solo se fijan arriba en el <b>orden por defecto</b> (por fecha).
+    /// Si el usuario ordena por precio, año, kilometraje o vistas se respeta su elección
+    /// y los destacados solo se distinguen por su distintivo, sin reordenar.
+    /// </remarks>
     public static IQueryable<Vehicle> ApplySorting(IQueryable<Vehicle> query, GetVehiclesQuery r) =>
         r.SortBy.ToLowerInvariant() switch
         {
@@ -117,6 +129,26 @@ public static class VehicleQueryFilters
             "year"    => r.SortDesc ? query.OrderByDescending(v => v.Year)       : query.OrderBy(v => v.Year),
             "mileage" => r.SortDesc ? query.OrderByDescending(v => v.Mileage)    : query.OrderBy(v => v.Mileage),
             "views"   => r.SortDesc ? query.OrderByDescending(v => v.ViewsCount) : query.OrderBy(v => v.ViewsCount),
-            _         => r.SortDesc ? query.OrderByDescending(v => v.CreatedAt)  : query.OrderBy(v => v.CreatedAt),
+            _         => ApplyDefaultSort(query, r),
         };
+
+    /// <summary>
+    /// Orden por defecto: primero «À la une», luego «En vedette», luego el resto; y dentro
+    /// de cada grupo, por fecha de publicación. Es el único orden que fija los destacados.
+    /// </summary>
+    private static IQueryable<Vehicle> ApplyDefaultSort(IQueryable<Vehicle> query, GetVehiclesQuery r)
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        var ranked = query.OrderByDescending(v =>
+            v.FeaturedUntil > now
+                ? (v.FeaturedTier == FeaturedTier.ALaUne
+                    ? 2
+                    : (v.FeaturedTier == FeaturedTier.EnVedette ? 1 : 0))
+                : 0);
+
+        return r.SortDesc
+            ? ranked.ThenByDescending(v => v.CreatedAt)
+            : ranked.ThenBy(v => v.CreatedAt);
+    }
 }

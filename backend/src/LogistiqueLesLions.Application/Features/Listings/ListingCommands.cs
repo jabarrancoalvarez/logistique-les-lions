@@ -34,6 +34,17 @@ public record DuplicateListingCommand(Guid UserId, Guid VehicleId) : IRequest<Re
 public record ReorderListingImagesCommand(
     Guid UserId, Guid VehicleId, IReadOnlyList<Guid> ImageIds) : IRequest<Result>;
 
+/// <summary>
+/// «Mettre en avant»: destaca el anuncio. <paramref name="Tier"/> es el nivel
+/// (En vedette / À la une) y <paramref name="DurationDays"/> la duración (15 o 30 días).
+/// Gratuito en la fase de prueba.
+/// </summary>
+public record FeatureListingCommand(
+    Guid UserId, Guid VehicleId, FeaturedTier Tier, int DurationDays) : IRequest<Result>;
+
+/// <summary>«Retirer la mise en avant»: el anuncio vuelve a ser normal.</summary>
+public record UnfeatureListingCommand(Guid UserId, Guid VehicleId) : IRequest<Result>;
+
 // ─── Handlers ──────────────────────────────────────────────────────────────
 
 internal static class ListingWorkflow
@@ -306,6 +317,54 @@ public class ReorderListingImagesCommandHandler(IApplicationDbContext db)
             image.IsPrimary = order == 0;
             order++;
         }
+
+        await db.SaveChangesAsync(ct);
+        return Result.Success();
+    }
+}
+
+public class FeatureListingCommandHandler(IApplicationDbContext db)
+    : IRequestHandler<FeatureListingCommand, Result>
+{
+    /// <summary>Duraciones admitidas hoy. Más adelante llegarán periodos y precios distintos.</summary>
+    private static readonly int[] AllowedDurations = [15, 30];
+
+    public async Task<Result> Handle(FeatureListingCommand request, CancellationToken ct)
+    {
+        var (vehicle, error) = await ListingWorkflow.LoadAsync(db, request.UserId, request.VehicleId, ct);
+        if (error is not null) return Result.Failure(error);
+
+        // Destacar es dar visibilidad extra: solo tiene sentido sobre un anuncio activo.
+        if (vehicle!.Status != VehicleStatus.Actif)
+            return Result.Failure("Listing.MustBeActiveToFeature");
+
+        if (request.Tier is not (FeaturedTier.EnVedette or FeaturedTier.ALaUne))
+            return Result.Failure("Listing.InvalidFeaturedTier");
+
+        if (!AllowedDurations.Contains(request.DurationDays))
+            return Result.Failure("Listing.InvalidFeaturedDuration");
+
+        var now = DateTimeOffset.UtcNow;
+        vehicle.FeaturedTier  = request.Tier;
+        vehicle.FeaturedAt    = now;
+        vehicle.FeaturedUntil = now.AddDays(request.DurationDays);
+
+        await db.SaveChangesAsync(ct);
+        return Result.Success();
+    }
+}
+
+public class UnfeatureListingCommandHandler(IApplicationDbContext db)
+    : IRequestHandler<UnfeatureListingCommand, Result>
+{
+    public async Task<Result> Handle(UnfeatureListingCommand request, CancellationToken ct)
+    {
+        var (vehicle, error) = await ListingWorkflow.LoadAsync(db, request.UserId, request.VehicleId, ct);
+        if (error is not null) return Result.Failure(error);
+
+        vehicle!.FeaturedTier  = FeaturedTier.Aucune;
+        vehicle.FeaturedAt    = null;
+        vehicle.FeaturedUntil = null;
 
         await db.SaveChangesAsync(ct);
         return Result.Success();

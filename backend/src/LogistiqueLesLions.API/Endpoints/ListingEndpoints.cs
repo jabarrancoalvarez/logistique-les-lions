@@ -134,6 +134,38 @@ public static class ListingEndpoints
         .WithName("ReorderListingImages")
         .WithSummary("Reordenar las fotografías; la primera pasa a ser la principal");
 
+        // ─── POST /api/v1/listings/{id}/feature ──────────────────────────────
+        // «Mettre en avant»: destacar el anuncio (En vedette / À la une, 15 o 30 días).
+        group.MapPost("/{id:guid}/feature", async (
+            Guid id,
+            [FromBody] ListingFeatureBody body,
+            ClaimsPrincipal user,
+            IMediator mediator,
+            CancellationToken ct) =>
+        {
+            if (!TryGetUserId(user, out var userId)) return Results.Unauthorized();
+
+            var result = await mediator.Send(
+                new FeatureListingCommand(userId, id, body.Tier, body.DurationDays), ct);
+
+            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
+        })
+        .WithName("FeatureListing")
+        .WithSummary("Destacar el anuncio (gratuito durante la fase de prueba)");
+
+        // ─── DELETE /api/v1/listings/{id}/feature ────────────────────────────
+        group.MapDelete("/{id:guid}/feature", async (
+            Guid id, ClaimsPrincipal user, IMediator mediator, CancellationToken ct) =>
+        {
+            if (!TryGetUserId(user, out var userId)) return Results.Unauthorized();
+
+            var result = await mediator.Send(new UnfeatureListingCommand(userId, id), ct);
+
+            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
+        })
+        .WithName("UnfeatureListing")
+        .WithSummary("Retirar la mise en avant del anuncio");
+
         return group;
     }
 
@@ -148,6 +180,9 @@ public static class ListingEndpoints
 public record ListingStatusBody(VehicleStatus Status);
 public record ListingPriceBody(decimal Price);
 public record ListingMileageBody(int Mileage);
+
+/// <summary>Nivel de destacado (En vedette / À la une) y duración en días (15 o 30).</summary>
+public record ListingFeatureBody(FeaturedTier Tier, int DurationDays);
 
 /// <summary>Orden completo de las fotografías; la primera es la principal.</summary>
 public record ListingImageOrderBody(IReadOnlyList<Guid>? ImageIds);

@@ -72,6 +72,15 @@ export const STATUS_LABELS: Record<VehicleStatus, string> = {
   Archive: 'Archivé'
 };
 
+// ─── Mise en avant (destacado) ─────────────────────────────────────────────────
+/** Niveau de mise en avant. Aucune = normal · EnVedette = búsqueda · ALaUne = portada. */
+export type FeaturedTier = 'Aucune' | 'EnVedette' | 'ALaUne';
+
+export const FEATURED_LABELS: Record<Exclude<FeaturedTier, 'Aucune'>, string> = {
+  EnVedette: 'En vedette',
+  ALaUne: 'À la une'
+};
+
 // ─── DTOs ─────────────────────────────────────────────────────────────────────
 export interface FeaturedVehicle {
   id: string;
@@ -119,7 +128,8 @@ export interface VehicleListItem {
   /** Fotos ordenadas, para deslizarlas dentro de la propia tarjeta. */
   images: string[];
   imageCount: number;
-  isFeatured: boolean;
+  /** Niveau de mise en avant vigente ('Aucune' si no o caducado). */
+  featuredTier: FeaturedTier;
   favoritesCount: number;
   viewsCount: number;
   createdAt: string;
@@ -190,7 +200,7 @@ export interface VehicleDetail {
   district: string | null;
 
   status: VehicleStatus;
-  isFeatured: boolean;
+  featuredTier: FeaturedTier;
   publishedAt: string | null;
   reservedAt: string | null;
   soldAt: string | null;
@@ -381,7 +391,7 @@ export class VehicleService {
   private readonly baseUrl = `${environment.apiUrl}/v1/vehicles`;
 
   // ─── Landing endpoints ──────────────────────────────────────────────────
-  getFeaturedVehicles(count = 6): Observable<FeaturedVehicle[]> {
+  getFeaturedVehicles(count = 24): Observable<FeaturedVehicle[]> {
     return this.http.get<FeaturedVehicle[]>(`${this.baseUrl}/featured`, {
       params: { count }
     });

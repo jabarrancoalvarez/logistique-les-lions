@@ -14,6 +14,8 @@ public class GetMyFavoritesQueryHandler(
 {
     public async Task<Result<FavoritesDto>> Handle(GetMyFavoritesQuery request, CancellationToken ct)
     {
+        var now = DateTimeOffset.UtcNow;
+
         var alertsAllEnabled = await context.UserProfiles
             .AsNoTracking()
             .Where(u => u.Id == request.UserId)
@@ -59,7 +61,7 @@ public class GetMyFavoritesQueryHandler(
                         .Take(8)
                         .ToList(),
                     s.Vehicle.Images.Count,
-                    s.Vehicle.IsFeatured,
+                    s.Vehicle.FeaturedUntil > now ? s.Vehicle.FeaturedTier : FeaturedTier.Aucune,
                     s.Vehicle.FavoritesCount,
                     s.Vehicle.ViewsCount,
                     s.Vehicle.CreatedAt,

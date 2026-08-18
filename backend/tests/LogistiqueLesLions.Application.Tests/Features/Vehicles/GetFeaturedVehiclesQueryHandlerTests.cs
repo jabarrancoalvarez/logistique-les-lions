@@ -11,8 +11,8 @@ using LogistiqueLesLions.Application.Common.Interfaces;
 namespace LogistiqueLesLions.Application.Tests.Features.Vehicles;
 
 /// <summary>
-/// Tests de integración para GetFeaturedVehiclesQueryHandler.
-/// Usa InMemory database para validar la lógica de consulta.
+/// Tests de integración para GetFeaturedVehiclesQueryHandler: la portada solo muestra
+/// los «À la une» vigentes (no caducados, activos y no ocultados).
 /// </summary>
 public class GetFeaturedVehiclesQueryHandlerTests : IDisposable
 {
@@ -40,30 +40,26 @@ public class GetFeaturedVehiclesQueryHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_DeberiaDevolver_SoloVehiculosDestacadosActivos()
+    public async Task Handle_DeberiaDevolver_SoloALaUneVigentes()
     {
-        // Arrange
         var query = new GetFeaturedVehiclesQuery(Count: 10);
 
-        // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
-        // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().HaveCount(2, "solo hay 2 vehículos activos y destacados en el seed");
-        result.Value.Should().AllSatisfy(v => v.Title.Should().NotBeNullOrEmpty());
+        // Solo los dos «À la une» activos y no caducados. En vedette, caducado y
+        // borrado quedan fuera.
+        result.Value.Should().HaveCount(2);
+        result.Value.Should().OnlyContain(v => v.Title.StartsWith("A la une"));
     }
 
     [Fact]
     public async Task Handle_DeberiaRespetar_LimiteCount()
     {
-        // Arrange
         var query = new GetFeaturedVehiclesQuery(Count: 1);
 
-        // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
-        // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().HaveCount(1);
     }
@@ -71,71 +67,58 @@ public class GetFeaturedVehiclesQueryHandlerTests : IDisposable
     [Fact]
     public async Task Handle_NoDebeDevolver_VehiculosEliminados()
     {
-        // Arrange
         var deletedVehicle = _context.Vehicles
             .IgnoreQueryFilters()
-            .First(v => v.IsFeatured && v.DeletedAt.HasValue);
+            .First(v => v.FeaturedTier == FeaturedTier.ALaUne && v.DeletedAt.HasValue);
 
-        var query = new GetFeaturedVehiclesQuery();
+        var result = await _handler.Handle(new GetFeaturedVehiclesQuery(), CancellationToken.None);
 
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
         result.Value!.Should().NotContain(v => v.Id == deletedVehicle.Id);
+    }
+
+    [Fact]
+    public async Task Handle_NoDebeDevolver_EnVedetteNiCaducados()
+    {
+        var result = await _handler.Handle(new GetFeaturedVehiclesQuery(Count: 10), CancellationToken.None);
+
+        result.Value!.Should().NotContain(v => v.Title.Contains("En vedette"));
+        result.Value!.Should().NotContain(v => v.Title.Contains("caduca"));
     }
 
     private void SeedTestData()
     {
+        var now = DateTimeOffset.UtcNow;
         var make = new VehicleMake
         {
-            Id = Guid.NewGuid(),
-            Name = "BMW",
-            CreatedAt = DateTimeOffset.UtcNow,
-            UpdatedAt = DateTimeOffset.UtcNow
+            Id = Guid.NewGuid(), Name = "BMW",
+            CreatedAt = now, UpdatedAt = now
         };
         _context.VehicleMakes.Add(make);
 
-        // Vehículo activo y destacado ✓
-        _context.Vehicles.Add(new Vehicle
-        {
-            Id = Guid.NewGuid(), Slug = "bmw-test-1", Title = "BMW Test 1",
-            MakeId = make.Id, Year = 2022, Price = 30000, Currency = "EUR",
-            CountryOrigin = "DE", Condition = VehicleCondition.Used,
-            Status = VehicleStatus.Actif, IsFeatured = true,
-            CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
-        });
+        Vehicle V(string slug, string title, FeaturedTier tier, DateTimeOffset? until,
+                  VehicleStatus status = VehicleStatus.Actif, DateTimeOffset? deletedAt = null) =>
+            new()
+            {
+                Id = Guid.NewGuid(), Slug = slug, Title = title,
+                MakeId = make.Id, Year = 2022, Price = 8_900_000m, Currency = "XOF",
+                CountryOrigin = "SN", Condition = VehicleCondition.Used,
+                Status = status,
+                FeaturedTier = tier,
+                FeaturedAt = tier == FeaturedTier.Aucune ? null : now,
+                FeaturedUntil = until,
+                DeletedAt = deletedAt,
+                CreatedAt = now, UpdatedAt = now
+            };
 
-        // Vehículo activo y destacado ✓
-        _context.Vehicles.Add(new Vehicle
-        {
-            Id = Guid.NewGuid(), Slug = "bmw-test-2", Title = "BMW Test 2",
-            MakeId = make.Id, Year = 2021, Price = 25000, Currency = "EUR",
-            CountryOrigin = "FR", Condition = VehicleCondition.Used,
-            Status = VehicleStatus.Actif, IsFeatured = true,
-            CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
-        });
-
-        // Vehículo NO destacado (no debería aparecer)
-        _context.Vehicles.Add(new Vehicle
-        {
-            Id = Guid.NewGuid(), Slug = "bmw-test-3", Title = "BMW Test 3",
-            MakeId = make.Id, Year = 2020, Price = 20000, Currency = "EUR",
-            CountryOrigin = "ES", Condition = VehicleCondition.Used,
-            Status = VehicleStatus.Actif, IsFeatured = false,
-            CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
-        });
-
-        // Vehículo destacado pero BORRADO (no debería aparecer)
-        _context.Vehicles.Add(new Vehicle
-        {
-            Id = Guid.NewGuid(), Slug = "bmw-test-4", Title = "BMW Test Deleted",
-            MakeId = make.Id, Year = 2019, Price = 15000, Currency = "EUR",
-            CountryOrigin = "IT", Condition = VehicleCondition.Used,
-            Status = VehicleStatus.Actif, IsFeatured = true,
-            DeletedAt = DateTimeOffset.UtcNow.AddDays(-1),
-            CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow
-        });
+        _context.Vehicles.AddRange(
+            V("alu-1", "A la une 1", FeaturedTier.ALaUne, now.AddDays(20)),
+            V("alu-2", "A la une 2", FeaturedTier.ALaUne, now.AddDays(5)),
+            V("normal", "Normal sans mise en avant", FeaturedTier.Aucune, null),
+            V("vedette", "En vedette (pas à la une)", FeaturedTier.EnVedette, now.AddDays(10)),
+            V("caduc", "A la une caducado", FeaturedTier.ALaUne, now.AddDays(-1)),
+            V("alu-del", "A la une supprimé", FeaturedTier.ALaUne, now.AddDays(20),
+              deletedAt: now.AddDays(-1))
+        );
 
         _context.SaveChanges();
     }

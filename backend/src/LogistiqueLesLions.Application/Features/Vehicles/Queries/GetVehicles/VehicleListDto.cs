@@ -32,7 +32,8 @@ public record VehicleListDto(
     /// </summary>
     IReadOnlyList<string> Images,
     int ImageCount,
-    bool IsFeatured,
+    /// <summary>Nivel de destacado vigente: Aucune, EnVedette o ALaUne. Los caducados llegan como Aucune.</summary>
+    FeaturedTier FeaturedTier,
     int FavoritesCount,
     int ViewsCount,
     DateTimeOffset CreatedAt,

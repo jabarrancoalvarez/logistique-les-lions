@@ -111,12 +111,6 @@ class VehicleCard extends StatelessWidget {
                               style: const TextStyle(
                                   fontSize: 12, color: AppColors.steel)),
                         ),
-                        if (vehicle.customsStatus != null)
-                          Text(customsLabel(vehicle.customsStatus),
-                              style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.steel)),
                       ],
                     ),
                   ],

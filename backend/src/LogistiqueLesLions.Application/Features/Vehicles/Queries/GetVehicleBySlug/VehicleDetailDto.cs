@@ -59,7 +59,7 @@ public record VehicleDetailDto(
 
     // ─── Estado ────────────────────────────────────────────────────────────
     VehicleStatus Status,
-    bool IsFeatured,
+    FeaturedTier FeaturedTier,
     DateTimeOffset? PublishedAt,
     DateTimeOffset? ReservedAt,
     DateTimeOffset? SoldAt,

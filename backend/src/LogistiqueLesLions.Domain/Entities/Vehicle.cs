@@ -50,7 +50,6 @@ public class Vehicle : AuditableEntity
     public int? Doors { get; set; }
     public int? Seats { get; set; }
 
-    // ─── Situación aduanera ────────────────────────────────────────────────
     // ─── Precio ────────────────────────────────────────────────────────────
     public decimal Price { get; set; }
     /// <summary>Código ISO 4217. Yoon u Auto opera únicamente en francos CFA (XOF/FCFA).</summary>
@@ -73,7 +72,25 @@ public class Vehicle : AuditableEntity
 
     // ─── Estado del anuncio ────────────────────────────────────────────────
     public VehicleStatus Status { get; set; } = VehicleStatus.Brouillon;
-    public bool IsFeatured { get; set; }
+
+    // ─── Mise en avant (destacado) ─────────────────────────────────────────
+    /// <summary>
+    /// Nivel de destacado. <c>Aucune</c> = normal. <c>EnVedette</c> encabeza la
+    /// búsqueda; <c>ALaUne</c> además sale en la portada. Gratuito en la fase de
+    /// prueba, de pago más adelante.
+    /// </summary>
+    public FeaturedTier FeaturedTier { get; set; } = FeaturedTier.Aucune;
+
+    /// <summary>Fecha en que caduca el destacado. Pasada esta, el anuncio vuelve a ser normal.</summary>
+    public DateTimeOffset? FeaturedUntil { get; set; }
+
+    /// <summary>Cuándo se activó el destacado. Sirve para repartir la portada con equidad.</summary>
+    public DateTimeOffset? FeaturedAt { get; set; }
+
+    /// <summary>El destacado está vigente: tiene nivel y no ha caducado. No decide el estado del anuncio.</summary>
+    public bool IsFeaturedActive(DateTimeOffset now) =>
+        FeaturedTier != FeaturedTier.Aucune && FeaturedUntil.HasValue && FeaturedUntil.Value > now;
+
     /// <summary>Heredado de los módulos de exportación. Ver docs/MODULOS-LEGACY.md.</summary>
     public bool IsExportReady { get; set; }
 

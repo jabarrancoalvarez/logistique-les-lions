@@ -29,8 +29,11 @@ public static class VehicleEndpoints
             IDistributedCache cache,
             CancellationToken ct) =>
         {
-            var size = Math.Clamp(count is null or 0 ? 6 : count.Value, 1, 12);
-            var cacheKey = $"featured_vehicles_{size}";
+            var size = Math.Clamp(count is null or 0 ? 12 : count.Value, 1, 30);
+            // La franja de rotación (5 min) entra en la clave: cada ventana cachea su
+            // propio barajado, así el carrusel rota con equidad sin servir datos rancios.
+            var window = DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 300;
+            var cacheKey = $"featured_vehicles_{size}_{window}";
 
             var cached = await cache.GetStringAsync(cacheKey, ct);
             if (cached is not null)

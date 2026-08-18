@@ -1,5 +1,6 @@
 using LogistiqueLesLions.Application.Common.Interfaces;
 using LogistiqueLesLions.Application.Common.Models;
+using LogistiqueLesLions.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,8 @@ public class GetVehiclesQueryHandler(
     public async Task<Result<PagedResult<VehicleListDto>>> Handle(
         GetVehiclesQuery request, CancellationToken ct)
     {
+        var now = DateTimeOffset.UtcNow;
+
         var query = VehicleQueryFilters.ApplySorting(
             VehicleQueryFilters.Apply(context, request), request);
 
@@ -53,7 +56,7 @@ public class GetVehiclesQueryHandler(
                     .Take(MaxCardImages)
                     .ToList(),
                 v.Images.Count,
-                v.IsFeatured,
+                v.FeaturedUntil > now ? v.FeaturedTier : FeaturedTier.Aucune,
                 v.FavoritesCount,
                 v.ViewsCount,
                 v.CreatedAt,

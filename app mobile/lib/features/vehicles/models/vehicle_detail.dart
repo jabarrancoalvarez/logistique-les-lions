@@ -27,8 +27,6 @@ class VehicleDetail {
   final String? drivetrain;
   final String? engineName;
 
-  final String? customsStatus;
-
   final num price;
   final bool priceNegotiable;
   final num? initialPrice;
@@ -94,7 +92,6 @@ class VehicleDetail {
     this.engineDisplacementCc,
     this.drivetrain,
     this.engineName,
-    this.customsStatus,
     this.initialPrice,
     this.priceIndicator,
     this.region,
@@ -126,7 +123,6 @@ class VehicleDetail {
         engineDisplacementCc: j['engineDisplacementCc'] as int?,
         drivetrain: j['drivetrain'] as String?,
         engineName: j['engineName'] as String?,
-        customsStatus: j['customsStatus'] as String?,
         price: (j['price'] as num?) ?? 0,
         priceNegotiable: j['priceNegotiable'] as bool? ?? false,
         initialPrice: j['initialPrice'] as num?,

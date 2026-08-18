@@ -6,18 +6,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LogistiqueLesLions.Application.Features.Vehicles.Queries.GetFeaturedVehicles;
 
+/// <summary>
+/// Anuncios «À la une» de la portada: el nivel de destacado más alto. Se devuelven en
+/// <b>rotación equitativa</b> para que, con muchos destacados, todos pasen por delante.
+/// El front muestra seis y las flechas recorren el resto.
+/// </summary>
 public class GetFeaturedVehiclesQueryHandler(IApplicationDbContext context)
     : IRequestHandler<GetFeaturedVehiclesQuery, Result<IEnumerable<FeaturedVehicleDto>>>
 {
+    /// <summary>Tope de candidatos que se barajan; suficiente para varias páginas de flechas.</summary>
+    private const int MaxPool = 200;
+
+    /// <summary>La rotación cambia cada 5 minutos (en segundos).</summary>
+    private const int RotationWindowSeconds = 300;
+
     public async Task<Result<IEnumerable<FeaturedVehicleDto>>> Handle(
         GetFeaturedVehiclesQuery request,
         CancellationToken cancellationToken)
     {
-        var vehicles = await context.Vehicles
+        var now = DateTimeOffset.UtcNow;
+
+        var candidates = await context.Vehicles
             .AsNoTracking()
-            .Where(v => v.IsFeatured && v.Status == VehicleStatus.Actif)
-            .OrderByDescending(v => v.CreatedAt)
-            .Take(request.Count)
+            .Where(v => v.FeaturedTier == FeaturedTier.ALaUne
+                     && v.FeaturedUntil > now
+                     && v.Status == VehicleStatus.Actif
+                     && v.AdminHiddenAt == null)
+            // Orden estable antes de barajar, para que la semilla mande de verdad.
+            .OrderBy(v => v.FeaturedAt)
+            .Take(MaxPool)
             .Include(v => v.Make)
             .Include(v => v.Model)
             .Include(v => v.Images.Where(i => i.IsPrimary).Take(1))
@@ -46,6 +63,15 @@ public class GetFeaturedVehiclesQueryHandler(IApplicationDbContext context)
             ))
             .ToListAsync(cancellationToken);
 
-        return Result<IEnumerable<FeaturedVehicleDto>>.Success(vehicles);
+        // Rotación equitativa: se baraja con una semilla que cambia cada 5 minutos, de
+        // modo que a lo largo del día todos los «À la une» ocupan las primeras posiciones.
+        var seed = (int)(now.ToUnixTimeSeconds() / RotationWindowSeconds);
+        var rng = new Random(seed);
+        var rotated = candidates
+            .OrderBy(_ => rng.Next())
+            .Take(request.Count)
+            .ToList();
+
+        return Result<IEnumerable<FeaturedVehicleDto>>.Success(rotated);
     }
 }

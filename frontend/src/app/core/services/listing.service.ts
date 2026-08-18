@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
-import { VehicleStatus } from './vehicle.service';
+import { VehicleStatus, FeaturedTier } from './vehicle.service';
 
 /**
  * «Mes annonces»: los vehículos que el usuario está vendiendo o ha vendido.
@@ -30,6 +30,11 @@ export interface MyListing {
   createdAt: string;
   publishedAt: string | null;
   soldAt: string | null;
+
+  /** Nivel de destacado vigente ('Aucune' si no lo está o ha caducado). */
+  featuredTier: FeaturedTier;
+  /** Hasta cuándo dura el destacado, para «En vedette jusqu'au…». */
+  featuredUntil: string | null;
 }
 
 export interface MyListings {
@@ -84,6 +89,16 @@ export class ListingService {
 
   updateMileage(id: string, mileage: number): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${id}/mileage`, { mileage });
+  }
+
+  /** «Mettre en avant»: destaca el anuncio (En vedette / À la une, 15 o 30 días). */
+  feature(id: string, tier: Exclude<FeaturedTier, 'Aucune'>, durationDays: 15 | 30): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/feature`, { tier, durationDays });
+  }
+
+  /** «Retirer la mise en avant». */
+  unfeature(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}/feature`);
   }
 
   duplicate(id: string): Observable<{ id: string }> {

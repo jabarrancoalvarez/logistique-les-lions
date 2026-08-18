@@ -6,7 +6,7 @@ import {
   ListingService, MyListings, MyListing, ListingQuality, ListingQualityItem,
   ListingQualityCheck
 } from '@core/services/listing.service';
-import { VehicleStatus, STATUS_LABELS } from '@core/services/vehicle.service';
+import { VehicleStatus, STATUS_LABELS, FeaturedTier, FEATURED_LABELS } from '@core/services/vehicle.service';
 import { ShareService } from '@core/services/share.service';
 import { FcfaPipe } from '@shared/pipes/fcfa.pipe';
 
@@ -249,9 +249,54 @@ export class MyVehiclesComponent implements OnInit {
     return item.status === 'Complete' ? '✓' : '⚠';
   }
 
+  // ─── Mise en avant (destacado) ───────────────────────────────────────────
+  readonly featuringId = signal<string | null>(null);
+  featureTier: Exclude<FeaturedTier, 'Aucune'> = 'ALaUne';
+  featureDuration: 15 | 30 = 30;
+
+  /** Etiqueta del nivel vigente, o `null` si el anuncio no está destacado. */
+  featuredLabel(listing: MyListing): string | null {
+    return listing.featuredTier === 'Aucune'
+      ? null
+      : FEATURED_LABELS[listing.featuredTier];
+  }
+
+  /** Solo se puede destacar un anuncio activo. */
+  canFeature(listing: MyListing): boolean {
+    return listing.status === 'Actif';
+  }
+
+  openFeature(listing: MyListing): void {
+    this.closeAll();
+    this.featureTier = listing.featuredTier === 'EnVedette' ? 'EnVedette' : 'ALaUne';
+    this.featureDuration = 30;
+    this.featuringId.set(listing.id);
+  }
+
+  confirmFeature(listing: MyListing): void {
+    if (this.busy()) return;
+
+    this.busy.set(true);
+    this.service.feature(listing.id, this.featureTier, this.featureDuration).subscribe({
+      next: () => { this.featuringId.set(null); this.load(); },
+      error: () => { this.busy.set(false); this.error.set('Mise en avant impossible.'); }
+    });
+  }
+
+  unfeature(listing: MyListing): void {
+    if (this.busy()) return;
+
+    this.busy.set(true);
+    this.service.unfeature(listing.id).subscribe({
+      next: () => this.load(),
+      error: () => { this.busy.set(false); this.error.set('Action impossible.'); }
+    });
+  }
+
   private closeAll(): void {
     this.editingPrice.set(null);
     this.editingMileage.set(null);
     this.qualityFor.set(null);
+    this.featuringId.set(null);
   }
 }
