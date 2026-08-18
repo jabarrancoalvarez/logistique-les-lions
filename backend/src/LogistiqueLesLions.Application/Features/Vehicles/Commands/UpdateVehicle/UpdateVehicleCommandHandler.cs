@@ -70,7 +70,6 @@ public class UpdateVehicleCommandHandler(
         vehicle.EngineDisplacementCc = request.EngineDisplacementCc;
         vehicle.Drivetrain           = request.Drivetrain;
         vehicle.EngineName           = request.EngineName;
-        vehicle.CustomsStatus        = request.CustomsStatus;
         vehicle.Price                = request.Price;
         vehicle.PriceNegotiable      = request.PriceNegotiable;
         vehicle.Region               = request.Region;

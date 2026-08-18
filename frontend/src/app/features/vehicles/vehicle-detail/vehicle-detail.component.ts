@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { NegotiationService } from '@core/services/negotiation.service';
 import {
   VehicleService, VehicleDetail, VehicleListItem,
-  FUEL_LABELS, TRANSMISSION_LABELS, BODY_LABELS, CUSTOMS_LABELS, DRIVETRAIN_LABELS,
+  FUEL_LABELS, TRANSMISSION_LABELS, BODY_LABELS, DRIVETRAIN_LABELS,
   PRICE_INDICATOR_LABELS, PRICE_INDICATOR_CLASSES, PublicTransparency
 } from '@core/services/vehicle.service';
 import { AuthService } from '@core/auth/auth.service';
@@ -151,11 +151,6 @@ export class VehicleDetailComponent implements OnInit {
       v.fuelType ? FUEL_LABELS[v.fuelType] : null,
       v.transmission ? TRANSMISSION_LABELS[v.transmission] : null
     ].filter(Boolean).join(' · ');
-  });
-
-  readonly customsLabel = computed(() => {
-    const c = this.vehicle()?.customsStatus;
-    return c ? CUSTOMS_LABELS[c] : null;
   });
 
   /**

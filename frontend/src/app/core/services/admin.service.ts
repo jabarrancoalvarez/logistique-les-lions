@@ -665,7 +665,6 @@ export interface StatsSupply {
   topModels: LabelCount[];
   byCity: LabelCount[];
   byFuel: LabelCount[];
-  byCustomsStatus: LabelCount[];
 }
 
 /** Lo que se busca y no se encuentra: el dato con más valor del panel. */

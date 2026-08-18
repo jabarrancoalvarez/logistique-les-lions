@@ -47,7 +47,6 @@ public class GetMyFavoritesQueryHandler(
                     s.Vehicle.Currency,
                     s.Vehicle.Region,
                     s.Vehicle.City,
-                    s.Vehicle.CustomsStatus,
                     s.Vehicle.Condition,
                     s.Vehicle.FuelType,
                     s.Vehicle.Transmission,

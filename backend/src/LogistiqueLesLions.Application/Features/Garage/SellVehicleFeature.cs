@@ -95,7 +95,6 @@ public class CreateListingFromGarageCommandHandler(
             // expresamente antes de publicar.
             Price          = 0m,
             Status         = VehicleStatus.Brouillon,
-            CustomsStatus  = null,
             Description    = null
         };
 

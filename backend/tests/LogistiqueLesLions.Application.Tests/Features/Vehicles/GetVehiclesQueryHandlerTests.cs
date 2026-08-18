@@ -73,28 +73,28 @@ public class GetVehiclesQueryHandlerTests : IDisposable
 
         // RAV4: dédouané, Dakar, professionnel, climatisation + GPS
         var rav4 = Vehicle("Toyota RAV4", _makeToyota, 8_900_000m, 2019, 126000,
-            CustomsStatus.Dedouane, "DK", "Dakar", _professionnel, VehicleStatus.Actif);
+            "DK", "Dakar", _professionnel, VehicleStatus.Actif);
         rav4.Equipments.Add(new VehicleEquipmentLink { EquipmentId = _clim });
         rav4.Equipments.Add(new VehicleEquipmentLink { EquipmentId = _gps });
 
         // Hilux: non dédouané, Thiès, particulier, solo climatisation
         var hilux = Vehicle("Toyota Hilux", _makeToyota, 12_000_000m, 2021, 80000,
-            CustomsStatus.NonDedouane, "TH", "Mbour", _particulier, VehicleStatus.Actif);
+            "TH", "Mbour", _particulier, VehicleStatus.Actif);
         hilux.Equipments.Add(new VehicleEquipmentLink { EquipmentId = _clim });
 
         // 208: passavant, Dakar, particulier, sin equipamiento
         var p208 = Vehicle("Peugeot 208", _makePeugeot, 4_500_000m, 2017, 150000,
-            CustomsStatus.Passavant, "DK", "Rufisque", _particulier, VehicleStatus.Actif);
+            "DK", "Rufisque", _particulier, VehicleStatus.Actif);
 
         // Reservado: sigue siendo visible públicamente
         var reserve = Vehicle("Toyota Corolla", _makeToyota, 6_000_000m, 2018, 100000,
-            CustomsStatus.Dedouane, "DK", "Dakar", _particulier, VehicleStatus.Reserve);
+            "DK", "Dakar", _particulier, VehicleStatus.Reserve);
 
         // Borrador y archivado: no deben aparecer
         var brouillon = Vehicle("Toyota Yaris", _makeToyota, 3_000_000m, 2016, 90000,
-            CustomsStatus.Dedouane, "DK", "Dakar", _particulier, VehicleStatus.Brouillon);
+            "DK", "Dakar", _particulier, VehicleStatus.Brouillon);
         var archive = Vehicle("Peugeot 308", _makePeugeot, 3_500_000m, 2015, 200000,
-            CustomsStatus.Dedouane, "DK", "Dakar", _particulier, VehicleStatus.Archive);
+            "DK", "Dakar", _particulier, VehicleStatus.Archive);
 
         _context.Vehicles.AddRange(rav4, hilux, p208, reserve, brouillon, archive);
         _context.SaveChanges();
@@ -102,7 +102,7 @@ public class GetVehiclesQueryHandlerTests : IDisposable
 
     private static Vehicle Vehicle(
         string title, Guid makeId, decimal price, int year, int mileage,
-        CustomsStatus customs, string region, string city, Guid sellerId, VehicleStatus status)
+        string region, string city, Guid sellerId, VehicleStatus status)
     {
         var id = Guid.NewGuid();
         return new Vehicle
@@ -115,7 +115,6 @@ public class GetVehiclesQueryHandlerTests : IDisposable
             Year = year,
             Mileage = mileage,
             Price = price,
-            CustomsStatus = customs,
             Region = region,
             City = city,
             SellerId = sellerId,
@@ -164,14 +163,6 @@ public class GetVehiclesQueryHandlerTests : IDisposable
 
         titles.Should().Contain("Toyota Yaris");
         titles.Should().Contain("Peugeot 308");
-    }
-
-    [Fact]
-    public async Task DeberiaFiltrarPorEstadoAduanero()
-    {
-        var titles = await TitlesFor(new GetVehiclesQuery { CustomsStatus = CustomsStatus.NonDedouane });
-
-        titles.Should().BeEquivalentTo(["Toyota Hilux"]);
     }
 
     [Fact]
@@ -248,7 +239,6 @@ public class GetVehiclesQueryHandlerTests : IDisposable
         {
             MakeId = _makeToyota,
             Region = "DK",
-            CustomsStatus = CustomsStatus.Dedouane,
             PriceTo = 9_000_000m
         });
 

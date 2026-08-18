@@ -79,7 +79,6 @@ public class CreateVehicleCommandHandlerTests : IDisposable
             EngineDisplacementCc: 1987,
             Drivetrain: Drivetrain.Integrale,
             EngineName: null,
-            CustomsStatus: CustomsStatus.Dedouane,
             Price: 8_900_000m,
             PriceNegotiable: true,
             Region: "DK",

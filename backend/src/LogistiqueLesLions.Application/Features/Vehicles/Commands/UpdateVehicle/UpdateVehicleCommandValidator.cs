@@ -25,9 +25,6 @@ public class UpdateVehicleCommandValidator : AbstractValidator<UpdateVehicleComm
 
         RuleFor(x => x.Price).GreaterThan(0);
 
-        RuleFor(x => x.CustomsStatus)
-            .IsInEnum().WithMessage("Le statut douanier est obligatoire.");
-
         RuleFor(x => x.Vin)
             .Length(17).When(x => !string.IsNullOrEmpty(x.Vin));
 

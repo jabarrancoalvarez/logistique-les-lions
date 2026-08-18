@@ -7,25 +7,6 @@
       class="input" placeholder="Toyota Corolla, Hilux, YU12345…">
   </div>
 
-  <!-- ─── Statut douanier : mis en avant par son importance au Sénégal ──── -->
-  <fieldset class="rounded-xl border-2 border-azure/40 bg-azure/5 p-3">
-    <legend class="px-1.5 text-sm font-semibold text-navy">Statut douanier</legend>
-    <div class="grid grid-cols-3 gap-1.5">
-      <button type="button" (click)="customsStatus = ''; requestCount()"
-        class="px-2 py-2 rounded-lg text-xs font-medium border transition-colors"
-        [class]="customsStatus === '' ? 'border-azure bg-white text-navy' : 'border-transparent text-navy/60 hover:bg-white/60'">
-        Tous
-      </button>
-      @for (c of customsStatuses; track c.value) {
-        <button type="button" (click)="customsStatus = c.value; requestCount()"
-          class="px-2 py-2 rounded-lg text-xs font-medium border transition-colors"
-          [class]="customsStatus === c.value ? 'border-azure bg-white text-navy' : 'border-transparent text-navy/60 hover:bg-white/60'">
-          {{ c.label }}
-        </button>
-      }
-    </div>
-  </fieldset>
-
   <!-- ─── Marque et modèle ─────────────────────────────────────────────── -->
   <div class="grid grid-cols-1 gap-3">
     <div>

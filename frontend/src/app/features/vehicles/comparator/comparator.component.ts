@@ -6,7 +6,7 @@ import { Subject, debounceTime, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   VehicleService, VehicleComparison, VehicleListItem, FilterOptions,
-  FUEL_LABELS, TRANSMISSION_LABELS, BODY_LABELS, CUSTOMS_LABELS, DRIVETRAIN_LABELS,
+  FUEL_LABELS, TRANSMISSION_LABELS, BODY_LABELS, DRIVETRAIN_LABELS,
   PRICE_INDICATOR_LABELS, PRICE_INDICATOR_CLASSES, STATUS_LABELS
 } from '@core/services/vehicle.service';
 import { ComparatorService } from '@core/services/comparator.service';
@@ -126,12 +126,6 @@ export class ComparatorComponent implements OnInit {
           row('Portes',            v => number(v.doors)),
           row('Places',            v => number(v.seats)),
           row('Couleur',           v => v.color)
-        ]
-      },
-      {
-        title: 'Situation administrative',
-        rows: [
-          row('Statut douanier', v => v.customsStatus ? CUSTOMS_LABELS[v.customsStatus] : null)
         ]
       },
       {

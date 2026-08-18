@@ -11,8 +11,8 @@ import { SavedSearchService } from '@core/services/saved-search.service';
 import { suggestSearchName } from '@shared/data/search-summary';
 import {
   VehicleFilters, VehicleMake, VehicleService, VehicleModelOption,
-  FUEL_LABELS, TRANSMISSION_LABELS, BODY_LABELS, CUSTOMS_LABELS, DRIVETRAIN_LABELS,
-  FuelType, TransmissionType, BodyType, CustomsStatus, Drivetrain, AccountTypeFilter
+  FUEL_LABELS, TRANSMISSION_LABELS, BODY_LABELS, DRIVETRAIN_LABELS,
+  FuelType, TransmissionType, BodyType, Drivetrain, AccountTypeFilter
 } from '@core/services/vehicle.service';
 import { SENEGAL_REGIONS, citiesOfRegion } from '@shared/data/senegal-geo';
 
@@ -63,7 +63,6 @@ export class FilterPanelComponent implements OnInit {
   readonly fuelTypes = optionsFrom(FUEL_LABELS);
   readonly transmissions = optionsFrom(TRANSMISSION_LABELS);
   readonly bodyTypes = optionsFrom(BODY_LABELS).filter(o => o.value !== 'Autre');
-  readonly customsStatuses = optionsFrom(CUSTOMS_LABELS);
   readonly drivetrains = optionsFrom(DRIVETRAIN_LABELS);
   readonly doorRanges = DOOR_RANGES;
   readonly seatRanges = SEAT_RANGES;
@@ -92,7 +91,6 @@ export class FilterPanelComponent implements OnInit {
   mileageTo = '';
   region = '';
   city = '';
-  customsStatus: '' | CustomsStatus = '';
   fuelType: '' | FuelType = '';
   transmission: '' | TransmissionType = '';
   bodyType: '' | BodyType = '';
@@ -164,7 +162,6 @@ export class FilterPanelComponent implements OnInit {
     this.mileageTo = f.mileageTo?.toString() ?? '';
     this.region = f.region ?? '';
     this.city = f.city ?? '';
-    this.customsStatus = f.customsStatus ?? '';
     this.fuelType = f.fuelType ?? '';
     this.transmission = f.transmission ?? '';
     this.bodyType = f.bodyType ?? '';
@@ -225,7 +222,6 @@ export class FilterPanelComponent implements OnInit {
       mileageTo:         num(this.mileageTo),
       region:            this.region || undefined,
       city:              this.city || undefined,
-      customsStatus:     this.customsStatus || undefined,
       fuelType:          this.fuelType || undefined,
       transmission:      this.transmission || undefined,
       bodyType:          this.bodyType || undefined,
@@ -263,7 +259,7 @@ export class FilterPanelComponent implements OnInit {
       priceFrom: undefined, priceTo: undefined,
       yearFrom: undefined, yearTo: undefined,
       mileageFrom: undefined, mileageTo: undefined,
-      region: undefined, city: undefined, customsStatus: undefined,
+      region: undefined, city: undefined,
       fuelType: undefined, transmission: undefined, bodyType: undefined,
       drivetrain: undefined, powerFrom: undefined, powerTo: undefined,
       displacementFrom: undefined, displacementTo: undefined,

@@ -84,7 +84,6 @@ public class SavedSearchTests : IDisposable
             YearTo = 2022,
             MileageTo = 150_000,
             Region = "DK",
-            CustomsStatus = CustomsStatus.Dedouane,
             FuelType = FuelType.Diesel,
             EquipmentIds = [Guid.NewGuid()]
         };
@@ -97,7 +96,6 @@ public class SavedSearchTests : IDisposable
         restored.YearTo.Should().Be(2022);
         restored.MileageTo.Should().Be(150_000);
         restored.Region.Should().Be("DK");
-        restored.CustomsStatus.Should().Be(CustomsStatus.Dedouane);
         restored.FuelType.Should().Be(FuelType.Diesel);
         restored.EquipmentIds.Should().BeEquivalentTo(filters.EquipmentIds);
     }
@@ -109,10 +107,10 @@ public class SavedSearchTests : IDisposable
         // significado de todas las búsquedas ya guardadas.
         var json = SavedSearchFilters.Serialize(new GetVehiclesQuery
         {
-            CustomsStatus = CustomsStatus.Passavant
+            FuelType = FuelType.Diesel
         });
 
-        json.Should().Contain("Passavant");
+        json.Should().Contain("Diesel");
     }
 
     [Fact]

@@ -51,12 +51,6 @@ public class Vehicle : AuditableEntity
     public int? Seats { get; set; }
 
     // ─── Situación aduanera ────────────────────────────────────────────────
-    /// <summary>
-    /// Declarado por quien publica. Nullable únicamente por los anuncios anteriores a
-    /// la migración: los nuevos lo exigen.
-    /// </summary>
-    public CustomsStatus? CustomsStatus { get; set; }
-
     // ─── Precio ────────────────────────────────────────────────────────────
     public decimal Price { get; set; }
     /// <summary>Código ISO 4217. Yoon u Auto opera únicamente en francos CFA (XOF/FCFA).</summary>

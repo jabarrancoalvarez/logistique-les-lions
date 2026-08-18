@@ -159,7 +159,6 @@ public class SellVehicleTests : IDisposable
 
         // Son las decisiones que el documento pide revisar expresamente.
         listing.Price.Should().Be(0m);
-        listing.CustomsStatus.Should().BeNull();
         listing.Description.Should().BeNull();
     }
 

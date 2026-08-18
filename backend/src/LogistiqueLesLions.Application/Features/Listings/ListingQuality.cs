@@ -13,8 +13,6 @@ public enum ListingQualityCheck
     Price = 3,
     /// <summary>Kilométrage.</summary>
     Mileage = 4,
-    /// <summary>Statut douanier.</summary>
-    CustomsStatus = 5,
     /// <summary>Localisation.</summary>
     Location = 6,
     /// <summary>Fiche technique.</summary>
@@ -46,11 +44,10 @@ public record ListingQualityDto(int Score, IReadOnlyList<ListingQualityItemDto> 
 public static class ListingQualityCalculator
 {
     // Los pesos suman 100 y están juntos a la vista, como en la complétude del garaje.
-    private const int PhotosPoints         = 25;
-    private const int DescriptionPoints    = 20;
+    private const int PhotosPoints         = 30;
+    private const int DescriptionPoints    = 25;
     private const int PricePoints          = 15;
     private const int MileagePoints        = 10;
-    private const int CustomsPoints        = 10;
     private const int LocationPoints       = 10;
     private const int SpecificationsPoints = 5;
     private const int EquipmentPoints      = 5;
@@ -82,9 +79,6 @@ public static class ListingQualityCalculator
             Item(ListingQualityCheck.Price, vehicle.Price > 0 ? 1 : 0, 1, PricePoints),
 
             Item(ListingQualityCheck.Mileage, vehicle.Mileage is > 0 ? 1 : 0, 1, MileagePoints),
-
-            Item(ListingQualityCheck.CustomsStatus,
-                vehicle.CustomsStatus is not null ? 1 : 0, 1, CustomsPoints),
 
             Item(ListingQualityCheck.Location,
                 new[] { !string.IsNullOrWhiteSpace(vehicle.Region),

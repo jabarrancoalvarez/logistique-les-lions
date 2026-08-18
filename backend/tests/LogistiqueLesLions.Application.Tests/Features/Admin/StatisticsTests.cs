@@ -95,7 +95,6 @@ public class StatisticsTests : IDisposable
             MakeId = _makeToyotaId, ModelId = modelId,
             Year = year, Mileage = mileage, Price = price,
             City = "Dakar", FuelType = FuelType.Diesel,
-            CustomsStatus = CustomsStatus.Dedouane,
             Status = status, SellerId = _sellerId, ViewsCount = views,
             PublishedAt = DateTimeOffset.UtcNow.AddDays(-2)
         };

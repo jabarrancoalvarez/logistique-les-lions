@@ -51,7 +51,6 @@ public class UpdateVehicleCommandHandlerTests : IDisposable
             Price = 9_500_000m,
             SellerId = _ownerId,
             Status = VehicleStatus.Actif,
-            CustomsStatus = CustomsStatus.Dedouane
         });
         _context.SaveChanges();
 
@@ -82,7 +81,6 @@ public class UpdateVehicleCommandHandlerTests : IDisposable
             EngineDisplacementCc: null,
             Drivetrain: null,
             EngineName: null,
-            CustomsStatus: CustomsStatus.Dedouane,
             Price: price,
             PriceNegotiable: true,
             Region: "DK",

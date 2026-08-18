@@ -26,7 +26,7 @@ export class HowItWorksComponent {
       step: '01',
       icon: 'search',
       title: 'Cherchez et comparez',
-      description: 'Filtrez par marque, région, budget, carburant et statut douanier. ' +
+      description: 'Filtrez par marque, région, budget et carburant. ' +
                    'Comparez plusieurs voitures côte à côte.'
     },
     {
@@ -71,7 +71,7 @@ export class HowItWorksComponent {
       step: '01',
       icon: 'camera',
       title: 'Publiez votre annonce',
-      description: 'Photos, fiche technique, prix en FCFA et statut douanier. ' +
+      description: 'Photos, fiche technique et prix en FCFA. ' +
                    'Gratuit et sans limite d\'annonces.'
     },
     {

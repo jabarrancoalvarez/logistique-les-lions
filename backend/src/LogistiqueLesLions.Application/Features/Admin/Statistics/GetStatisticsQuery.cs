@@ -58,8 +58,7 @@ public record StatsSupplyDto(
     IReadOnlyList<LabelCountDto> TopMakes,
     IReadOnlyList<LabelCountDto> TopModels,
     IReadOnlyList<LabelCountDto> ByCity,
-    IReadOnlyList<LabelCountDto> ByFuel,
-    IReadOnlyList<LabelCountDto> ByCustomsStatus
+    IReadOnlyList<LabelCountDto> ByFuel
 );
 
 // ─── Demanda ───────────────────────────────────────────────────────────────
@@ -194,9 +193,7 @@ public class GetStatisticsQueryHandler(IApplicationDbContext db)
             // Los enums se agrupan por su valor y se rotulan después: así el GROUP BY no
             // depende de cómo esté guardado el enum en la columna.
             await TopEnumAsync(active.Where(v => v.FuelType != null)
-                .Select(v => v.FuelType!.Value), ct),
-            await TopEnumAsync(active.Where(v => v.CustomsStatus != null)
-                .Select(v => v.CustomsStatus!.Value), ct));
+                .Select(v => v.FuelType!.Value), ct));
     }
 
     private async Task<StatsDemandDto> DemandAsync(CancellationToken ct)
@@ -435,7 +432,6 @@ public class GetStatisticsQueryHandler(IApplicationDbContext db)
         if (f.MileageFrom is not null || f.MileageTo is not null) yield return "Kilométrage";
         if (!string.IsNullOrWhiteSpace(f.Region)) yield return "Région";
         if (!string.IsNullOrWhiteSpace(f.City)) yield return "Ville";
-        if (f.CustomsStatus is not null) yield return "Statut douanier";
         if (f.FuelType is not null) yield return "Carburant";
         if (f.Transmission is not null) yield return "Boîte";
         if (f.BodyType is not null) yield return "Carrosserie";

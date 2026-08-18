@@ -60,7 +60,6 @@ public class CompareVehiclesQueryHandlerTests : IDisposable
             Price = price,
             SellerId = Guid.NewGuid(),
             Status = status,
-            CustomsStatus = CustomsStatus.Dedouane
         };
         if (withClim) vehicle.Equipments.Add(new VehicleEquipmentLink { EquipmentId = _clim });
 

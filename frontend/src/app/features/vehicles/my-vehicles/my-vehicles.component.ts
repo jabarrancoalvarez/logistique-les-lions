@@ -229,8 +229,6 @@ export class MyVehiclesComponent implements OnInit {
         : n > 0 ? 'Description trop courte' : 'Aucune description',
       Price: item.status === 'Complete' ? 'Prix renseigné' : 'Prix à renseigner',
       Mileage: item.status === 'Complete' ? 'Kilométrage renseigné' : 'Kilométrage à renseigner',
-      CustomsStatus: item.status === 'Complete'
-        ? 'Statut douanier renseigné' : 'Statut douanier à renseigner',
       Location: item.status === 'Complete'
         ? 'Localisation complète' : 'Localisation à compléter',
       Specifications: item.status === 'Complete'

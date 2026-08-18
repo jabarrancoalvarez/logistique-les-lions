@@ -37,7 +37,6 @@ public record GetVehiclesQuery : IRequest<Result<PagedResult<VehicleListDto>>>
     public string? City { get; init; }
 
     /// <summary>Filtro destacado por su importancia en Senegal.</summary>
-    public CustomsStatus? CustomsStatus { get; init; }
 
     // ─── Mecánica ──────────────────────────────────────────────────────────
     public FuelType? FuelType { get; init; }

@@ -11,12 +11,6 @@ import { AuthService } from '@core/auth/auth.service';
 import { YOON_CURRENCY_CODE } from '@shared/pipes/fcfa.pipe';
 import { SENEGAL_REGIONS, citiesOfRegion } from '@shared/data/senegal-geo';
 
-const CUSTOMS_STATUSES = [
-  { value: 'Dedouane',    label: 'Dédouané' },
-  { value: 'NonDedouane', label: 'Non dédouané' },
-  { value: 'Passavant',   label: 'Passavant' }
-] as const;
-
 type WizardStep = 1 | 2 | 3 | 4;
 
 @Component({
@@ -115,13 +109,10 @@ export class VehicleFormComponent {
     // Yoon u Auto opera únicamente en FCFA: el campo queda fijo y sin selector.
     currency:       [YOON_CURRENCY_CODE, Validators.required],
     priceNegotiable:[''],
-    // Bloque obligatorio de la ficha en Senegal.
-    customsStatus:  ['', Validators.required],
     region:         [''],
     city:           [''],
   });
 
-  readonly customsStatuses = CUSTOMS_STATUSES;
   readonly regions = SENEGAL_REGIONS;
   private readonly selectedRegion = signal<string>('');
   readonly cities = computed(() => citiesOfRegion(this.selectedRegion()));
@@ -208,7 +199,6 @@ export class VehicleFormComponent {
       engineDisplacementCc: null,
       drivetrain:           null,
       engineName:           null,
-      customsStatus:  s3.customsStatus,
       price:          +s3.price!,
       priceNegotiable: !!s3.priceNegotiable,
       region:         nz(s3.region),

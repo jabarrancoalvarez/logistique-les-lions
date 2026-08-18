@@ -89,7 +89,7 @@ export class LandingPageComponent implements OnInit {
     {
       icon: 'location',
       title: 'Pensé pour le Sénégal',
-      text: 'Les 14 régions, les prix en FCFA et le statut douanier affiché sur ' +
+      text: 'Les 14 régions et les prix en FCFA affichés sur ' +
             'chaque annonce.'
     },
     {
@@ -118,7 +118,7 @@ export class LandingPageComponent implements OnInit {
     this.meta.updateTag({
       name: 'description',
       content: 'La plateforme sénégalaise pour acheter et vendre une voiture : ' +
-               'annonces en FCFA, statut douanier, négociation, contrat vérifié et ' +
+               'annonces en FCFA, négociation, contrat vérifié et ' +
                'Mon Garage. Gratuit et sans limite.'
     });
     this.meta.updateTag({

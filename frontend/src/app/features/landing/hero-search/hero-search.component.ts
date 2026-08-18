@@ -115,7 +115,6 @@ export class HeroSearchComponent implements OnInit, OnDestroy {
   /** Los parámetros deben coincidir con los que entiende el Marketplace. */
   readonly quickSearches: { label: string; params: Record<string, string> }[] = [
     { label: 'Toyota Hilux', params: { search: 'Hilux' } },
-    { label: 'Dédouané',     params: { customsStatus: 'Dedouane' } },
     { label: 'SUV / 4x4',    params: { bodyType: 'Suv' } },
     { label: 'Dakar',        params: { region: 'DK' } }
   ];

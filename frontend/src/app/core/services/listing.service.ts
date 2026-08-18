@@ -41,7 +41,7 @@ export interface MyListings {
 // ─── Qualité de l'annonce ──────────────────────────────────────────────────
 export type ListingQualityCheck =
   | 'Photos' | 'Description' | 'Price' | 'Mileage'
-  | 'CustomsStatus' | 'Location' | 'Specifications' | 'Equipment';
+  | 'Location' | 'Specifications' | 'Equipment';
 
 export type ListingQualityStatus = 'Missing' | 'Partial' | 'Complete';
 
