@@ -462,8 +462,6 @@ class _SpecsGrid extends StatelessWidget {
         (Icons.event_seat_outlined, 'Places', '${vehicle.seats}'),
       if (vehicle.color != null && vehicle.color!.isNotEmpty)
         (Icons.palette_outlined, 'Couleur', vehicle.color!),
-      if (vehicle.customsStatus != null)
-        (Icons.verified_outlined, 'Douane', customsLabel(vehicle.customsStatus)),
     ];
 
     return GridView.builder(

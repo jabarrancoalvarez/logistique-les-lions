@@ -24,7 +24,6 @@ class FiltersSheet extends ConsumerStatefulWidget {
 class _FiltersSheetState extends ConsumerState<FiltersSheet> {
   late String? _makeId = widget.initial.makeId;
   late String? _region = widget.initial.region;
-  late String? _customs = widget.initial.customsStatus;
   late String? _fuel = widget.initial.fuelType;
   late String? _transmission = widget.initial.transmission;
   late String? _body = widget.initial.bodyType;
@@ -58,7 +57,7 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
 
   void _reset() {
     setState(() {
-      _makeId = _region = _customs = _fuel = _transmission = _body = _condition = null;
+      _makeId = _region = _fuel = _transmission = _body = _condition = null;
       _priceFrom.clear();
       _priceTo.clear();
       _yearFrom.clear();
@@ -74,7 +73,6 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
       sortDesc: widget.initial.sortDesc,
       makeId: _makeId,
       region: _region,
-      customsStatus: _customs,
       fuelType: _fuel,
       transmission: _transmission,
       bodyType: _body,
@@ -192,17 +190,6 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
                           DropdownMenuItem(value: r.name, child: Text(r.name)),
                       ],
                       onChanged: (v) => setState(() => _region = v),
-                    ),
-                    const SizedBox(height: 20),
-                    _label('Statut douanier'),
-                    _Chips(
-                      value: _customs,
-                      options: const {
-                        'Dedouane': 'Dédouané',
-                        'NonDedouane': 'Non dédouané',
-                        'Passavant': 'Passavant',
-                      },
-                      onChanged: (v) => setState(() => _customs = v),
                     ),
                     const SizedBox(height: 20),
                     _label('Carburant'),

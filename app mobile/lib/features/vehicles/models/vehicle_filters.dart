@@ -9,7 +9,6 @@ class VehicleFilters {
   final int? yearTo;
   final int? mileageTo;
   final String? region;
-  final String? customsStatus; // Dedouane | NonDedouane | Passavant
   final String? fuelType;
   final String? transmission;
   final String? bodyType;
@@ -26,7 +25,6 @@ class VehicleFilters {
     this.yearTo,
     this.mileageTo,
     this.region,
-    this.customsStatus,
     this.fuelType,
     this.transmission,
     this.bodyType,
@@ -44,7 +42,6 @@ class VehicleFilters {
     if (yearFrom != null || yearTo != null) n++;
     if (mileageTo != null) n++;
     if (region != null) n++;
-    if (customsStatus != null) n++;
     if (fuelType != null) n++;
     if (transmission != null) n++;
     if (bodyType != null) n++;
@@ -61,7 +58,6 @@ class VehicleFilters {
     Object? yearTo = _keep,
     Object? mileageTo = _keep,
     Object? region = _keep,
-    Object? customsStatus = _keep,
     Object? fuelType = _keep,
     Object? transmission = _keep,
     Object? bodyType = _keep,
@@ -78,8 +74,6 @@ class VehicleFilters {
       yearTo: yearTo == _keep ? this.yearTo : yearTo as int?,
       mileageTo: mileageTo == _keep ? this.mileageTo : mileageTo as int?,
       region: region == _keep ? this.region : region as String?,
-      customsStatus:
-          customsStatus == _keep ? this.customsStatus : customsStatus as String?,
       fuelType: fuelType == _keep ? this.fuelType : fuelType as String?,
       transmission:
           transmission == _keep ? this.transmission : transmission as String?,
@@ -108,7 +102,6 @@ class VehicleFilters {
     put('yearTo', yearTo);
     put('mileageTo', mileageTo);
     put('region', region);
-    put('customsStatus', customsStatus);
     put('fuelType', fuelType);
     put('transmission', transmission);
     put('bodyType', bodyType);

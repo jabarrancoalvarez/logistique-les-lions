@@ -15,7 +15,6 @@ class VehicleSummary {
   final num price;
   final String? region;
   final String? city;
-  final String? customsStatus;
   final String condition;
   final String? fuelType;
   final String? transmission;
@@ -52,7 +51,6 @@ class VehicleSummary {
     this.mileage,
     this.region,
     this.city,
-    this.customsStatus,
     this.fuelType,
     this.transmission,
     this.bodyType,
@@ -82,7 +80,6 @@ class VehicleSummary {
         price: (j['price'] as num?) ?? 0,
         region: j['region'] as String?,
         city: j['city'] as String?,
-        customsStatus: j['customsStatus'] as String?,
         condition: (j['condition'] ?? 'Used') as String,
         fuelType: j['fuelType'] as String?,
         transmission: j['transmission'] as String?,

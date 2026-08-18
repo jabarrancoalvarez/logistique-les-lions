@@ -34,13 +34,6 @@ String bodyLabel(String? v) => switch (v) {
       _ => '—',
     };
 
-String customsLabel(String? v) => switch (v) {
-      'Dedouane' => 'Dédouané',
-      'NonDedouane' => 'Non dédouané',
-      'Passavant' => 'Passavant',
-      _ => '—',
-    };
-
 String conditionLabel(String? v) => switch (v) {
       'New' => 'Neuf',
       'Used' => 'Occasion',
