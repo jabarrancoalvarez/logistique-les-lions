@@ -85,3 +85,11 @@ PriceIndicatorStyle? priceIndicatorStyle(String? v) => switch (v) {
           Icons.trending_up),
       _ => null,
     };
+
+/// Nivel de destacado («mise en avant»). Devuelve la etiqueta francesa o `null`
+/// cuando el anuncio no está destacado (Aucune o valor desconocido).
+String? featuredLabel(String? tier) => switch (tier) {
+      'ALaUne' => 'À la une',
+      'EnVedette' => 'En vedette',
+      _ => null,
+    };

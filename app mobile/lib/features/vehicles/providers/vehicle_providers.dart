@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../data/vehicle_repository.dart';
+import '../models/featured_vehicle.dart';
 import '../models/vehicle_detail.dart';
 import '../models/vehicle_filters.dart';
 import '../models/vehicle_make.dart';
@@ -13,6 +14,11 @@ final vehicleRepositoryProvider = Provider<VehicleRepository>(
 /// Marcas para el buscador (cacheadas por la propia API 24 h).
 final makesProvider = FutureProvider<List<VehicleMake>>(
   (ref) => ref.watch(vehicleRepositoryProvider).getMakes(),
+);
+
+/// Anuncios «À la une» de la portada, en rotación equitativa (la API baraja).
+final featuredVehiclesProvider = FutureProvider<List<FeaturedVehicle>>(
+  (ref) => ref.watch(vehicleRepositoryProvider).getFeatured(),
 );
 
 /// Ficha de un vehículo por slug. Registra la visualización de paso.

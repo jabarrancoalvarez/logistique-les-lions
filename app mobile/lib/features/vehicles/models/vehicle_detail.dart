@@ -38,7 +38,7 @@ class VehicleDetail {
   final String? district;
 
   final String status;
-  final bool isFeatured;
+  final String featuredTier;
 
   final int viewsCount;
   final int favoritesCount;
@@ -66,7 +66,7 @@ class VehicleDetail {
     required this.priceNegotiable,
     required this.priceComparablesCount,
     required this.status,
-    required this.isFeatured,
+    this.featuredTier = 'Aucune',
     required this.viewsCount,
     required this.favoritesCount,
     required this.images,
@@ -132,7 +132,7 @@ class VehicleDetail {
         city: j['city'] as String?,
         district: j['district'] as String?,
         status: (j['status'] ?? 'Actif') as String,
-        isFeatured: j['isFeatured'] as bool? ?? false,
+        featuredTier: (j['featuredTier'] ?? 'Aucune') as String,
         viewsCount: j['viewsCount'] as int? ?? 0,
         favoritesCount: j['favoritesCount'] as int? ?? 0,
         images: (j['images'] as List<dynamic>? ?? const [])

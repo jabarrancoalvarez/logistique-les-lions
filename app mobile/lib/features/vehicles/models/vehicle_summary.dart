@@ -23,7 +23,8 @@ class VehicleSummary {
   final String? thumbnailUrl;
   final List<String> images;
   final int imageCount;
-  final bool isFeatured;
+  /// Nivel de destacado vigente ('Aucune' si no lo está o caducó).
+  final String featuredTier;
   final int favoritesCount;
   final int viewsCount;
   final String status;
@@ -43,7 +44,7 @@ class VehicleSummary {
     required this.sellerId,
     required this.images,
     required this.imageCount,
-    required this.isFeatured,
+    this.featuredTier = 'Aucune',
     required this.favoritesCount,
     required this.viewsCount,
     this.modelName,
@@ -90,7 +91,7 @@ class VehicleSummary {
             .map((e) => e as String)
             .toList(),
         imageCount: j['imageCount'] as int? ?? 0,
-        isFeatured: j['isFeatured'] as bool? ?? false,
+        featuredTier: (j['featuredTier'] ?? 'Aucune') as String,
         favoritesCount: j['favoritesCount'] as int? ?? 0,
         viewsCount: j['viewsCount'] as int? ?? 0,
         status: (j['status'] ?? 'Actif') as String,

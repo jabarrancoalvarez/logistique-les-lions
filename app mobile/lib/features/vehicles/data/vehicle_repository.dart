@@ -1,5 +1,6 @@
 import '../../../core/models/paged_result.dart';
 import '../../../core/network/api_client.dart';
+import '../models/featured_vehicle.dart';
 import '../models/vehicle_detail.dart';
 import '../models/vehicle_filters.dart';
 import '../models/vehicle_make.dart';
@@ -32,6 +33,15 @@ class VehicleRepository {
   Future<VehicleDetail> getBySlug(String slug) async {
     final res = await _api.dio.get('/vehicles/$slug');
     return VehicleDetail.fromJson(res.data as Map<String, dynamic>);
+  }
+
+  /// Anuncios «À la une» para la portada, en rotación. `GET /vehicles/featured`.
+  Future<List<FeaturedVehicle>> getFeatured({int count = 24}) async {
+    final res = await _api.dio.get('/vehicles/featured',
+        queryParameters: {'count': count});
+    return (res.data as List<dynamic>)
+        .map((e) => FeaturedVehicle.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Marcas para el buscador. `GET /vehicles/makes`.
