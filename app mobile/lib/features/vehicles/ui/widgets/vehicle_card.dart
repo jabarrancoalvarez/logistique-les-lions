@@ -43,6 +43,7 @@ class VehicleCard extends StatelessWidget {
                   : vehicle.status == 'Vendu'
                       ? 'Vendu'
                       : null,
+              featuredBadge: featuredLabel(vehicle.featuredTier),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
@@ -131,6 +132,7 @@ class _Cover extends StatelessWidget {
     required this.isFavorite,
     required this.onToggleFavorite,
     this.statusBadge,
+    this.featuredBadge,
   });
 
   final String? imageUrl;
@@ -138,6 +140,7 @@ class _Cover extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback onToggleFavorite;
   final String? statusBadge;
+  final String? featuredBadge;
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +197,31 @@ class _Cover extends StatelessWidget {
               ),
             ),
           ),
+          if (featuredBadge != null)
+            Positioned(
+              bottom: 8,
+              left: 8,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.azureDark,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star, size: 12, color: Colors.white),
+                    const SizedBox(width: 3),
+                    Text(featuredBadge!,
+                        style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700)),
+                  ],
+                ),
+              ),
+            ),
           if (imageCount > 1)
             Positioned(
               bottom: 8,

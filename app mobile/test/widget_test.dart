@@ -336,7 +336,7 @@ void main() {
       'sellerId': 's1',
       'images': ['a.jpg', 'b.jpg'],
       'imageCount': 2,
-      'isFeatured': false,
+      'featuredTier': 'ALaUne',
       'favoritesCount': 0,
       'viewsCount': 3,
       'fuelType': 'Diesel',

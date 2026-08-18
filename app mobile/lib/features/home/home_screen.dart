@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../auth/providers/auth_providers.dart';
 import '../notifications/ui/notification_bell.dart';
+import 'widgets/featured_carousel.dart';
 
 /// «Accueil» — portada de la app. Presenta la marca y lleva al escaparate.
 class HomeScreen extends ConsumerWidget {
@@ -26,6 +27,10 @@ class HomeScreen extends ConsumerWidget {
               child: _CtaButton(),
             ),
           ),
+
+          // «À la une» : anuncios destacados en rotación (se oculta si no hay).
+          const FeaturedCarousel(),
+
           const Padding(
             padding: EdgeInsets.fromLTRB(20, 4, 20, 8),
             child: Text(
