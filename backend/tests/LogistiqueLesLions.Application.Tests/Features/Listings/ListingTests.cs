@@ -371,7 +371,6 @@ public class ListingTests : IDisposable
         await ListingAsync(VehicleStatus.Actif);
         var vehicle = await _context.Vehicles.SingleAsync();
         vehicle.Description   = new string('a', 250);
-        vehicle.CustomsStatus = CustomsStatus.Dedouane;
         vehicle.Region        = "DK";
         vehicle.City          = "Dakar";
         vehicle.FuelType      = FuelType.Diesel;

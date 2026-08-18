@@ -27,10 +27,6 @@ public class CreateVehicleCommandValidator : AbstractValidator<CreateVehicleComm
         RuleFor(x => x.Price)
             .GreaterThan(0).WithMessage("Le prix doit être supérieur à 0.");
 
-        // Bloque destacado de la ficha: siempre debe declararse en los anuncios nuevos.
-        RuleFor(x => x.CustomsStatus)
-            .IsInEnum().WithMessage("Le statut douanier est obligatoire.");
-
         RuleFor(x => x.SellerId)
             .NotEmpty();
 

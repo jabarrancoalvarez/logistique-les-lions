@@ -15,7 +15,6 @@ public record GetAdminListingsQuery(
     Guid? SellerId = null,
     string? City = null,
     VehicleStatus? Status = null,
-    CustomsStatus? CustomsStatus = null,
     AccountType? SellerAccountType = null,
     decimal? PriceFrom = null,
     decimal? PriceTo = null,
@@ -85,7 +84,6 @@ public class GetAdminListingsQueryHandler(IApplicationDbContext db)
         }
 
         if (request.Status is { } status) query = query.Where(v => v.Status == status);
-        if (request.CustomsStatus is { } customs) query = query.Where(v => v.CustomsStatus == customs);
         if (request.PriceFrom is { } from) query = query.Where(v => v.Price >= from);
         if (request.PriceTo is { } to) query = query.Where(v => v.Price <= to);
         if (request.CreatedFrom is { } createdFrom) query = query.Where(v => v.CreatedAt >= createdFrom);

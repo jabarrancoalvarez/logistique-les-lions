@@ -577,7 +577,6 @@ public class YoonUAutoReseeder(
                         : Drivetrain.Avant,
                     // El estado aduanero es el filtro que más importa en Senegal: se
                     // reparte para que los tres valores tengan anuncios.
-                    CustomsStatus = (CustomsStatus)(1 + (i % 3)),
                     Price = price,
                     Currency = "XOF",
                     PriceNegotiable = rng.NextDouble() > 0.5,

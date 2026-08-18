@@ -11,8 +11,6 @@ export type BodyType =
   | 'Citadine' | 'Berline' | 'Break' | 'Suv' | 'Coupe'
   | 'Cabriolet' | 'Monospace' | 'PickUp' | 'Utilitaire' | 'Autre';
 export type VehicleStatus = 'Brouillon' | 'Actif' | 'EnPause' | 'Reserve' | 'Vendu' | 'Archive';
-/** Statut douanier — bloque destacado de la ficha. */
-export type CustomsStatus = 'Dedouane' | 'NonDedouane' | 'Passavant';
 export type Drivetrain = 'Avant' | 'Arriere' | 'Integrale';
 
 /** Etiquetas en francés de los enums, para no repetirlas en cada componente. */
@@ -41,12 +39,6 @@ export const BODY_LABELS: Record<BodyType, string> = {
   PickUp: 'Pick-up',
   Utilitaire: 'Fourgon / Utilitaire',
   Autre: 'Autre'
-};
-
-export const CUSTOMS_LABELS: Record<CustomsStatus, string> = {
-  Dedouane: 'Dédouané',
-  NonDedouane: 'Non dédouané',
-  Passavant: 'Passavant'
 };
 
 export const DRIVETRAIN_LABELS: Record<Drivetrain, string> = {
@@ -118,7 +110,6 @@ export interface VehicleListItem {
   currency: string;
   region: string | null;
   city: string | null;
-  customsStatus: CustomsStatus | null;
   condition: VehicleCondition;
   fuelType: FuelType | null;
   transmission: TransmissionType | null;
@@ -182,7 +173,6 @@ export interface VehicleDetail {
   drivetrain: Drivetrain | null;
   engineName: string | null;
 
-  customsStatus: CustomsStatus | null;
 
   price: number;
   currency: string;
@@ -251,7 +241,6 @@ export interface VehicleFilters {
 
   region?: string;
   city?: string;
-  customsStatus?: CustomsStatus;
 
   fuelType?: FuelType;
   transmission?: TransmissionType;
@@ -329,7 +318,6 @@ export interface VehicleComparison {
   seats: number | null;
   color: string | null;
 
-  customsStatus: CustomsStatus | null;
   /** Códigos del catálogo, p. ej. `CLIMATISATION`. */
   equipmentCodes: string[];
 

@@ -20,7 +20,6 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.HasIndex(v => v.MakeId);
         builder.HasIndex(v => v.CountryOrigin);
         // Filtros del Marketplace con especial protagonismo en Senegal.
-        builder.HasIndex(v => v.CustomsStatus);
         builder.HasIndex(v => new { v.Region, v.City });
         builder.HasIndex(v => new { v.Status, v.IsFeatured, v.DeletedAt })
             .HasFilter("deleted_at IS NULL")
@@ -50,7 +49,6 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.Property(v => v.FuelType).HasConversion<string>().HasMaxLength(30);
         builder.Property(v => v.Transmission).HasConversion<string>().HasMaxLength(20);
         builder.Property(v => v.BodyType).HasConversion<string>().HasMaxLength(20);
-        builder.Property(v => v.CustomsStatus).HasConversion<string>().HasMaxLength(20);
         builder.Property(v => v.Drivetrain).HasConversion<string>().HasMaxLength(20);
 
         // SearchVector is a computed tsvector column added via raw SQL in migrations

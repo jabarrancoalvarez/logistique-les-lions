@@ -4,7 +4,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, Statistics, LabelCount } from '@core/services/admin.service';
-import { FUEL_LABELS, CUSTOMS_LABELS } from '@core/services/vehicle.service';
+import { FUEL_LABELS } from '@core/services/vehicle.service';
 import { FcfaPipe } from '@shared/pipes/fcfa.pipe';
 import { SENEGAL_REGIONS } from '@shared/data/senegal-geo';
 
@@ -93,16 +93,12 @@ export class AdminStatisticsComponent implements OnInit {
   }
 
   /**
-   * Las agregaciones llegan con el nombre del enum —«NonDedouane»—, que es lo correcto:
+   * Las agregaciones llegan con el nombre del enum —«Essence»—, que es lo correcto:
    * el servidor devuelve un código estable e independiente del idioma. Traducirlo es
    * cosa de la pantalla.
    */
   fuelLabel(code: string): string {
     return (FUEL_LABELS as Record<string, string>)[code] ?? code;
-  }
-
-  customsLabel(code: string): string {
-    return (CUSTOMS_LABELS as Record<string, string>)[code] ?? code;
   }
 
   regionName(code: string): string {

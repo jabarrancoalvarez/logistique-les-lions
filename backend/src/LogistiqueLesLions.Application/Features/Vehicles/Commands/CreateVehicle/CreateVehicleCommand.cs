@@ -31,7 +31,6 @@ public record CreateVehicleCommand(
     string? EngineName,
 
     // ─── Situación aduanera ────────────────────────────────────────────────
-    CustomsStatus CustomsStatus,
 
     // ─── Precio ────────────────────────────────────────────────────────────
     decimal Price,

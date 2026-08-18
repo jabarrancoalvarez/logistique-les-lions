@@ -806,7 +806,6 @@ public class AdminListingSearchRequest
     [FromQuery] public Guid? SellerId { get; set; }
     [FromQuery] public string? City { get; set; }
     [FromQuery] public VehicleStatus? Status { get; set; }
-    [FromQuery] public CustomsStatus? CustomsStatus { get; set; }
     [FromQuery] public AccountType? SellerAccountType { get; set; }
     [FromQuery] public decimal? PriceFrom { get; set; }
     [FromQuery] public decimal? PriceTo { get; set; }
@@ -823,7 +822,7 @@ public class AdminListingSearchRequest
     [FromQuery] public int? PageSize { get; set; }
 
     public GetAdminListingsQuery ToQuery() => new(
-        Search, MakeId, ModelId, SellerId, City, Status, CustomsStatus, SellerAccountType,
+        Search, MakeId, ModelId, SellerId, City, Status, SellerAccountType,
         PriceFrom, PriceTo, CreatedFrom, CreatedTo, Hidden, Flagged, Reported, Page ?? 1, PageSize ?? 20);
 }
 

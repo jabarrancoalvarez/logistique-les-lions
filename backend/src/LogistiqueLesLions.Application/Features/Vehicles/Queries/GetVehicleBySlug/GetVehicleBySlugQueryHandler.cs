@@ -57,7 +57,6 @@ public class GetVehicleBySlugQueryHandler(
             v.Condition, v.BodyType, v.FuelType, v.Transmission,
             v.Color, v.Doors, v.Seats, v.Vin,
             v.PowerCv, v.EngineDisplacementCc, v.Drivetrain, v.EngineName,
-            v.CustomsStatus,
             v.Price, v.Currency, v.PriceNegotiable, initialPrice, priceChangedAt,
             indicator.Indicator, indicator.ComparablesCount,
             v.Region, v.City, v.District,

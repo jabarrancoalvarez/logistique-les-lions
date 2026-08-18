@@ -41,7 +41,6 @@ public class GetVehiclesQueryHandler(
                 v.Currency,
                 v.Region,
                 v.City,
-                v.CustomsStatus,
                 v.Condition,
                 v.FuelType,
                 v.Transmission,

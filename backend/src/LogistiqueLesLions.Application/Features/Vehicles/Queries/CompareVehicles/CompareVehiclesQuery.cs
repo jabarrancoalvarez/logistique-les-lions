@@ -47,8 +47,6 @@ public record VehicleComparisonDto(
     int? Seats,
     string? Color,
 
-    // ─── Situación administrativa ──────────────────────────────────────────
-    CustomsStatus? CustomsStatus,
 
     // ─── Equipamiento declarado ────────────────────────────────────────────
     IReadOnlyList<string> EquipmentCodes,

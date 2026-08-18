@@ -34,8 +34,6 @@ public record VehicleDetailDto(
     Drivetrain? Drivetrain,
     string? EngineName,
 
-    // ─── Statut douanier ───────────────────────────────────────────────────
-    CustomsStatus? CustomsStatus,
 
     // ─── Precio ────────────────────────────────────────────────────────────
     decimal Price,

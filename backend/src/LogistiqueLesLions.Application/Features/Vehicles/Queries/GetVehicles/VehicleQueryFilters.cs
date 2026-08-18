@@ -55,7 +55,6 @@ public static class VehicleQueryFilters
         // ─── Ubicación y aduana ────────────────────────────────────────────
         if (!string.IsNullOrWhiteSpace(r.Region)) query = query.Where(v => v.Region == r.Region);
         if (!string.IsNullOrWhiteSpace(r.City))   query = query.Where(v => v.City == r.City);
-        if (r.CustomsStatus.HasValue) query = query.Where(v => v.CustomsStatus == r.CustomsStatus.Value);
 
         // ─── Mecánica ──────────────────────────────────────────────────────
         if (r.FuelType.HasValue)     query = query.Where(v => v.FuelType == r.FuelType.Value);

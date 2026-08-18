@@ -208,19 +208,6 @@
             <input type="checkbox" formControlName="priceNegotiable" id="negotiable" class="w-4 h-4">
             <label for="negotiable" class="text-sm text-navy">Prix négociable</label>
           </div>
-          <!-- Statut douanier: bloque destacado de la ficha en Senegal -->
-          <div>
-            <label class="block text-sm font-medium text-navy mb-1.5">Statut douanier *</label>
-            <select formControlName="customsStatus" class="input">
-              <option value="">Sélectionner…</option>
-              @for (c of customsStatuses; track c.value) {
-                <option [value]="c.value">{{ c.label }}</option>
-              }
-            </select>
-            <p class="text-xs text-navy/50 mt-1">
-              Cette information est déclarée par vous. Yoon u Auto ne la vérifie pas.
-            </p>
-          </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-sm font-medium text-navy mb-1.5">Région</label>
@@ -277,7 +264,7 @@
           <div>
             <label class="block text-sm font-medium text-navy mb-1.5">Titre de l’annonce *</label>
             <input type="text" formControlName="title" class="input"
-              placeholder="ex : Toyota Hilux 2019 — très bon état, dédouanée">
+              placeholder="ex : Toyota Hilux 2019 — très bon état, entretien à jour">
             @if (step4.get('title')?.touched && step4.get('title')?.errors?.['required']) {
               <p class="text-xs text-red-600 mt-1">Le titre est obligatoire.</p>
             }

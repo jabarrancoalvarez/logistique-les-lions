@@ -28,7 +28,6 @@ public record UpdateVehicleCommand(
     Drivetrain? Drivetrain,
     string? EngineName,
 
-    CustomsStatus CustomsStatus,
 
     decimal Price,
     bool PriceNegotiable,

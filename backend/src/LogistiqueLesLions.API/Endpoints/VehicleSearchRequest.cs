@@ -28,7 +28,6 @@ public class VehicleSearchRequest
 
     [FromQuery] public string? Region { get; set; }
     [FromQuery] public string? City { get; set; }
-    [FromQuery] public CustomsStatus? CustomsStatus { get; set; }
 
     [FromQuery] public FuelType? FuelType { get; set; }
     [FromQuery] public TransmissionType? Transmission { get; set; }
@@ -86,7 +85,6 @@ public class VehicleSearchRequest
         MileageTo         = MileageTo,
         Region            = Region,
         City              = City,
-        CustomsStatus     = CustomsStatus,
         FuelType          = FuelType,
         Transmission      = Transmission,
         BodyType          = BodyType,

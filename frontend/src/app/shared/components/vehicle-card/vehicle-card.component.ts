@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
   FeaturedVehicle, VehicleListItem, VehicleService,
-  FUEL_LABELS, CUSTOMS_LABELS, STATUS_LABELS,
+  FUEL_LABELS, STATUS_LABELS,
   PRICE_INDICATOR_LABELS, PRICE_INDICATOR_CLASSES
 } from '../../../core/services/vehicle.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -105,11 +105,6 @@ export class VehicleCardComponent {
   get modelLine(): string {
     const v = this.vehicle;
     return [v.makeName, v.modelName, this.version].filter(Boolean).join(' ');
-  }
-
-  get customsLabel(): string | null {
-    const status = (this.vehicle as VehicleListItem).customsStatus;
-    return status ? CUSTOMS_LABELS[status] : null;
   }
 
   /** Se avisa cuando el anuncio ya no está simplemente disponible. */

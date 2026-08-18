@@ -104,7 +104,6 @@ public class GetSimilarVehiclesQueryHandler(IApplicationDbContext context)
             v.Currency,
             v.Region,
             v.City,
-            v.CustomsStatus,
             v.Condition,
             v.FuelType,
             v.Transmission,

@@ -17,7 +17,7 @@ public static class SavedSearchFilters
     private static readonly JsonSerializerOptions Options = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        // Los enums se guardan por nombre: un JSON con "Dedouane" sobrevive a que
+        // Los enums se guardan por nombre: un JSON con "Diesel" sobrevive a que
         // mañana se reordene el enum; uno con "1" no.
         Converters = { new JsonStringEnumConverter() },
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull

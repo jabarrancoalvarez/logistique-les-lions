@@ -1,6 +1,6 @@
 import {
   VehicleFilters,
-  FUEL_LABELS, TRANSMISSION_LABELS, BODY_LABELS, CUSTOMS_LABELS, DRIVETRAIN_LABELS
+  FUEL_LABELS, TRANSMISSION_LABELS, BODY_LABELS, DRIVETRAIN_LABELS
 } from '@core/services/vehicle.service';
 import { SENEGAL_REGIONS } from './senegal-geo';
 
@@ -39,7 +39,6 @@ export function summarizeFilters(f: VehicleFilters): string {
   if (f.transmission)  parts.push(TRANSMISSION_LABELS[f.transmission]);
   if (f.bodyType)      parts.push(BODY_LABELS[f.bodyType]);
   if (f.drivetrain)    parts.push(DRIVETRAIN_LABELS[f.drivetrain]);
-  if (f.customsStatus) parts.push(CUSTOMS_LABELS[f.customsStatus]);
 
   // La ciudad es más precisa que la región: si hay ambas, basta con la ciudad.
   if (f.city) parts.push(f.city);

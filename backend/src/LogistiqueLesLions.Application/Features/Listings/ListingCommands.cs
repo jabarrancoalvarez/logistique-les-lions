@@ -235,7 +235,6 @@ public class DuplicateListingCommandHandler(
             EngineName           = original.EngineName,
             Doors                = original.Doors,
             Seats                = original.Seats,
-            CustomsStatus        = original.CustomsStatus,
             Price                = original.Price,
             PriceNegotiable      = original.PriceNegotiable,
             Region               = original.Region,

@@ -20,7 +20,6 @@ public record VehicleListDto(
     string Currency,
     string? Region,
     string? City,
-    CustomsStatus? CustomsStatus,
     VehicleCondition Condition,
     FuelType? FuelType,
     TransmissionType? Transmission,

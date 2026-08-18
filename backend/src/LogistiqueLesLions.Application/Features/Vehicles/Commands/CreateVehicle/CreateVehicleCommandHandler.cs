@@ -70,7 +70,6 @@ public class CreateVehicleCommandHandler(
             EngineDisplacementCc = request.EngineDisplacementCc,
             Drivetrain           = request.Drivetrain,
             EngineName           = request.EngineName,
-            CustomsStatus        = request.CustomsStatus,
             Price                = request.Price,
             PriceNegotiable      = request.PriceNegotiable,
             Region               = request.Region,

@@ -47,7 +47,7 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
       },
       {
         title: '3. Rôle de Yoon u Auto',
-        body: 'Yoon u Auto n’est ni vendeur, ni acheteur, ni mandataire des parties. Elle n’est pas partie au contrat de vente conclu entre elles et ne détient pas les fonds. Les véhicules, leur état, leur situation douanière et les informations publiées relèvent de la seule responsabilité de la personne qui publie l’annonce.'
+        body: 'Yoon u Auto n’est ni vendeur, ni acheteur, ni mandataire des parties. Elle n’est pas partie au contrat de vente conclu entre elles et ne détient pas les fonds. Les véhicules, leur état et les informations publiées relèvent de la seule responsabilité de la personne qui publie l’annonce.'
       },
       {
         title: '4. Propriété intellectuelle',
@@ -148,7 +148,7 @@ const LEGAL_CONTENT: Record<string, LegalContent> = {
       },
       {
         title: '4. Vos annonces',
-        body: 'Vous garantissez que le véhicule existe, qu’il vous appartient ou que vous êtes autorisé à le vendre, et que les informations publiées — kilométrage, année, état douanier, prix — sont exactes. Chaque changement de prix est conservé dans l’historique de l’annonce.'
+        body: 'Vous garantissez que le véhicule existe, qu’il vous appartient ou que vous êtes autorisé à le vendre, et que les informations publiées — kilométrage, année, prix — sont exactes. Chaque changement de prix est conservé dans l’historique de l’annonce.'
       },
       {
         title: '5. Modération',

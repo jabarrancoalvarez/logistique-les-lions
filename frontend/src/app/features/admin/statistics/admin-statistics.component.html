@@ -165,19 +165,6 @@
           }
         </ul>
       </div>
-      <div class="bg-white rounded-xl border border-navy/10 p-5">
-        <h3 class="text-sm font-medium text-navy mb-3">Statut douanier</h3>
-        <ul class="space-y-1.5" role="list">
-          @for (d of s.supply.byCustomsStatus; track d.label) {
-            <li class="flex items-center justify-between text-sm">
-              <span class="text-navy">{{ customsLabel(d.label) }}</span>
-              <span class="text-navy/60 tabular-nums">{{ d.count }}</span>
-            </li>
-          } @empty {
-            <li class="text-sm text-navy/50">—</li>
-          }
-        </ul>
-      </div>
     </div>
 
     <!-- ─── Demande ─────────────────────────────────────────────────────── -->
