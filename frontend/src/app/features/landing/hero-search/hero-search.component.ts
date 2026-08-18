@@ -10,6 +10,18 @@ import { VehicleService, VehicleMake } from '@core/services/vehicle.service';
 import { SENEGAL_REGIONS } from '@shared/data/senegal-geo';
 
 /**
+ * Importes seleccionables del presupuesto (FCFA): de 1.000.000 en 1.000.000 hasta
+ * 10.000.000, luego cada 5.000.000 hasta 40.000.000 y un «Plus de 40.000.000».
+ */
+const BUDGET_OPTIONS: { value: string; label: string }[] = (() => {
+  const dot = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const millions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40];
+  const opts = millions.map(m => ({ value: String(m * 1_000_000), label: dot(m * 1_000_000) + ' FCFA' }));
+  opts.push({ value: '40000001', label: 'Plus de 40.000.000 FCFA' });
+  return opts;
+})();
+
+/**
  * Buscador de la portada.
  *
  * Los campos son los que importan en Senegal: marca, región, presupuesto en FCFA y
@@ -56,13 +68,14 @@ export class HeroSearchComponent implements OnInit, OnDestroy {
   readonly searchForm: FormGroup = this.fb.group({
     make: [''],
     region: [''],
-    priceMax: [''],
-    customsStatus: ['']
+    priceMin: [''],
+    priceMax: ['']
   });
 
   readonly makes = signal<VehicleMake[]>([]);
   readonly filteredMakes = signal<VehicleMake[]>([]);
   readonly regions = SENEGAL_REGIONS;
+  readonly budgetOptions = BUDGET_OPTIONS;
 
   /** Palabras que rotan en el titular. */
   private readonly heroWords = ['en confiance', 'sans frais', 'au Sénégal', 'entre nous'];
@@ -123,8 +136,8 @@ export class HeroSearchComponent implements OnInit, OnDestroy {
       icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
     },
     {
-      text: 'Statut douanier sur chaque annonce',
-      icon: 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
+      text: 'Vous ne trouvez pas votre voiture ? On la cherche pour vous',
+      icon: 'M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.816a1 1 0 01-1.414 1.415l-4.816-4.817A6 6 0 012 8z'
     }
   ];
 
@@ -140,8 +153,9 @@ export class HeroSearchComponent implements OnInit, OnDestroy {
     // enviarla como makeId exigiría resolver aquí el identificador del catálogo.
     if (form.make?.trim()) params['search'] = form.make.trim();
     if (form.region) params['region'] = form.region;
-    if (form.priceMax) params['priceTo'] = form.priceMax;
-    if (form.customsStatus) params['customsStatus'] = form.customsStatus;
+    if (form.priceMin) params['priceFrom'] = form.priceMin;
+    // «Plus de 40M» como techo significa sin límite superior.
+    if (form.priceMax && form.priceMax !== '40000001') params['priceTo'] = form.priceMax;
 
     this.router.navigate(['/vehiculos'], { queryParams: params });
   }
