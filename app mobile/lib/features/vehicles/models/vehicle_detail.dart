@@ -1,3 +1,5 @@
+import '../../../core/util/image_url.dart';
+
 /// Ficha completa del vehículo (proyección de `VehicleDetailDto`).
 class VehicleDetail {
   final String id;
@@ -154,13 +156,16 @@ class VehicleDetail {
             DateTime.now(),
       );
 
-  /// URLs de las imágenes ordenadas (la primaria primero).
+  /// URLs de las imágenes ordenadas (la primaria primero), resueltas a absolutas.
   List<String> get imageUrls {
     final sorted = [...images]..sort((a, b) {
         if (a.isPrimary != b.isPrimary) return a.isPrimary ? -1 : 1;
         return a.sortOrder.compareTo(b.sortOrder);
       });
-    return sorted.map((e) => e.url).toList();
+    return sorted
+        .map((e) => resolveImageUrl(e.url))
+        .whereType<String>()
+        .toList();
   }
 }
 

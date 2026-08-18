@@ -1,3 +1,5 @@
+import '../../../core/util/image_url.dart';
+
 /// Tarjeta del Marketplace (proyección de `VehicleListDto`). Lleva lo justo para
 /// mostrar el anuncio sin abrirlo.
 class VehicleSummary {
@@ -59,10 +61,12 @@ class VehicleSummary {
     this.priceIndicator,
   });
 
-  /// Primera imagen utilizable para la tarjeta.
+  /// Primera imagen utilizable para la tarjeta, resuelta a URL absoluta.
   String? get coverImage {
-    if (images.isNotEmpty) return images.first;
-    return thumbnailUrl ?? primaryImageUrl;
+    final raw = images.isNotEmpty
+        ? images.first
+        : (thumbnailUrl ?? primaryImageUrl);
+    return resolveImageUrl(raw);
   }
 
   factory VehicleSummary.fromJson(Map<String, dynamic> j) => VehicleSummary(

@@ -7,23 +7,19 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppColors.navy,
+    return Scaffold(
+      backgroundColor: AppColors.heroBottom,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.directions_car_filled, size: 64, color: AppColors.white),
-            SizedBox(height: 20),
-            Text(
-              'Yoon u Auto',
-              style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48),
+              child: Image.asset('assets/brand/logo.png',
+                  width: 240, fit: BoxFit.contain),
             ),
-            SizedBox(height: 24),
-            SizedBox(
+            const SizedBox(height: 28),
+            const SizedBox(
               height: 22,
               width: 22,
               child: CircularProgressIndicator(

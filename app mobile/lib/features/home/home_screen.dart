@@ -78,9 +78,9 @@ class _Hero extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.navyDark, AppColors.navy, AppColors.navyLight],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [AppColors.heroTop, AppColors.heroBottom],
         ),
       ),
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
@@ -88,19 +88,8 @@ class _Hero extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.directions_car_filled,
-                  color: AppColors.azureLight, size: 26),
-              const SizedBox(width: 8),
-              const Text('Yoon u Auto',
-                  style: TextStyle(
-                      color: AppColors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800)),
-            ],
-          ),
-          const SizedBox(height: 12),
+          Image.asset('assets/brand/logo.png', height: 66, fit: BoxFit.contain),
+          const SizedBox(height: 14),
           Text(
             name != null ? 'Bonjour, $name' : 'Services Automobiles au Sénégal',
             style: const TextStyle(
