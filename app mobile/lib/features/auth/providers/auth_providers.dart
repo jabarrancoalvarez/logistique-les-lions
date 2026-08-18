@@ -3,6 +3,7 @@ import '../../../core/network/api_client.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../data/auth_repository.dart';
 import '../models/app_user.dart';
+import '../models/profile.dart';
 
 /// Estado de la sesión de la app.
 sealed class AuthState {
@@ -37,6 +38,11 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(ref.watch(apiClientProvider), ref.watch(secureStorageProvider));
 });
+
+/// Perfil completo del usuario autenticado, para la pantalla de edición.
+final myProfileProvider = FutureProvider.autoDispose<Profile>(
+  (ref) => ref.watch(authRepositoryProvider).getMyProfile(),
+);
 
 // ─── Controlador de sesión ───────────────────────────────────────────────────
 
@@ -107,6 +113,16 @@ class AuthController extends StateNotifier<AuthState> {
       return 'Ce numéro est déjà enregistré.';
     }
     return 'Impossible de créer le compte. Réessayez.';
+  }
+
+  /// Tras editar el perfil: recarga el usuario guardado y refresca la sesión.
+  Future<void> reloadProfile() async {
+    try {
+      final user = await _repo.reloadUser();
+      if (user != null) state = Authenticated(user);
+    } catch (_) {
+      // Si falla la recarga, el perfil se actualizó igual en el servidor.
+    }
   }
 
   Future<void> logout() async {

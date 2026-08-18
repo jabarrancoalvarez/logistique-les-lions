@@ -2,6 +2,7 @@ import 'dart:convert';
 import '../../../core/network/api_client.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../models/app_user.dart';
+import '../models/profile.dart';
 
 /// Acceso a los endpoints de autenticación (mismos que la web).
 class AuthRepository {
@@ -55,6 +56,52 @@ class AuthRepository {
     final userJson = await _storage.userJson;
     if (userJson == null) return null;
     return AppUser.fromJson(jsonDecode(userJson) as Map<String, dynamic>);
+  }
+
+  /// Perfil completo del usuario. `GET /auth/me` (envuelto en Result).
+  Future<Profile> getMyProfile() async {
+    final res = await _api.dio.get('/auth/me');
+    final value = (res.data as Map<String, dynamic>)['value']
+        as Map<String, dynamic>;
+    return Profile.fromJson(value);
+  }
+
+  /// Actualiza el perfil. `PUT /auth/me`. El teléfono no se envía (no editable).
+  Future<void> updateProfile({
+    required String displayName,
+    required String accountType,
+    String? region,
+    String? city,
+    String? email,
+    String? bio,
+    bool allowWhatsAppContact = false,
+  }) async {
+    await _api.dio.put('/auth/me', data: {
+      'displayName': displayName,
+      'accountType': accountType,
+      'region': region,
+      'city': city,
+      'email': email,
+      'bio': bio,
+      'allowWhatsAppContact': allowWhatsAppContact,
+    });
+  }
+
+  /// Vuelve a pedir el perfil y actualiza el [AppUser] guardado (sin tocar los
+  /// tokens). Se usa tras editar el perfil.
+  Future<AppUser?> reloadUser() async {
+    final p = await getMyProfile();
+    final user = AppUser(
+      id: p.id,
+      displayName: p.displayName,
+      role: p.role,
+      phone: p.phone,
+      email: p.email,
+      accountType: p.accountType,
+      avatarUrl: p.avatarUrl,
+    );
+    await _storage.saveUser(jsonEncode(user.toJson()));
+    return user;
   }
 
   Future<AppUser> _persist(dynamic data) async {

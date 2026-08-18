@@ -3,6 +3,7 @@ import 'package:yoon_u_auto/core/data/senegal_regions.dart';
 import 'package:yoon_u_auto/core/theme/app_theme.dart';
 import 'package:yoon_u_auto/core/util/fcfa.dart';
 import 'package:yoon_u_auto/features/auth/models/app_user.dart';
+import 'package:yoon_u_auto/features/auth/models/profile.dart';
 import 'package:yoon_u_auto/features/admin/models/admin_contract.dart';
 import 'package:yoon_u_auto/features/admin/models/admin_dashboard.dart';
 import 'package:yoon_u_auto/features/admin/models/admin_enums.dart';
@@ -342,7 +343,8 @@ void main() {
       'priceIndicator': 'BonneAffaire',
     });
     expect(v.title, 'Toyota Corolla');
-    expect(v.coverImage, 'a.jpg');
+    // La imagen relativa se resuelve a URL absoluta (dominio web).
+    expect(v.coverImage, 'https://yoon-u-auto.vercel.app/a.jpg');
     expect(v.priceIndicator, 'BonneAffaire');
   });
 
@@ -379,6 +381,28 @@ void main() {
     expect(user.displayName, 'QA Particulier');
     expect(user.isAdmin, isFalse);
     expect(user.accountType, 'Particulier');
+  });
+
+  test('Profile parsea los campos editables y el teléfono verificado', () {
+    final p = Profile.fromJson({
+      'id': 'u1',
+      'displayName': 'QA Particulier',
+      'phone': '+221771234501',
+      'phoneVerified': true,
+      'email': 'qa@example.com',
+      'role': 'User',
+      'accountType': 'Particulier',
+      'region': 'DK',
+      'city': 'Dakar',
+      'bio': 'Bonjour',
+      'allowWhatsAppContact': true,
+      'verifiedSalesCount': 2,
+      'activeListingsCount': 3,
+    });
+    expect(p.phoneVerified, isTrue);
+    expect(p.region, 'DK');
+    expect(p.allowWhatsAppContact, isTrue);
+    expect(p.accountType, 'Particulier');
   });
 
   test('AppUser reconoce el rol de administrador', () {

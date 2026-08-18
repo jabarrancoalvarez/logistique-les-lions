@@ -14,7 +14,18 @@ class AccountScreen extends ConsumerWidget {
     final auth = ref.watch(authControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Compte')),
+      appBar: AppBar(
+        title: const Text('Compte'),
+        actions: auth is Authenticated
+            ? [
+                IconButton(
+                  tooltip: 'Modifier le profil',
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () => context.push('/profil/edit'),
+                ),
+              ]
+            : null,
+      ),
       body: auth is Authenticated
           ? _profile(context, ref, auth)
           : _guest(context),

@@ -29,6 +29,10 @@ class SecureStorage {
     await _storage.write(key: _kRefresh, value: refreshToken);
   }
 
+  /// Actualiza solo el usuario guardado (tras editar el perfil), sin tocar tokens.
+  Future<void> saveUser(String userJson) =>
+      _storage.write(key: _kUser, value: userJson);
+
   Future<String?> get accessToken => _storage.read(key: _kAccess);
   Future<String?> get refreshToken => _storage.read(key: _kRefresh);
   Future<String?> get userJson => _storage.read(key: _kUser);
